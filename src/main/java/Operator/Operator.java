@@ -1,7 +1,7 @@
 package Operator;
 
 public class Operator {
-    public static final String TAG = "tag";
+    public static final String TAG = "tag ";
     public static final String CREATE = "create " ;
     public static final String DROP = "drop " ;
     public static final String ALTER = "alter " ;
