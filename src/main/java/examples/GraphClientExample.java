@@ -89,7 +89,7 @@ public class GraphClientExample {
             session = pool.getSession("root", "nebula", false);
             {
                 String createSchema = "CREATE SPACE IF NOT EXISTS test; "
-                                      + "USE test;"
+                                      + "USE test1;"
                                       + "CREATE TAG IF NOT EXISTS person(name string, age int);"
                                       + "CREATE EDGE IF NOT EXISTS like(likeness double)";
                 ResultSet resp = session.execute(createSchema);

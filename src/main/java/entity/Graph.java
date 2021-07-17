@@ -1,5 +1,6 @@
 package entity;
 
+import Operator.Operator;
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
 import com.vesoft.nebula.client.graph.data.ResultSet;
@@ -8,7 +9,7 @@ import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.exception.NotValidConnectionException;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
-import error.SpaceNotFoundException;
+import error.ExecuteException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -61,7 +62,7 @@ public  class Graph {
         }
         assert execute != null;
         if (!execute.isSucceeded()) {
-            throw new SpaceNotFoundException("space is not found");
+            throw new ExecuteException("space is not found");
         }
 
         return session;
@@ -77,9 +78,13 @@ public  class Graph {
         }
         assert execute != null;
         if (!execute.isSucceeded()) {
-            throw new SpaceNotFoundException(execute.getErrorMessage());
+            throw new ExecuteException (execute.getErrorMessage());
         }
         return execute;
+    }
+
+    public ResultSet show_Tags(){
+        return run(Operator.SHOW_TAGs);
     }
 
 }

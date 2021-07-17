@@ -1,17 +1,23 @@
+import com.facebook.thrift.TException;
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
+import com.vesoft.nebula.client.graph.data.HostAddress;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
+import com.vesoft.nebula.client.meta.MetaManager;
+import com.vesoft.nebula.meta.TagItem;
 import entity.ConnectionProfile;
+import entity.Graph;
 import entity.GraphService;
+import ogm.Tag;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class TextGraphService {
     private static final Logger log = LoggerFactory.getLogger(TextGraphService.class);
@@ -90,18 +96,36 @@ public class TextGraphService {
         nebulaPoolConfig.setMaxConnSize(100);
         GraphService graphService =  new GraphService("127.0.0.1",9669,"root","1","test",nebulaPoolConfig);
         {
-            String query = "GO FROM \"Tom\" OVER like "
-                    + "YIELD $^.person.name, $^.person.age, like.likeness";
+            String query = "describe tag QKM2";
             ResultSet resp = graphService.run(query);
             if (!resp.isSucceeded()) {
                 log.error(String.format("Execute: `%s', failed: %s",
                         query, resp.getErrorMessage()));
                 System.exit(1);
             }
-            printResult(resp);
+            System.out.println(resp);
         }
 
+    }
 
+    @Test
+    public void test_add_Tag() throws NoSuchFieldException, IllegalAccessException {
+        Tag tag = new Tag("QKM3");
+        tag.creat_Tag();
+
+    }
+
+    @Test
+    public void test_get_tags() throws NoSuchFieldException, IllegalAccessException {
+        Graph graph = new ConnectionProfile();
+        ResultSet resultSet = graph.show_Tags();
+        System.out.println(resultSet.rowValues(0).values());
+    }
+
+    @Test
+    public void test1_get_tags() throws NoSuchFieldException, IllegalAccessException, TException {
+        MetaManager manager = MetaManager.getMetaManager(Arrays.asList(new HostAddress("127.0.0.1", 9559)));
+        //System.out.println(tag.schema);
     }
 
 }
