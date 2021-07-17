@@ -20,7 +20,7 @@ public class TagOperation extends Graph {
         //拼接nGql调用graph执行run
         name.setAccessible(true);
        // System.out.println(name.get(tag));
-        graph.run(Operator.CREATE_TAG+Operator.IF_NOT_EXIST +name.get(tag)+Operator.LEFT_BRACKETS+Operator.RIGHT_BRACKETS);
+        graph.run(Operator.CREATE+Operator.IF_NOT_EXIST +name.get(tag)+Operator.LEFT_BRACKETS+Operator.RIGHT_BRACKETS);
     }
 
     public void drop_Tag(Tag tag) throws NoSuchFieldException, IllegalAccessException {
@@ -29,7 +29,7 @@ public class TagOperation extends Graph {
         //拼接nGql调用graph执行run
         name.setAccessible(true);
         // System.out.println(name.get(tag));
-        graph.run(Operator.CREATE_TAG+Operator.IF_NOT_EXIST +name.get(tag)+Operator.LEFT_BRACKETS+Operator.RIGHT_BRACKETS);
+        graph.run(Operator.CREATE+Operator.IF_NOT_EXIST +name.get(tag)+Operator.LEFT_BRACKETS+Operator.RIGHT_BRACKETS);
     }
 
 
@@ -39,7 +39,7 @@ public class TagOperation extends Graph {
         //拼接nGql调用graph执行run
         name.setAccessible(true);
         // System.out.println(name.get(tag));
-        graph.run(Operator.CREATE_TAG+Operator.IF_NOT_EXIST +name.get(tag)+Operator.LEFT_BRACKETS+Operator.RIGHT_BRACKETS);
+        graph.run(Operator.CREATE+Operator.IF_NOT_EXIST +name.get(tag)+Operator.LEFT_BRACKETS+Operator.RIGHT_BRACKETS);
     }
 
 
