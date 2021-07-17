@@ -25,6 +25,7 @@ public class GraphClientExample {
 
     private static void printResult(ResultSet resultSet) throws UnsupportedEncodingException {
         List<String> colNames = resultSet.keys();
+       // System.out.println(colNames.toString());
         for (String name : colNames) {
             System.out.printf("%15s |", name);
         }
@@ -131,7 +132,7 @@ public class GraphClientExample {
             }
 
             {
-                String query = "GO FROM \"Bob\" OVER like "
+                String query = "GO FROM \"Tom\" OVER like "
                     + "YIELD $^.person.name, $^.person.age, like.likeness";
                 ResultSet resp = session.execute(query);
                 if (!resp.isSucceeded()) {
