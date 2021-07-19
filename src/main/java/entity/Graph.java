@@ -84,7 +84,7 @@ public  class Graph {
     }
 
     public ResultSet show_Tags(){
-        return run(Operator.SHOW_TAGs);
+        return run(Operator.SHOW+Operator.TAG);
     }
 
 }

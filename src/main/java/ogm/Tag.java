@@ -1,6 +1,4 @@
 package ogm;
-import entity.ConnectionProfile;
-import operation.TagOperation;
 
 import java.util.HashMap;
 
@@ -53,8 +51,4 @@ public class Tag {
     }
 
 
-    public void creat_Tag() throws NoSuchFieldException, IllegalAccessException {
-        TagOperation tagOperation = new TagOperation(new ConnectionProfile());
-        tagOperation.create_Tag(this);
-    }
 }

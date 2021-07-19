@@ -6,11 +6,11 @@ import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.client.meta.MetaManager;
-import com.vesoft.nebula.meta.TagItem;
 import entity.ConnectionProfile;
 import entity.Graph;
 import entity.GraphService;
 import ogm.Tag;
+import operation.TagOperation;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,8 +111,15 @@ public class TextGraphService {
     @Test
     public void test_add_Tag() throws NoSuchFieldException, IllegalAccessException {
         Tag tag = new Tag("QKM3");
-        tag.creat_Tag();
+        TagOperation tagOperation = new TagOperation(new ConnectionProfile());
+        tagOperation.create(tag);
+    }
 
+    @Test
+    public void test_drop_Tag() throws NoSuchFieldException, IllegalAccessException {
+        Tag tag = new Tag("QKM3");
+        TagOperation tagOperation = new TagOperation(new ConnectionProfile());
+        tagOperation.drop(tag);
     }
 
     @Test
@@ -122,10 +129,5 @@ public class TextGraphService {
         System.out.println(resultSet.rowValues(0).values());
     }
 
-    @Test
-    public void test1_get_tags() throws NoSuchFieldException, IllegalAccessException, TException {
-        MetaManager manager = MetaManager.getMetaManager(Arrays.asList(new HostAddress("127.0.0.1", 9559)));
-        //System.out.println(tag.schema);
-    }
 
 }
