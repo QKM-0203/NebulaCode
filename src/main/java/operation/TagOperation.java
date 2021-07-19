@@ -1,6 +1,7 @@
 package operation;
 
 import Operator.Operator;
+import com.vesoft.nebula.client.graph.data.ResultSet;
 import common.Operate;
 import entity.Graph;
 import ogm.Tag;
@@ -41,5 +42,17 @@ public class TagOperation implements Operate<Object> {
     @Override
     public void update(Object Entity) {
 
+    }
+
+    public ResultSet getTags(){
+        return  graph.run(Operator.SHOW+Operator.TAGS);
+    }
+
+
+    public ResultSet getTagStructure(Tag tag) throws NoSuchFieldException, IllegalAccessException {
+        Class<? extends Tag> aClass = tag.getClass();
+        Field name = aClass.getDeclaredField("name");
+        System.out.println(Operator.DESCRIBE+Operator.TAG + name.get(tag));
+        return  graph.run(Operator.DESCRIBE+Operator.TAG +name.get(tag));
     }
 }

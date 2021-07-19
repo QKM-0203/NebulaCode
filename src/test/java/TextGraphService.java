@@ -124,9 +124,17 @@ public class TextGraphService {
 
     @Test
     public void test_get_tags() throws NoSuchFieldException, IllegalAccessException {
-        Graph graph = new ConnectionProfile();
-        ResultSet resultSet = graph.show_Tags();
-        System.out.println(resultSet.rowValues(0).values());
+        TagOperation tagOperation = new TagOperation(new ConnectionProfile());
+        ResultSet tags = tagOperation.getTags();
+        System.out.println(tags);
+    }
+
+    @Test
+    public void test_get_tagStructure() throws NoSuchFieldException, IllegalAccessException {
+        TagOperation tagOperation = new TagOperation(new ConnectionProfile());
+        Tag qkm2 = new Tag("QKM2");
+        ResultSet tags = tagOperation.getTagStructure(qkm2);
+        System.out.println(tags);
     }
 
 
