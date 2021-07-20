@@ -1,10 +1,10 @@
-package ogm;
+package entity;
 import java.util.List;
 
 public class Tag {
     private final String name;
 
-   //增删属性、修改数据类型，也可以为属性设置、修改TTL（Time-To-Live）。
+   //属性列表
     private List<Property> propertyList;
 
 
@@ -44,9 +44,11 @@ public class Tag {
         this.ttl_duration = ttl_duration;
     }
 
+
     public String getTtl_col() {
         return ttl_col;
     }
+
     public void setTtl_col(String ttl_col) {
         this.ttl_col = ttl_col;
     }
@@ -56,9 +58,6 @@ public class Tag {
         return name;
     }
 
-    public List<Property> getPropertyList() {
-        return propertyList;
-    }
 
     public void setPropertyList(List<Property> propertyList) {
         this.propertyList = propertyList;

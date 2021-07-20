@@ -21,7 +21,7 @@ public enum Type {
     DATE,
     DATETIME,
     DOUBLE,
-    FIXED_STRING,
+    FIXED_STRING(8),
     FLOAT,
     INT8,
     INT16,
@@ -30,6 +30,21 @@ public enum Type {
     STRING,
     TIME,
     TIMESTAMP,
-    BOOL
+    BOOL;
+    int length = 0;
+    Type (int length){
+        this.length = length;
+    }
+    Type(){
 
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public Type setLength(int length) {
+        this.length = length;
+        return this;
+    }
 }

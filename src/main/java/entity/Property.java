@@ -1,4 +1,4 @@
-package ogm;
+package entity;
 
 import Operator.Type;
 
