@@ -1,37 +1,30 @@
 package ogm;
-
-import java.util.HashMap;
+import java.util.List;
 
 public class Tag {
     private final String name;
 
+   //增删属性、修改数据类型，也可以为属性设置、修改TTL（Time-To-Live）。
+    private List<Property> propertyList;
 
-    //增删属性、修改数据类型，也可以为属性设置、修改TTL（Time-To-Live）。
-    private  HashMap<String,Object>  propertyHashMap;
 
     //指定时间戳差值，单位：秒。时间戳差值必须为64位非负整数。属性值和时间戳差值之和如果小于当前时间戳，
-    // 属性就会过期。如果ttl_duration为0，属性永不过期。
-    private float ttl_duration = 0;
+    //属性就会过期。如果ttl_duration为0，属性永不过期。
+    private long ttl_duration = 0;
+
 
     //指定为哪个属性设置存活时间，类型必须为int或者timestamp
     private String ttl_col;
 
-    public float getTtl_duration() {
-        return ttl_duration;
-    }
-
-    public void setTtl_duration(float ttl_duration) {
-        this.ttl_duration = ttl_duration;
-    }
 
     /**
-     *
-     * @param name  标签名
-     * @param propertyHashMap  属性列表
+     * 创建含有属性的标签
+     * @param name 标签名称
+     * @param propertyList  属性列表
      */
-    public Tag(String name,HashMap<String,Object> propertyHashMap){
-         this.name = name;
-         this.propertyHashMap = propertyHashMap;
+    public Tag(String name,  List<Property> propertyList){
+        this.name = name;
+        this.propertyList = propertyList;
     }
 
     /**
@@ -42,13 +35,32 @@ public class Tag {
         this.name = name;
     }
 
+
+    public float getTtl_duration() {
+        return ttl_duration;
+    }
+
+    public void setTtl_duration(long ttl_duration) {
+        this.ttl_duration = ttl_duration;
+    }
+
+    public String getTtl_col() {
+        return ttl_col;
+    }
+    public void setTtl_col(String ttl_col) {
+        this.ttl_col = ttl_col;
+    }
+
+
     public String getName() {
         return name;
     }
 
-    public HashMap<String, Object> getPropertyHashMap() {
-        return propertyHashMap;
+    public List<Property> getPropertyList() {
+        return propertyList;
     }
 
-
+    public void setPropertyList(List<Property> propertyList) {
+        this.propertyList = propertyList;
+    }
 }
