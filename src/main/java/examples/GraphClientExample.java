@@ -25,6 +25,7 @@ public class GraphClientExample {
 
     private static void printResult(ResultSet resultSet) throws UnsupportedEncodingException {
         List<String> colNames = resultSet.keys();
+       // System.out.println(colNames.toString());
         for (String name : colNames) {
             System.out.printf("%15s |", name);
         }
@@ -88,7 +89,7 @@ public class GraphClientExample {
             session = pool.getSession("root", "nebula", false);
             {
                 String createSchema = "CREATE SPACE IF NOT EXISTS test; "
-                                      + "USE test;"
+                                      + "USE test1;"
                                       + "CREATE TAG IF NOT EXISTS person(name string, age int);"
                                       + "CREATE EDGE IF NOT EXISTS like(likeness double)";
                 ResultSet resp = session.execute(createSchema);
@@ -131,7 +132,7 @@ public class GraphClientExample {
             }
 
             {
-                String query = "GO FROM \"Bob\" OVER like "
+                String query = "GO FROM \"Tom\" OVER like "
                     + "YIELD $^.person.name, $^.person.age, like.likeness";
                 ResultSet resp = session.execute(query);
                 if (!resp.isSucceeded()) {

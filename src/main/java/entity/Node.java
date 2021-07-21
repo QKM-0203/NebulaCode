@@ -1,33 +1,28 @@
 package entity;
-import java.util.List;
+import ogm.Tag;
+
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
-//创建多个标签
 public class Node {
 
     //图空间中全局唯一vid
-    private Object vid;
+    private final Object vid;
 
+    //标签集合,仅检测标签的名称，不会检测具体属性。
+    private Set<Tag> tagSet =  new HashSet<>();
 
-    //标签名字
-    private String tagName;
-
-
-    //Node的标签集合
-    private List<Map<String, Object>> tagList;
-
-    //创建一个节点，同时为该节点创建一个标签，
-    public Node(Object vid,String tagName,Map<String, Object> tag) {
+    public Node(Object vid,Set<Tag> tagSet){
+        this.tagSet = tagSet;
         this.vid = vid;
-        this.tagName = tagName;
-        this.tagList.add(0,tag);
     }
 
 
-    //创建Node
-    public boolean createNode(){
-        return true;
+    public Node(Object vid,Tag tagSet){
+        this.tagSet.add(tagSet);
+        this.vid = vid;
     }
 
 
