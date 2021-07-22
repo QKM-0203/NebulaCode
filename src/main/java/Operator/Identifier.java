@@ -13,5 +13,9 @@ public enum Identifier {
     AND  ,
     OR ,
     XOR ,
-    NOT
+    NOT;
+
 }
+
+
+

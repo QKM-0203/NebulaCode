@@ -1,25 +1,25 @@
 package entity;
 
-import Operator.Type;
+import Operator.DateType;
 
 public class Space {
 
     private String spaceName;
 
-    //图空间的分片数量
+    //the number of partitions in graph space
     private int partitionNumber = 100;
 
-    //每个分片的副本数量
+    //number of copies per slice
     private int replicaFactor = 1;
 
-    //ID的数据类型可选值FIXED_STRING(<N>)和INT64
-    private Type vidType = Type.FIXED_STRING;
+    //optional value for data type of id is FIXED_STRING(<N>)和INT64
+    private DateType vidDateType = DateType.FIXED_STRING;
 
-    public Space(String spaceName, int partitionNumber, int replicaFactor, Type vidType) {
+    public Space(String spaceName, int partitionNumber, int replicaFactor, DateType vidDateType) {
         this.spaceName = spaceName;
         this.partitionNumber = partitionNumber;
         this.replicaFactor = replicaFactor;
-        this.vidType = vidType;
+        this.vidDateType = vidDateType;
     }
 
     public Space() {
@@ -46,7 +46,7 @@ public class Space {
 
 
 
-    public void setVidType(Type vidType) {
-        this.vidType = vidType;
+    public void setVidType(DateType vidDateType) {
+        this.vidDateType = vidDateType;
     }
 }

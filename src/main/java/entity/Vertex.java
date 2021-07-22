@@ -9,7 +9,7 @@ public class Vertex {
     //vertexVid
     private Object vid;
 
-    //propMap
+
     private HashMap<String, HashMap<String,Object>> propMap;
 
 

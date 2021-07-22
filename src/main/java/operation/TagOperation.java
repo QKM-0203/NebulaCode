@@ -5,11 +5,11 @@ import Operator.Symbol;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import common.Operate;
 import entity.Graph;
-import entity.Tag;
+import entity.Schema;
 
 import java.lang.reflect.Field;
 
-public class TagOperation implements Operate<Tag> {
+public class TagOperation implements Operate<Schema> {
     private final Graph graph;
 
     public TagOperation(Graph graph ){
@@ -18,28 +18,26 @@ public class TagOperation implements Operate<Tag> {
 
 
     @Override
-    public void create(Tag tag) throws NoSuchFieldException, IllegalAccessException {
-            Class<? extends Tag> aClass = tag.getClass();
+    public void create(Schema schema) throws NoSuchFieldException, IllegalAccessException {
+            Class<? extends Schema> aClass = schema.getClass();
             Field name = aClass.getDeclaredField("name");
             name.setAccessible(true);
-            System.out.println(Identifier.CREATE+Symbol.SPACE+ Identifier.TAG.toString()+Symbol.SPACE+name.get(tag)+Symbol.SPACE+ Symbol.LEFT_BRACKETS+ Symbol.RIGHT_BRACKETS);
-            graph.run(Identifier.CREATE+Symbol.SPACE+ Identifier.TAG.toString()+Symbol.SPACE+name.get(tag)+Symbol.SPACE+ Symbol.LEFT_BRACKETS+ Symbol.RIGHT_BRACKETS);
+            System.out.println(Identifier.CREATE+Symbol.SPACE+ Identifier.TAG.toString()+Symbol.SPACE+name.get(schema)+Symbol.SPACE+ Symbol.LEFT_BRACKETS+ Symbol.RIGHT_BRACKETS);
+            graph.run(Identifier.CREATE+Symbol.SPACE+ Identifier.TAG.toString()+Symbol.SPACE+name.get(schema)+Symbol.SPACE+ Symbol.LEFT_BRACKETS+ Symbol.RIGHT_BRACKETS);
 
     }
 
     @Override
-    public void drop(Tag tag) throws NoSuchFieldException, IllegalAccessException {
-        Class<? extends Tag> aClass = tag.getClass();
+    public void drop(Schema schema) throws NoSuchFieldException, IllegalAccessException {
+        Class<? extends Schema> aClass = schema.getClass();
         Field name = aClass.getDeclaredField("name");
         name.setAccessible(true);
-        System.out.println(Identifier.DROP+Symbol.SPACE+ Identifier.TAG.toString()+Symbol.SPACE+name.get(tag));
-        graph.run(Identifier.DROP+Symbol.SPACE+ Identifier.TAG.toString() +Symbol.SPACE+name.get(tag));
+        System.out.println(Identifier.DROP+Symbol.SPACE+ Identifier.TAG.toString()+Symbol.SPACE+name.get(schema));
+        graph.run(Identifier.DROP+Symbol.SPACE+ Identifier.TAG.toString() +Symbol.SPACE+name.get(schema));
 
     }
 
-    
-    @Override
-    public void update(Tag taG) {
+    public void update(Schema taG) {
 
     }
 
@@ -48,18 +46,18 @@ public class TagOperation implements Operate<Tag> {
     }
 
 
-    public ResultSet describeTag(Tag tag) throws NoSuchFieldException, IllegalAccessException {
-        Class<? extends Tag> aClass = tag.getClass();
+    public ResultSet describeTag(Schema schema) throws NoSuchFieldException, IllegalAccessException {
+        Class<? extends Schema> aClass = schema.getClass();
         Field name = aClass.getDeclaredField("name");
         //关闭JDK的语言访问检查
         name.setAccessible(true);
-       System.out.println(Identifier.DESCRIBE+Symbol.SPACE+ Identifier.TAG.toString() +Symbol.SPACE+name.get(tag));
-        return  graph.run(Identifier.DESCRIBE+Symbol.SPACE+ Identifier.TAG.toString() +Symbol.SPACE+name.get(tag));
+       System.out.println(Identifier.DESCRIBE+Symbol.SPACE+ Identifier.TAG.toString() +Symbol.SPACE+name.get(schema));
+        return  graph.run(Identifier.DESCRIBE+Symbol.SPACE+ Identifier.TAG.toString() +Symbol.SPACE+name.get(schema));
     }
 
 
 
-    public void create_Pro(Tag tag){
+    public void create_Pro(Schema schema){
 //        List<Property> propertyList = tag.getPropertyList();
 //        StringBuilder stringBuilder = new StringBuilder(Identifier.CREATE+Symbol.SPACE+Identifier.TAG+Symbol.SPACE+
 //                Symbol.LEFT_BRACKETS);

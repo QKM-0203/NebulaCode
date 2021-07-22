@@ -1,39 +1,39 @@
 package entity;
 
-import Operator.Type;
+import Operator.DateType;
 
 public class Property {
-    //属性名称。每个标签中的属性名称必须唯一。
-    private  String prop_name;
+    //property name.property names must be unique in each label
+    private  String propName;
 
-    private  Type data_type;
+    private DateType dataDateType;
 
     private  boolean isNullable;
 
     private  Object defaultValue;
 
 
-    public Property(String prop_name, Type data_type, boolean isNullable, Object defaultValue) {
-        this.prop_name = prop_name;
-        this.data_type = data_type;
+    public Property(String propName, DateType dataDateType, boolean isNullable, Object defaultValue) {
+        this.propName = propName;
+        this.dataDateType = dataDateType;
         this.isNullable = isNullable;
         this.defaultValue = defaultValue;
     }
 
-    public String getProp_name() {
-        return prop_name;
+    public String getPropName() {
+        return propName;
     }
 
-    public void setProp_name(String prop_name) {
-        this.prop_name = prop_name;
+    public void setPropName(String propName) {
+        this.propName = propName;
     }
 
-    public Type getData_type() {
-        return data_type;
+    public DateType getDataType() {
+        return dataDateType;
     }
 
-    public void setData_type(Type data_type) {
-        this.data_type = data_type;
+    public void setDataType(DateType dataDateType) {
+        this.dataDateType = dataDateType;
     }
 
     public boolean isNullable() {

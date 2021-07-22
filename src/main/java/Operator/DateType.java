@@ -1,7 +1,7 @@
 package Operator;
 
 
-public enum Type {
+public enum DateType {
     DATE,
     DATETIME,
     DOUBLE,
@@ -16,10 +16,10 @@ public enum Type {
     TIMESTAMP,
     BOOL;
     int length = 0;
-    Type (int length){
+    DateType(int length){
         this.length = length;
     }
-    Type(){
+    DateType(){
 
     }
 
@@ -27,7 +27,7 @@ public enum Type {
         return length;
     }
 
-    public Type setLength(int length) {
+    public DateType setLength(int length) {
         this.length = length;
         return this;
     }

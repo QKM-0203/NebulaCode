@@ -26,6 +26,7 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.25</version>
         </dependency>
+
         <dependency>
             <groupId>com.vesoft</groupId>
             <artifactId>client</artifactId>
@@ -37,5 +38,6 @@
             <version>4.12</version>
         </dependency>
     </dependencies>
+
 
 </project>

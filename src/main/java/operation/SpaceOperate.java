@@ -14,8 +14,5 @@ public class SpaceOperate implements Operate<Space> {
 
     }
 
-    @Override
-    public void update(Space Entity) {
 
-    }
 }
