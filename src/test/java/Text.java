@@ -6,6 +6,7 @@
 import Operator.DateType;
 import entity.*;
 import operation.TagOperation;
+import operation.VertexOperate;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -64,18 +65,7 @@ public class Text {
 
     }
 
-    @Test
-    public  void test_add_edge(){
-        HashMap<String, Object> propMap = new HashMap<>();
-        HashMap<String, Object> propValue = new HashMap<>();
-        propValue.put("name","asd");
-        propValue.put("age",19);
-        propMap.put("QKM2",propValue);
-        //插入一条边，每条边有一个边类型
-        Relationship relationship = new Relationship("1","2","p_t_r",1,propMap);
-        Relationship relationship1 = new Relationship("1","2","p_t_r",propMap);
 
-    }
 
 
 

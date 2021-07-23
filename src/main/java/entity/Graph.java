@@ -14,7 +14,9 @@ import error.ExecuteException;
 import java.io.UnsupportedEncodingException;
 
 public class Graph extends GraphService{
+
     private final Session session;
+    private String  spaceName;
 
     protected Graph(String spaceName, Session session) {
         this.session = session;

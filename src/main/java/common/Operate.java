@@ -5,7 +5,12 @@
  */
 package common;
 
+import entity.Graph;
+
 public  interface Operate<T>  {
     void create(T Entity) throws NoSuchFieldException, IllegalAccessException;
     void drop(T Entity) throws NoSuchFieldException, IllegalAccessException;
+    private int get(){
+        return 1;
+    }
 }

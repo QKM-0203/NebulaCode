@@ -19,7 +19,6 @@ public class Walkable {
         this.subgraph = subgraph;
     }
 
-    //get id or all
     public Vertex getStartNode(){
         return null;
     }
