@@ -5,28 +5,12 @@
  */
 import Operator.DateType;
 import entity.*;
-import operation.TagOperation;
-import operation.VertexOperate;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Text {
-
-    @Test
-    public void test_add_Tag() throws NoSuchFieldException, IllegalAccessException {
-        Schema schema = new Schema("QKM3");
-        TagOperation tagOperation = new TagOperation(new GraphService().getGraph("test",false));
-        tagOperation.create(schema);
-    }
-
-    @Test
-    public void test_drop_Tag() throws NoSuchFieldException, IllegalAccessException {
-        Schema schema = new Schema("QKM3");
-        TagOperation tagOperation = new TagOperation(new GraphService().getGraph("test",false));
-        tagOperation.drop(schema);
-    }
 
 
     @Test

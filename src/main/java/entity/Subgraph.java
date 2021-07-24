@@ -6,17 +6,59 @@
 package entity;
 
 
+import com.vesoft.nebula.client.graph.data.ResultSet;
+
 import java.util.List;
 
-public class Subgraph {
+public class Subgraph{
+
+    private List<Vertex> vertexList;
+
     private List<Relationship> relationshipsList;
 
+    public Subgraph(){
 
-    public Subgraph(List<Relationship> relationshipsList) {
-        this.relationshipsList = relationshipsList;
     }
 
-    public void setRelationshipsList(List<Relationship> relationshipsList) {
-        this.relationshipsList = relationshipsList;
+    public Subgraph(List<Vertex> vertexList, List<Relationship> relationshipsList) {
+          init(vertexList,relationshipsList);
     }
+
+    protected void init(List<Vertex> vertexList, List<Relationship> relationshipsList){
+        this.vertexList = vertexList;
+        this.relationshipsList = relationshipsList;
+        //Get nodes from inside edges and add them to vertexList
+        //Judge that the subgraph cannot be empty. There must be at least one vertex
+    }
+
+
+    public  List<Vertex>  vertexes(){
+        return  vertexList;
+    }
+
+    public List<Relationship> relationships(){
+        return relationshipsList;
+    }
+
+    public Graph graph(){
+        return vertexList.get(0).graph;
+    }
+
+
+    public List<String> tags(){
+          return null;
+    }
+
+    public ResultSet types(){
+        return null;
+    }
+
+    public List<Property> properties(){
+        return null;
+    }
+
+
+
+
+
 }

@@ -6,8 +6,14 @@
 package entity;
 
 
+import java.util.List;
 
-public class Path {
+public class Path  extends Walkable{
+
+
+    public Path(List<Object> modelList){
+        super(modelList);
+    }
 
 
 }

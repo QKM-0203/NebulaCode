@@ -5,36 +5,44 @@
  */
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Walkable {
+public class Walkable extends Subgraph{
 
-   private Subgraph subgraph;
+    //vertex and edges are stored alternately
+    private List<Object> sequence;
 
-    public Walkable(Subgraph subgraph) {
-        this.subgraph = subgraph;
-    }
-
-    public void setSubgraph(Subgraph subgraph) {
-        this.subgraph = subgraph;
+    public Walkable(List<Object> sequence) {
+          this.sequence = sequence;
+          List<Vertex> vertexList = new ArrayList<>();
+          List<Relationship> relationshipList = new ArrayList<>();
+          //store points and edges separately in vertexList and relationshipList
+          init(vertexList,relationshipList);
     }
 
     public Vertex getStartNode(){
-        return null;
+        return (Vertex) sequence.get(0);
     }
 
     public Vertex getEndNode(){
-        return null;
+
+        return (Vertex) sequence.get(sequence.size()-1);
     }
 
     //get all nodes of subgraph
     public List<Vertex> getNodes(){
-        return null;
+        return vertexes();
     }
 
     //get all relationships of subgraph
     public List<Relationship> getRelationships(){
-        return null;
+        return relationships();
+    }
+
+    //ergodic subgraph
+    public void walk(){
+
     }
 
 

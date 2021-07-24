@@ -70,4 +70,6 @@ public class Schema {
     public void setPropertyList(List<Property> propertyList) {
         this.propertyList = propertyList;
     }
+
+
 }

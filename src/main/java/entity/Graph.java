@@ -6,12 +6,15 @@
 package entity;
 
 
+import Operator.DateType;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
 import error.ExecuteException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.List;
 
 public class Graph extends GraphService{
 
@@ -49,6 +52,85 @@ public class Graph extends GraphService{
         }
         return execute;
     }
+
+
+    //model can be Node or Relationship  or  Subgraph
+    public void create(Object model){
+
+    }
+
+
+
+    //delete vertex first delete relationship about vertex
+    public void delete(Object model){
+
+
+    }
+
+
+    public void delete_all(){
+
+    }
+
+    public void update(Object model){
+
+
+    }
+
+
+   public boolean exists(Object model){
+        return true;
+   }
+
+
+   //Integer is index length
+   public boolean createTagIndex(String tagName, HashMap<String,Integer> propList){
+       return true;
+   }
+
+   public boolean createEdgeName(String edge,HashMap<String,Integer> propList){
+        return true;
+   }
+
+   public List<String> getTags(){
+        return null;
+   }
+
+   public List<String> getEdges(){
+        return null;
+   }
+
+   public boolean createIndex(String name,List<String> propList){
+        return true;
+   }
+
+   public boolean dropTagIndex(String name,List<String> propList){
+        return true;
+   }
+
+   public ResultSet getTagIndexes(String name){
+        return null;
+   }
+
+   public ResultSet query(String nGql,HashMap<String,Object> propList){
+        return null;
+   }
+
+    public boolean createSchema(Schema schema){
+        return true;
+    }
+
+    public boolean dropSchema(String name){
+        return true;
+    }
+
+    //add property or update property
+    public boolean modifySchema(String name,HashMap<String, DateType> propMap){
+        return true;
+    }
+
+
+
 
 
 

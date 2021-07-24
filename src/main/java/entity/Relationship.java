@@ -7,11 +7,11 @@ package entity;
 
 import java.util.HashMap;
 
-public class Relationship {
+public class Relationship extends Entity{
 
-    private Vertex  leftVertex;
+    private Vertex startVertex;
 
-    private Vertex  rightVertex;
+    private Vertex endVertex;
 
     private String edgeName;
 
@@ -20,50 +20,48 @@ public class Relationship {
     private HashMap<String,Object>  propMap;
 
     //only one vertex and null edgeType propertyList
-    public Relationship(Vertex leftVertex,String edgeName,int rank) {
-        this.leftVertex = leftVertex;
+    public Relationship(Vertex startVertex, String edgeName, int rank) {
+        this.startVertex = startVertex;
         this.edgeName = edgeName;
         this.rank = rank;
     }
 
     //only one vertex and edgeType propertyList
-    public Relationship(Vertex leftVertex, String edgeName, HashMap<String, Object> propMap,int rank) {
-        this.leftVertex = leftVertex;
+    public Relationship(Vertex startVertex, String edgeName, HashMap<String, Object> propMap, int rank) {
+        this.startVertex = startVertex;
         this.edgeName = edgeName;
         this.propMap = propMap;
         this.rank = rank;
     }
 
 
-    public Relationship(Vertex leftVertex, Vertex rightVertex, String edgeName, HashMap<String, Object> propMap,int rank) {
-        this.leftVertex = leftVertex;
-        this.rightVertex = rightVertex;
+    public Relationship(Vertex startVertex, Vertex endVertex, String edgeName, HashMap<String, Object> propMap, int rank) {
+        this.startVertex = startVertex;
+        this.endVertex = endVertex;
         this.edgeName = edgeName;
         this.propMap = propMap;
         this.rank = rank;
     }
 
     //edgeType propertyList is null
-    public Relationship(Vertex leftVertex, Vertex rightVertex, String edgeName,int rank) {
-        this.leftVertex = leftVertex;
-        this.rightVertex = rightVertex;
+    public Relationship(Vertex startVertex, Vertex endVertex, String edgeName, int rank) {
+        this.startVertex = startVertex;
+        this.endVertex = endVertex;
         this.edgeName = edgeName;
         this.rank = rank;
     }
-
-
 
 
     public void setRank(int rank) {
         this.rank = rank;
     }
 
-    public void setLeftVertex(Vertex leftVertex) {
-        this.leftVertex = leftVertex;
+    public void setStartVertex(Vertex startVertex) {
+        this.startVertex = startVertex;
     }
 
-    public void setRightVertex(Vertex rightVertex) {
-        this.rightVertex = rightVertex;
+    public void setEndVertex(Vertex endVertex) {
+        this.endVertex = endVertex;
     }
 
     public void setEdgeName(String edgeName) {
@@ -73,4 +71,18 @@ public class Relationship {
     public void setPropMap(HashMap<String, Object> propMap) {
         this.propMap = propMap;
     }
+
+    public Graph graph(){
+        return graph;
+    }
+
+    public HashMap<String,Object> properties(){
+        return propMap;
+    }
+
+    public boolean updateProp(HashMap<String,Object> propMap){
+        return true;
+    }
+
+
 }

@@ -6,10 +6,12 @@
 package entity;
 
 
+
 import java.util.HashMap;
+import java.util.List;
 
 
-public class Vertex {
+public class Vertex extends Entity{
 
     //vertexVid
     private Object vid;
@@ -30,4 +32,37 @@ public class Vertex {
     public void setPropMap(HashMap<String, HashMap<String, Object>> propMap) {
         this.propMap = propMap;
     }
+
+    public Graph graph(){
+        return graph;
+    }
+
+    public List<String> getTags(){
+        return null;
+    }
+
+    public boolean isHasTag(String tagName){
+        return true;
+    }
+
+    public boolean addTag(String name,HashMap<String,Object> propMap){
+        //update local
+        //update db (delete vertex and insert vertex)
+        return true;
+    }
+
+
+    //delete vertex
+    public boolean clearAllTags(){
+        graph.delete(this);
+        return true;
+    }
+
+    //update propertyValue of tag
+    public boolean updateTag(String name,HashMap<String,Object> propMap){
+        //judge vertex if exist in graph
+        return true;
+    }
+
+
 }
