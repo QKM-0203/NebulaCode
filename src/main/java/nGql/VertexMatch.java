@@ -11,7 +11,8 @@ import java.util.List;
 
 public class VertexMatch {
 
-    private Graph graph;
+    protected Graph graph;
+    private Object vid;
     private String tagName;
     private HashMap<String,Object> propMap;
     private long skip;
@@ -24,6 +25,11 @@ public class VertexMatch {
 
     protected VertexMatch(Graph graph) {
          this.graph = graph;
+    }
+
+    public VertexMatch setVid(Object vid) {
+        this.vid = vid;
+        return this;
     }
 
     public  VertexMatch init(String tagName, HashMap<String, Object> propMap) {
@@ -66,11 +72,11 @@ public class VertexMatch {
         return "";
     }
 
-    //查询的结果
+    //Execute the query and return the results of the query
     public List<Vertex> query(){
         String s = connectParameters();
         ResultSet run = graph.run(s);
-        //将run转成对象
+        //Convert run to vertex object
         return null;
     }
 

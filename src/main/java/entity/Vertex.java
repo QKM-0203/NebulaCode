@@ -47,7 +47,7 @@ public class Vertex extends Entity{
 
     public boolean addTag(String name,HashMap<String,Object> propMap){
         //update local
-        //update db (delete vertex and insert vertex)
+        //update db (insert vertex)
         return true;
     }
 

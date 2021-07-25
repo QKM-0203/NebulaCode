@@ -2,7 +2,6 @@ package nGql;
 
 
 import entity.Graph;
-import entity.Vertex;
 
 import java.util.HashMap;
 
@@ -18,8 +17,8 @@ public class VertexMatcher extends VertexMatch {
         return this;
     }
 
-    public Vertex getVertexByVid(Object vid){
-        return null;
+    public VertexMatch matchByVid(Object vid){
+       return setVid(vid);
     }
 
 
