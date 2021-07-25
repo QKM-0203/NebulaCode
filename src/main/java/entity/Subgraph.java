@@ -16,7 +16,7 @@ public class Subgraph{
 
     private List<Relationship> relationshipsList;
 
-    public Subgraph(){
+    protected Subgraph(){
 
     }
 
@@ -45,11 +45,13 @@ public class Subgraph{
     }
 
 
+    //{"Person", "Employee"}
     public List<String> tags(){
           return null;
     }
 
-    public ResultSet types(){
+    //{"KNOWS", "LIKES", "DISLIKES","MARRIED_TO", "WORKS_FOR"}
+    public List<String> types(){
         return null;
     }
 

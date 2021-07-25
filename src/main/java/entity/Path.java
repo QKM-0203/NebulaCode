@@ -11,9 +11,21 @@ import java.util.List;
 public class Path  extends Walkable{
 
 
-    public Path(List<Object> modelList){
-        super(modelList);
+    public Path(List<Object> path){
+          init(path);
+          super.init(path);
     }
+
+
+    //Convert to the form of alternating vertex and edges
+    public void init(List<Object> path ){
+
+    }
+
+    public static List<String> walk(Walkable walkable){
+        return null;
+    }
+
 
 
 }

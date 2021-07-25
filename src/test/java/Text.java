@@ -4,6 +4,8 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 import Operator.DateType;
+import Operator.Special;
+import com.vesoft.nebula.client.graph.data.ResultSet;
 import entity.*;
 import org.junit.Test;
 
@@ -45,8 +47,15 @@ public class Text {
         //插入一个点，每个点都有多个标签
         Vertex vertex4 = new Vertex(1, propMap);
 
+    }
 
-
+    @Test
+    public void text4(){
+//        GraphService graphService = new GraphService();
+//        Graph name = graphService.getGraph("test",false);
+//        //[("3" :palyer {name: "yq", age: 21})]
+//        System.out.println(name.run("match (v:palyer) return v;").rowValues(0).values());
+        Special asc = Special.ASC;
     }
 
 

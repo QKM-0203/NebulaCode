@@ -6,21 +6,20 @@
 package Operator;
 
 public enum Identifier {
-    TAG ,
-    TAGS ,
-    CREATE ,
-    DROP ,
-    ALTER ,
-    SHOW ,
-    DESCRIBE ,
-    IF_NOT_EXIST ,
-    IF_EXIST ,
-    AND  ,
-    OR ,
-    XOR ,
-    NOT;
 
+    LEFT_BRACKETS("("),
+    RIGHT_BRACKETS(")"),
+    SPACE(" "),
+    COMMA(",");
+
+
+    public  String symbol;
+
+    Identifier(String symbol){
+        this.symbol = symbol;
+   }
+
+   public String getIdentifier(){
+       return  symbol;
+   }
 }
-
-
-

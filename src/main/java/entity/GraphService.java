@@ -8,6 +8,7 @@ package entity;
 
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
+import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.exception.AuthFailedException;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.exception.NotValidConnectionException;
@@ -46,9 +47,6 @@ public class GraphService  {
             }
             if(pro.getProperty("password") != null){
                 password = pro.getProperty("password");
-            }
-            if(pro.getProperty("spaceName") != null){
-                spaceName = pro.getProperty("spaceName");
             }
             if(pro.getProperty("maxConnSize") != null){
                 nebulaPoolConfig.setMaxConnSize(Integer.parseInt(pro.getProperty("maxConnSize")));
@@ -107,6 +105,34 @@ public class GraphService  {
     //pass in spaceName get Graph
     public Graph getGraph(String spaceName,boolean reconnect){
         return new Graph(spaceName,getSession(reconnect));
+    }
+
+    public ResultSet spaces(){
+        return null;
+    }
+
+    public void createSpace(Space space){
+
+    }
+
+    public void dropSpaces(List<String> spaceNameList){
+
+    }
+
+    public ResultSet showUser(){
+        return null;
+    }
+
+    public ResultSet  showHosts(){
+        return null;
+    }
+
+    public ResultSet getConfigs(){
+        return null;
+    }
+
+    public ResultSet getParts(){
+        return null;
     }
 
 

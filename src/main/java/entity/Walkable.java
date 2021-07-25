@@ -13,12 +13,21 @@ public class Walkable extends Subgraph{
     //vertex and edges are stored alternately
     private List<Object> sequence;
 
+    protected Walkable(){
+
+    }
+
     public Walkable(List<Object> sequence) {
-          this.sequence = sequence;
-          List<Vertex> vertexList = new ArrayList<>();
-          List<Relationship> relationshipList = new ArrayList<>();
-          //store points and edges separately in vertexList and relationshipList
-          init(vertexList,relationshipList);
+          init(sequence);
+    }
+
+    protected  void init(List<Object> sequence){
+        this.sequence = sequence;
+        List<Vertex> vertexList = new ArrayList<>();
+        List<Relationship> relationshipList = new ArrayList<>();
+
+        //store points and edges separately in vertexList and relationshipList
+        init(vertexList,relationshipList);
     }
 
     public Vertex getStartNode(){
@@ -40,9 +49,8 @@ public class Walkable extends Subgraph{
         return relationships();
     }
 
-    //ergodic subgraph
-    public void walk(){
-
+    public int steps(){
+        return sequence.size()-1;
     }
 
 

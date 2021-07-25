@@ -5,8 +5,10 @@
  */
 package Operator;
 
-public enum EdgeDirection {
+public enum Special {
     REVERSELY ,
-    BIDIRECT
+    BIDIRECT,
+    DESC,
+    ASC;
 
 }
