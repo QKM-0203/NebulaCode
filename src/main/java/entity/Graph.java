@@ -118,10 +118,11 @@ public class Graph extends GraphService{
         return true;
     }
 
-    //add property or update property
-    public boolean modifySchema(String name,HashMap<String, DateType> propMap){
+    //add property or update property DateType or update TTL,if is null don not modify
+    public boolean modifySchema(String name,Schema schema){
         return true;
     }
+
 
 
 
