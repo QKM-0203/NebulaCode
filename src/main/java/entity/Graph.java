@@ -106,8 +106,9 @@ public class Graph extends GraphService{
         return null;
    }
 
+   //return value type is not sure
    private ResultSet query(String nGql){
-        return null;
+        return run(nGql);
    }
 
     public boolean createSchema(Schema schema){
