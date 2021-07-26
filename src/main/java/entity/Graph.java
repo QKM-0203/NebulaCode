@@ -12,6 +12,7 @@ import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
 import error.ExecuteException;
 
+import javax.management.ObjectName;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -109,7 +110,7 @@ public class Graph extends GraphService{
         return null;
    }
 
-   public List<String> query(String nGql,HashMap<String,Object> propList){
+   private ResultSet query(String nGql, List<Object> parameterList){
         return null;
    }
 
