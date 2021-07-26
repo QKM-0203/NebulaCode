@@ -4,6 +4,7 @@ package nGql;
 import Operator.Special;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import entity.Graph;
+import entity.Subgraph;
 import entity.Vertex;
 
 import java.util.HashMap;
@@ -77,7 +78,9 @@ public class VertexMatch {
         String s = connectParameters();
         ResultSet run = graph.run(s);
         //Convert run to vertex object
-        return null;
+        Subgraph subgraph = Encoding.encodeSubgraph(run);
+        assert subgraph != null;
+        return subgraph.vertexes();
     }
 
    public long count(){
