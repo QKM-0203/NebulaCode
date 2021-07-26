@@ -84,12 +84,8 @@ public class Graph extends GraphService{
 
 
    //Integer is index length
-   public boolean createTagIndex(String tagName, String indexName,HashMap<String,Integer> propList){
+   public boolean createSchemaIndex(String Name, String indexName,HashMap<String,Integer> propList){
        return true;
-   }
-
-   public boolean createEdgeIndex(String edgeName, String indexName,HashMap<String,Integer> propList){
-        return true;
    }
 
    public List<String> getTags(){
