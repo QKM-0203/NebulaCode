@@ -83,11 +83,11 @@ public class Graph extends GraphService{
 
 
    //Integer is index length
-   public boolean createTagIndex(String tagName, HashMap<String,Integer> propList){
+   public boolean createTagIndex(String tagName, String indexName,HashMap<String,Integer> propList){
        return true;
    }
 
-   public boolean createEdgeIndex(String edgeName,HashMap<String,Integer> propList){
+   public boolean createEdgeIndex(String edgeName, String indexName,HashMap<String,Integer> propList){
         return true;
    }
 
@@ -99,7 +99,7 @@ public class Graph extends GraphService{
         return null;
    }
 
-   public void createIndex(Schema tag,HashMap<String,Integer> propList){
+   public void createIndex(Schema tag,String indexName,HashMap<String,Integer> propList){
    }
 
    public void dropIndex(Schema tag){
