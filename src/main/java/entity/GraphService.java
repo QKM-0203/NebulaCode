@@ -31,10 +31,11 @@ public class GraphService  {
     public   int port = 9669;
     public   NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
 
-    //read configuration file (nebula.properties)
+    /**
+     * read configuration file (nebula.properties)
+     */
     public GraphService() {
             Properties pro = new Properties();
-            String spaceName = null;
             //use classLoader to load the configuration file and get the byte input stream
             InputStream is = GraphService.class.getClassLoader().getResourceAsStream("nebula.properties");
             try {
@@ -69,7 +70,9 @@ public class GraphService  {
     }
 
 
-    //pass in parameters use default connectionPool
+    /**
+     * pass in parameters use default connectionPool
+     */
     public GraphService(String host, int port, String username, String password){
         this.host = host;
         this.port = port;
@@ -79,7 +82,9 @@ public class GraphService  {
     }
 
 
-    //pass in parameters use self-connectionPool config
+    /**
+     * pass in parameters use self-connectionPool config
+     */
     public GraphService(String host, int port, String username, String password, NebulaPoolConfig nebulaPoolConfig){
         this.host = host;
         this.port = port;
@@ -102,7 +107,9 @@ public class GraphService  {
     }
 
 
-    //pass in spaceName get Graph
+    /**
+     * pass in spaceName get Graph
+     */
     public Graph getGraph(String spaceName,boolean reconnect){
         return new Graph(spaceName,getSession(reconnect));
     }
@@ -119,7 +126,7 @@ public class GraphService  {
 
     }
 
-    //not sure about the return value type, write it in resultSet first
+
     public ResultSet showUser(){
         return null;
     }

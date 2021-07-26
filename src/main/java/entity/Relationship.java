@@ -19,20 +19,6 @@ public class Relationship extends Entity{
 
     private HashMap<String,Object>  propMap;
 
-    //only one vertex and null edgeType propertyList
-    public Relationship(Vertex startVertex, String edgeName, int rank) {
-        this.startVertex = startVertex;
-        this.edgeName = edgeName;
-        this.rank = rank;
-    }
-
-    //only one vertex and edgeType propertyList
-    public Relationship(Vertex startVertex, String edgeName, HashMap<String, Object> propMap, int rank) {
-        this.startVertex = startVertex;
-        this.edgeName = edgeName;
-        this.propMap = propMap;
-        this.rank = rank;
-    }
 
 
     public Relationship(Vertex startVertex, Vertex endVertex, String edgeName, HashMap<String, Object> propMap, int rank) {
@@ -43,7 +29,9 @@ public class Relationship extends Entity{
         this.rank = rank;
     }
 
-    //edgeType propertyList is null
+    /**
+     * edgeType propertyList is null
+     */
     public Relationship(Vertex startVertex, Vertex endVertex, String edgeName, int rank) {
         this.startVertex = startVertex;
         this.endVertex = endVertex;

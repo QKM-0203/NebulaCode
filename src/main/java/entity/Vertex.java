@@ -41,7 +41,7 @@ public class Vertex extends Entity{
         return null;
     }
 
-    public boolean isHasTag(String tagName){
+    public boolean hasTag(String tagName){
         return true;
     }
 
@@ -52,13 +52,17 @@ public class Vertex extends Entity{
     }
 
 
-    //delete vertex
+    /**
+     * delete vertex
+     */
     public boolean clearAllTags(){
         graph.delete(this);
         return true;
     }
 
-    //update propertyValue of tag
+    /**
+     * update propertyValue of tag
+     */
     public boolean updateTag(String name,HashMap<String,Object> propMap){
         //judge vertex if exist in graph
         return true;

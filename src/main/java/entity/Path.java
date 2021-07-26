@@ -17,7 +17,10 @@ public class Path  extends Walkable{
     }
 
 
-    //Convert to the form of alternating vertex and edges
+    /**
+     * Convert to the form of alternating vertex and edges
+     */
+
     public void init(List<Object> path ){
 
     }

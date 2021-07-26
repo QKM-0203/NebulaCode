@@ -39,12 +39,16 @@ public class Walkable extends Subgraph{
         return (Vertex) sequence.get(sequence.size()-1);
     }
 
-    //get all nodes of subgraph
+    /**
+     * get all nodes of subgraph
+     */
     public List<Vertex> getNodes(){
         return vertexes();
     }
 
-    //get all relationships of subgraph
+    /**
+     * get all relationships of subgraph
+     */
     public List<Relationship> getRelationships(){
         return relationships();
     }

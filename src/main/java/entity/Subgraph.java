@@ -6,7 +6,6 @@
 package entity;
 
 
-import com.vesoft.nebula.client.graph.data.ResultSet;
 
 import java.util.List;
 
@@ -30,6 +29,7 @@ public class Subgraph{
         //Get nodes from inside edges and add them to vertexList
         //Judge that the subgraph cannot be empty. There must be at least one vertex
     }
+
 
 
     public  List<Vertex>  vertexes(){
