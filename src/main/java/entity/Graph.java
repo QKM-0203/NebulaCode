@@ -110,7 +110,7 @@ public class Graph extends GraphService{
         return null;
    }
 
-   private ResultSet query(String nGql, List<Object> parameterList){
+   private ResultSet query(String nGql){
         return null;
    }
 
