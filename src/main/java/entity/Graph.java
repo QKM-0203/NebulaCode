@@ -55,14 +55,13 @@ public class Graph extends GraphService{
 
 
     //model can be Node or Relationship  or  Subgraph
-    public void create(Object model){
+    public void create(Object graphObject){
 
     }
 
 
-
     //delete vertex first delete relationship about vertex
-    public void delete(Object model){
+    public void delete(Object graphObject){
 
 
     }
@@ -72,13 +71,13 @@ public class Graph extends GraphService{
 
     }
 
-    public void update(Object model){
+    public void update(Object graphObject){
 
 
     }
 
 
-   public boolean exists(Object model){
+   public boolean exists(Object graphObject){
         return true;
    }
 
@@ -88,7 +87,7 @@ public class Graph extends GraphService{
        return true;
    }
 
-   public boolean createEdgeName(String edge,HashMap<String,Integer> propList){
+   public boolean createEdgeIndex(String edgeName,HashMap<String,Integer> propList){
         return true;
    }
 
@@ -100,19 +99,17 @@ public class Graph extends GraphService{
         return null;
    }
 
-   public boolean createIndex(String name,List<String> propList){
-        return true;
+   public void createIndex(Schema tag,HashMap<String,Integer> propList){
    }
 
-   public boolean dropTagIndex(String name,List<String> propList){
-        return true;
+   public void dropIndex(Schema tag){
    }
 
-   public ResultSet getTagIndexes(String name){
+   public List<String> getTagIndexes(String name){
         return null;
    }
 
-   public ResultSet query(String nGql,HashMap<String,Object> propList){
+   public List<String> query(String nGql,HashMap<String,Object> propList){
         return null;
    }
 

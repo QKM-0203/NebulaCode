@@ -119,6 +119,7 @@ public class GraphService  {
 
     }
 
+    //not sure about the return value type, write it in resultSet first
     public ResultSet showUser(){
         return null;
     }
