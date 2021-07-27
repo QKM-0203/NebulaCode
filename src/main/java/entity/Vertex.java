@@ -7,8 +7,8 @@ package entity;
 
 
 
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 
 
 public class Vertex extends Entity{
@@ -31,6 +31,23 @@ public class Vertex extends Entity{
 
     public void setPropMap(HashMap<String, HashMap<String, Object>> propMap) {
         this.propMap = propMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Vertex vertex = (Vertex) o;
+        return Objects.equals(vid, vertex.vid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vid, propMap);
     }
 
     public Graph graph(){
@@ -66,6 +83,29 @@ public class Vertex extends Entity{
     public boolean updateTag(String name,HashMap<String,Object> propMap){
         //judge vertex if exist in graph
         return true;
+    }
+
+
+    //(1 :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
+    @Override
+    public String toString() {
+       String result = (vid instanceof String ) ? "("+"\""+"%s"+"\""+"%s" +")" :
+               "("+"%s"+"%s" +")";
+        StringBuilder part = new StringBuilder();
+        for (String tagName : propMap.keySet()) {
+            HashMap<String, Object> propValueMap = propMap.get(tagName);
+            part.append(String.format(" :%s{",tagName));
+            ArrayList<String> prop = new ArrayList<>();
+            for (String propName : propValueMap.keySet()) {
+                if(propValueMap.get(propName) instanceof String){
+                    prop.add(String.format("%s: "+"\""+"%s"+"\"",propName,propValueMap.get(propName)));
+                }else{
+                    prop.add(String.format("%s: "+"%s",propName,propValueMap.get(propName)));
+                }
+            }
+            part.append(String.join(", ", prop)).append("}");
+        }
+       return String.format(result,vid,part);
     }
 
 

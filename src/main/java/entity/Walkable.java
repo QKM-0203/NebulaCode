@@ -4,57 +4,43 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 package entity;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class Walkable extends Subgraph{
+public class Walkable {
 
-    //vertex and edges are stored alternately
-    private List<Object> sequence;
+    private List<Relationship> relationships;
+    private List<Vertex> vertices;
 
-    protected Walkable(){
 
-    }
-
-    public Walkable(List<Object> sequence) {
-          init(sequence);
-    }
-
-    protected  void init(List<Object> sequence){
-        this.sequence = sequence;
-        List<Vertex> vertexList = new ArrayList<>();
-        List<Relationship> relationshipList = new ArrayList<>();
-
-        //store points and edges separately in vertexList and relationshipList
-        init(vertexList,relationshipList);
+    protected void init(List<Relationship> relationships,List<Vertex> vertices){
+        this.relationships = relationships;
+        this.vertices = vertices;
     }
 
     public Vertex getStartNode(){
-        return (Vertex) sequence.get(0);
+        return vertices.get(0);
     }
 
     public Vertex getEndNode(){
-
-        return (Vertex) sequence.get(sequence.size()-1);
+        return vertices.get(vertices.size()-1);
     }
 
     /**
-     * get all nodes of subgraph
+     * get all vertices
      */
-    public List<Vertex> getNodes(){
-        return vertexes();
+    public List<Vertex> getVertices(){
+        return vertices;
     }
 
     /**
-     * get all relationships of subgraph
+     * get all relationships
      */
     public List<Relationship> getRelationships(){
-        return relationships();
+        return relationships;
     }
 
     public int steps(){
-        return sequence.size()-1;
+        return relationships.size();
     }
 
 

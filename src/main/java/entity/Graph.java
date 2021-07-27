@@ -46,7 +46,7 @@ public class Graph {
 
     /**
      *
-     * @param graphObject graphObject can be Node or Relationship or Subgraph
+     * @param graphObject graphObject can be Node or Relationship or Subgraph or path
      */
     public void create(Object graphObject){
 

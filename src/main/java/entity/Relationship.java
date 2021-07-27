@@ -5,7 +5,9 @@
  */
 package entity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Relationship extends Entity{
 
@@ -60,8 +62,36 @@ public class Relationship extends Entity{
         this.propMap = propMap;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Relationship that = (Relationship) o;
+        return rank == that.rank
+                && Objects.equals(startVertex, that.startVertex)
+                && Objects.equals(endVertex, that.endVertex)
+                && Objects.equals(edgeName, that.edgeName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startVertex, endVertex, edgeName, rank, propMap);
+    }
+
     public Graph graph(){
         return graph;
+    }
+
+    public Vertex getStartVertex() {
+        return startVertex;
+    }
+
+    public Vertex getEndVertex() {
+        return endVertex;
     }
 
     public HashMap<String,Object> properties(){
@@ -72,5 +102,20 @@ public class Relationship extends Entity{
         return true;
     }
 
-
+   //("2" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})-[:asd@1{name: "asd", age: 19}]
+   // ->("1" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
+    @Override
+    public String toString() {
+        String result = startVertex.toString()+ "-" + "[:" +edgeName+"@"+ rank + "%s" + "]" + "->" +endVertex.toString();
+        ArrayList<String> prop = new ArrayList<>();
+        StringBuilder part = new StringBuilder("{");
+        for (String propName : propMap.keySet()) {
+             if(propMap.get(propName) instanceof  String){
+                 prop.add(String.format("%s: "+"\""+"%s"+"\"",propName,propMap.get(propName)));
+             }else{
+                 prop.add(String.format("%s: "+"%s",propName,propMap.get(propName)));
+             }
+        }
+        return String.format(result,part.append(String.join(", ",prop)).append("}"));
+    }
 }
