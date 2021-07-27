@@ -41,6 +41,9 @@ public class Relationship extends Entity{
         this.rank = rank;
     }
 
+    public String getEdgeName() {
+        return edgeName;
+    }
 
     public void setRank(int rank) {
         this.rank = rank;
@@ -102,7 +105,15 @@ public class Relationship extends Entity{
         return true;
     }
 
-   //("2" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})-[:asd@1{name: "asd", age: 19}]
+    public HashMap<String, Object> getPropMap() {
+        return propMap;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    //("2" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})-[:asd@1{name: "asd", age: 19}]
    // ->("1" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
     @Override
     public String toString() {
