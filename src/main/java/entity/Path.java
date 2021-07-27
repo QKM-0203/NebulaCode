@@ -60,7 +60,11 @@ public class Path extends Walkable {
     }
 
 
-
+    /**
+     * <("2" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})-[:asd@1{name: "asd", age: 19}]->("4" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
+     * -[:asd@1{name: "asd", age: 19}]->("5" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})<-[:asd@1{name: "asd", age: 19}]-("6" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})>
+     * @return
+     */
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();

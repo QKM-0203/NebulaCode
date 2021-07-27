@@ -58,8 +58,11 @@ public class Subgraph{
         return null;
     }
 
-
-
-
-
+    @Override
+    public String toString() {
+        return "Subgraph{" +
+                "vertex" + vertexList +
+                ", relationships" + relationshipsList +
+                +'}';
+    }
 }
