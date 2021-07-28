@@ -161,9 +161,13 @@ public class GraphService  {
 
     }
 
-    public boolean dropSpaces(List<String> spaceNameList){
+    public boolean dropSpaces(List<String> spaceNameList) throws IOErrorException, UnsupportedEncodingException {
         if (spaceNameList == null) {
             return false;
+        }
+        Session session = getSession();
+        for (String spaceName : spaceNameList) {
+            session.execute(String.format("DROP SPACE %s",spaceName));
         }
         return true;
     }
