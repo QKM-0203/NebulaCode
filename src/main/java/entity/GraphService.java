@@ -136,9 +136,9 @@ public class GraphService  {
 
     public boolean createSpace(Space space) throws IOErrorException, UnsupportedEncodingException {
         if (space == null) {
-            throw new NullPointerException("space object is not null");
+            throw new NullPointerException("space object cannot be null");
         } else if (space.getSpaceName() == null) {
-            throw new NullPointerException("spaceName is not null");
+            throw new NullPointerException("spaceName cannot be null");
         }
         Session session = getSession();
         String createSpace = null;
