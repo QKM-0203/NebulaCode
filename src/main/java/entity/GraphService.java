@@ -6,6 +6,7 @@
 package entity;
 
 
+import Operator.DateType;
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
 import com.vesoft.nebula.client.graph.data.ResultSet;
@@ -29,7 +30,10 @@ public class GraphService  {
     public   String password = "nebula";
     public   String host = "127.0.0.1";
     public   int port = 9669;
+    private boolean reconnect = false;
     public   NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
+
+
 
     /**
      * read configuration file (nebula.properties)
@@ -58,6 +62,9 @@ public class GraphService  {
             if(pro.getProperty("timeout") != null){
                 nebulaPoolConfig.setTimeout(Integer.parseInt(pro.getProperty("timeout")));
             }
+            if(pro.getProperty("reconnect") != null){
+                reconnect = Boolean.parseBoolean(pro.getProperty("reconnect"));
+            }
             if(pro.getProperty("idleTime") != null){
                 nebulaPoolConfig.setIdleTime(Integer.parseInt(pro.getProperty("idleTime")));
             }
@@ -73,11 +80,12 @@ public class GraphService  {
     /**
      * pass in parameters use default connectionPool
      */
-    public GraphService(String host, int port, String username, String password){
+    public GraphService(String host, int port, String username, String password,boolean reconnect){
         this.host = host;
         this.port = port;
         this.username = username;
         this.password = password;
+        this.reconnect = reconnect;
 
     }
 
@@ -85,22 +93,27 @@ public class GraphService  {
     /**
      * pass in parameters use self-connectionPool config
      */
-    public GraphService(String host, int port, String username, String password, NebulaPoolConfig nebulaPoolConfig){
+    public GraphService(String host, int port, String username, String password,boolean reconnect,NebulaPoolConfig nebulaPoolConfig){
         this.host = host;
         this.port = port;
         this.username = username;
         this.password = password;
+        this.reconnect = reconnect;
         this.nebulaPoolConfig = nebulaPoolConfig;
     }
 
-    private Session getSession(boolean reconnect){
+    private Session getSession(){
         NebulaPool nebulaPool = new NebulaPool();
         Session session = null;
         List<HostAddress> addresses = Arrays.asList(new HostAddress(host,port));
         try {
             nebulaPool.init(addresses, nebulaPoolConfig);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        try {
             session = nebulaPool.getSession(username, password, reconnect);
-        } catch (UnknownHostException | NotValidConnectionException | IOErrorException | AuthFailedException e) {
+        } catch (NotValidConnectionException | IOErrorException | AuthFailedException e) {
             e.printStackTrace();
         }
         return session;
@@ -110,16 +123,28 @@ public class GraphService  {
     /**
      * pass in spaceName get Graph
      */
-    public Graph getGraph(String spaceName,boolean reconnect){
-        return new Graph(spaceName,getSession(reconnect));
+    public Graph getGraph(String spaceName) {
+        return new Graph(spaceName,getSession());
     }
 
     public ResultSet spaces(){
         return null;
     }
 
-    public void createSpace(Space space){
 
+    public void createSpace(Space space) throws UnknownHostException, IOErrorException, AuthFailedException, NotValidConnectionException {
+        Session session = getSession();
+        String result = null;
+        if(space.getVidDateType().equals(DateType.FIXED_STRING)){
+           result = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
+                    ,space.getSpaceName(),space.getPartitionNumber(),space.getReplicaFactor(),
+                    String.format("%s(%d"+")",space.getVidDateType(),space.getVidDateType().getLength()));
+        }else{
+            result = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
+                    ,space.getSpaceName(),space.getPartitionNumber(),space.getReplicaFactor(),
+                     space.getVidDateType());
+        }
+        System.out.println(result);
     }
 
     public void dropSpaces(List<String> spaceNameList){

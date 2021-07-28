@@ -35,6 +35,7 @@ public class Space {
         return spaceName;
     }
 
+
     public void setSpaceName(String spaceName) {
         this.spaceName = spaceName;
     }
@@ -50,8 +51,19 @@ public class Space {
     }
 
 
-
     public void setVidType(DateType vidDateType) {
         this.vidDateType = vidDateType;
+    }
+
+    public int getPartitionNumber() {
+        return partitionNumber;
+    }
+
+    public int getReplicaFactor() {
+        return replicaFactor;
+    }
+
+    public DateType getVidDateType() {
+        return vidDateType;
     }
 }

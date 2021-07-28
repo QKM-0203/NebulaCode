@@ -18,7 +18,6 @@ import java.util.List;
 public class Graph {
 
     private final Session session;
-    private String  spaceName;
 
     protected Graph(String spaceName, Session session) {
         this.session = session;
