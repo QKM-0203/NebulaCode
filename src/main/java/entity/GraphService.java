@@ -139,7 +139,7 @@ public class GraphService  {
             throw new NullPointerException("space object cannot be null");
         }
         if(space.getSpaceName() == null) {
-            throw new NullPointerException("spaceName cannot be null");
+            throw new IllegalArgumentException("spaceName cannot be null");
         }
         Session session = getSession();
         String createSpace = null;
