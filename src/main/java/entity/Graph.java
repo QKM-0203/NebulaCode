@@ -3,125 +3,190 @@
  * This source code is licensed under Apache 2.0 License,
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
-package entity;
 
+package entity;
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
 import error.ExecuteException;
-
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Graph space object,it is obtained from {@link GraphService} according to
+ * the name of the graph space.
+ *
+ * <p>You can add, delete, modify, update and obtain the data structure of graph space
+ * through graph space objects.</p>
+ */
 public class Graph {
+  private final Session session;
 
-    private final Session session;
-
-    protected Graph(String spaceName, Session session) {
-        this.session = session;
-        //use session execute "use spaceName"
-        ResultSet  result = null;
-
-        String useSpace = "USE " + spaceName;
-        try {
-            result = session.execute(useSpace);
-        } catch (IOErrorException e) {
-            e.printStackTrace();
-        }
-        if( result == null){
-            throw new ExecuteException("session is broken");
-        }
-        if (! result.isSucceeded()) {
-            throw new ExecuteException("space is not found");
-        }
-
+  protected Graph(String spaceName, Session session) {
+    this.session = session;
+    ResultSet  result = null;
+    String useSpace = "USE " + spaceName;
+    try {
+      result = session.execute(useSpace);
+    } catch (IOErrorException e) {
+      e.printStackTrace();
     }
-
-    public ResultSet run(String nGql) throws IOErrorException, UnsupportedEncodingException {
-       return session.execute(nGql);
+    if (result == null) {
+      throw new ExecuteException("session is broken");
     }
-
-    /**
-     *
-     * @param graphObject graphObject can be Node or Relationship or Subgraph or path
-     */
-    public void create(Object graphObject){
-
+    if (!result.isSucceeded()) {
+      throw new ExecuteException("space is not found");
     }
+  }
 
-    /**
-     *
-     * @param graphObject delete vertex first delete relationship about vertex
-     */
-    public void delete(Object graphObject){
+  /**
+   * execute sentence(nGql) statement.
+   *
+   * @param sentence sentence statement
+   * @return execute result
+   * @throws IOErrorException IOErrorException when execute sentence
+   */
+  public ResultSet run(String sentence) throws IOErrorException {
+    return session.execute(sentence);
+  }
 
+  /**
+   * create graphObject.
+   *
+   * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path.
+   */
+  public void create(Object graphObject) {
 
-    }
+  }
 
-    public void delete_all(){
+  /**
+   * delete graphObject.
+   *
+   * <p>delete vertex first delete relationship about vertex</p>
+   *
+   * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path
+   */
+  public void delete(Object graphObject) {
 
-    }
+  }
 
-    public void update(Object graphObject){
+  /**
+   * delete all edges and vertex of space.
+   */
+  public void deleteAll() {
 
+  }
 
-    }
+  /**
+   * update graphObject.
+   *
+   * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path
+   */
+  public void update(Object graphObject) {
 
-    public boolean exists(Object graphObject){
-        return true;
-   }
+  }
 
-    /**
-     * Integer is index length
-     * @param Name schemaName
-     * @param indexName indexName
-     * @param propList indexList
-     * @return  if success
-     */
-    public boolean createSchemaIndex(String Name, String indexName,HashMap<String,Integer> propList){
-       return true;
-   }
+  /**
+   * determine whether the graphObject exists.
+   *
+   * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path
+   * @return whether exist
+   */
+  public boolean exists(Object graphObject) {
+    return true;
+  }
 
-    public List<String> getTags(){
-        return null;
-   }
+  /**
+   * create an index with the specified name for tagName and or edgeName
+   * according to the given attribute map, {@code Integer} is index length.
+   *
+   * @param name tagName or edgeName
+   * @param indexName indexName
+   * @param propList indexList
+   * @return  whether create success
+   */
+  public boolean createSchemaIndex(String name, String indexName,
+                                     HashMap<String, Integer> propList) {
+    return true;
+  }
 
-    public List<String> getEdges(){
-        return null;
-   }
+  /**
+   * get all tagName from space.
+   *
+   * @return get tagNameList from space
+   */
+  public List<String> getTags() {
+    return null;
+  }
 
-    public void createIndex(Schema tag,String indexName,HashMap<String,Integer> propList){
-   }
+  /**
+   * get all edgeName from space.
+   *
+   * @return get edgeNameList from space
+   */
+  public List<String> getEdges() {
+    return null;
+  }
 
-    public void dropIndex(Schema tag){
-   }
+  /**
+   * delete Index by index name.
+   *
+   * @param indexName indexName
+   */
+  public void dropIndex(String indexName) {
 
-    public List<String> getTagIndexes(String name){
-        return null;
-   }
+  }
 
+  /**
+   * get indexList by tagName.
+   *
+   * @param tagName tagName
+   * @return indexList
+   */
+  public List<String> getTagIndexes(String tagName) {
+    return null;
+  }
 
-    private ResultSet query(String nGql) throws IOErrorException, UnsupportedEncodingException {
-        return run(nGql);
-   }
+  /**
+   * get indexList by edgeName.
+   *
+   * @param edgeName edgeName
+   * @return indexList
+   */
+  public List<String> getEdgeTypeIndexes(String edgeName) {
+    return null;
+  }
 
-    public boolean createSchema(Schema schema){
-        return true;
-    }
+  /**
+   * create schema.
+   *
+   * @param schema tagObject or edgeTypeObject
+   * @return whether success
+   */
+  public boolean createSchema(Schema schema) {
+    return true;
+  }
 
-    public boolean dropSchema(String name){
-        return true;
-    }
+  /**
+   * drop schema.
+   *
+   * @param schemaName edgeName or tagName
+   * @return whether drop success
+   */
+  public boolean dropSchema(String schemaName) {
+    return true;
+  }
 
-    /**
-     *  add property or update property DateType or update TTL,if is null don not modify
-     */
-    public boolean modifySchema(String name,Schema schema){
-        return true;
-    }
-
-
-
+  /**
+   * add property or update property DateType or update TTL,
+   * if is null don not modify.
+   *
+   * @param schemaName edgeName or tagName
+   * @param schema tagObject or edgeTypeObject
+   * @return whether modify success
+   */
+  public boolean modifySchema(String schemaName, Schema schema) {
+    return true;
+  }
 }

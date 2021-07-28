@@ -3,57 +3,68 @@
  * This source code is licensed under Apache 2.0 License,
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
+
 package entity;
 
-import Operator.DateType;
+import operator.DateType;
 
+/**
+ * you can set the property name, property value type, and property value settings for a property.
+ *
+ * <p>{@link #propName} is attribute name,{@link #dataType} is attribute type,
+ * {@link #isNullable} whether is null,{@link #defaultValue} attribute default value.</p>
+ */
 public class Property {
-    //property name.property names must be unique in each label
-    private  String propName;
+  private  String propName;
+  private DateType dataType;
+  private  boolean isNullable;
+  private  Object defaultValue;
 
-    private DateType dataDateType;
+  /**
+   * user pass in propName、dataType、isNullable、defaultValue can create
+   * a satisfactory attribute .
+   *
+   * @param propName attribute name
+   * @param dataType  attribute data type
+   * @param isNullable whether is null
+   * @param defaultValue default value
+   */
+  public Property(String propName, DateType dataType, boolean isNullable, Object defaultValue) {
+    this.propName = propName;
+    this.dataType = dataType;
+    this.isNullable = isNullable;
+    this.defaultValue = defaultValue;
+  }
 
-    private  boolean isNullable;
+  public String getPropName() {
+    return propName;
+  }
 
-    private  Object defaultValue;
+  public void setPropName(String propName) {
+    this.propName = propName;
+  }
 
+  public DateType getDataType() {
+    return dataType;
+  }
 
-    public Property(String propName, DateType dataDateType, boolean isNullable, Object defaultValue) {
-        this.propName = propName;
-        this.dataDateType = dataDateType;
-        this.isNullable = isNullable;
-        this.defaultValue = defaultValue;
-    }
+  public void setDataType(DateType dataDateType) {
+    this.dataType = dataDateType;
+  }
 
-    public String getPropName() {
-        return propName;
-    }
+  public boolean isNullable() {
+    return isNullable;
+  }
 
-    public void setPropName(String propName) {
-        this.propName = propName;
-    }
+  public void setNullable(boolean nullable) {
+    isNullable = nullable;
+  }
 
-    public DateType getDataType() {
-        return dataDateType;
-    }
+  public Object getDefaultValue() {
+    return defaultValue;
+  }
 
-    public void setDataType(DateType dataDateType) {
-        this.dataDateType = dataDateType;
-    }
-
-    public boolean isNullable() {
-        return isNullable;
-    }
-
-    public void setNullable(boolean nullable) {
-        isNullable = nullable;
-    }
-
-    public Object getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(Object defaultValue) {
-        this.defaultValue = defaultValue;
-    }
+  public void setDefaultValue(Object defaultValue) {
+    this.defaultValue = defaultValue;
+  }
 }
