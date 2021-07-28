@@ -15,8 +15,8 @@ public class Path extends Walkable {
 
     private List<Object> sequence = new ArrayList<>();
 
-    public Path(List<Relationship> relationships){
-          init(relationships);
+    public Path(List<Part> path){
+          init(path);
     }
 
     public List<Object> getSequence() {
@@ -26,31 +26,47 @@ public class Path extends Walkable {
     /**
      * if is a right path
      */
-    public void init(List<Relationship> relationships){
-        ArrayList<Vertex> vertices = new ArrayList<>();
-        sequence.add(relationships.get(0).getStartVertex());
-        sequence.add(relationships.get(0));
-        sequence.add(relationships.get(0).getEndVertex());
-        for (int index = 1; index < relationships.size(); index++) {
-            Vertex vertex = (Vertex)sequence.get(sequence.size() - 1);
-            if(vertex.equals(relationships.get(index).getStartVertex())){
-                sequence.add(relationships.get(index));
-                sequence.add(relationships.get(index).getEndVertex());
-
-            }else if(vertex.equals(relationships.get(index).getEndVertex())){
-                sequence.add(relationships.get(index));
-                sequence.add(relationships.get(index).getStartVertex());
+    public void init(List<Part> path){
+        sequence.add(path.get(0).getStartVertex());
+        for (int index = 0; index < path.size(); index++) {
+            Vertex lastVertex = (Vertex)sequence.get(sequence.size() - 1);
+            if(lastVertex.getVid().equals(path.get(index).getStartVertex().getVid())){
+                if(lastVertex.getVid().equals(path.get(index).getRelationship().getStartVertex())){
+                    sequence.add(path.get(index).getRelationship());
+                    if(path.get(index).getEndVertex().getVid().equals(path.get(index).getRelationship().getEndVertex())){
+                        sequence.add(path.get(index).getEndVertex());
+                    }else{
+                        throw new ExecuteException(String.format("%s can not connect %s",
+                                path.get(index).getRelationship().getEndVertex(),path.get(index).getEndVertex()));
+                    }
+                }else if(lastVertex.getVid().equals(path.get(index).getRelationship().getEndVertex())){
+                    sequence.add(path.get(index).getRelationship());
+                    if(path.get(index).getEndVertex().getVid().equals(path.get(index).getRelationship().getStartVertex())){
+                        sequence.add(path.get(index).getEndVertex());
+                    }else{
+                        throw new ExecuteException(String.format("%s can not connect %s",
+                                path.get(index).getRelationship().getStartVertex(),path.get(index).getEndVertex()));
+                    }
+                }else{
+                    throw new ExecuteException(String.format("%s can not connect %s",
+                            lastVertex,path.get(index).getStartVertex()));
+                }
             }else{
-                throw new ExecuteException(String.format("%s can not connect %s",(Vertex)sequence.get(sequence.size()-1)
-                        ,(Relationship)relationships.get(index)));
+                throw new ExecuteException(String.format("%s can not connect %s",
+                        lastVertex,path.get(index).getStartVertex()));
             }
         }
+        ArrayList<Vertex> vertices = new ArrayList<>();
+        ArrayList<Relationship> relationships = new ArrayList<>();
         for (Object o : sequence) {
             if(o instanceof Vertex){
                 vertices.add((Vertex) o);
+            }else{
+                relationships.add((Relationship) o);
             }
         }
         super.init(relationships,vertices);
+
     }
 
     /**
@@ -85,7 +101,7 @@ public class Path extends Walkable {
                         prop.add(String.format("%s: "+"%s",propName,propMap.get(propName)));
                     }
                 }
-                if(((Relationship)sequence.get(index)).getStartVertex().equals((Vertex) sequence.get(index-1))){
+                if(((Relationship)sequence.get(index)).getStartVertex().equals(((Vertex) sequence.get(index-1)).getVid())){
 
                     result.append(String.format("-" + "[:" +((Relationship) sequence.get(index)).getEdgeName()+
                                     "@"+((Relationship) sequence.get(index)).getRank() + "%s" + "]" + "->",

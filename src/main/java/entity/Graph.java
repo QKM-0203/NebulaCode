@@ -27,7 +27,7 @@ public class Graph {
         String useSpace = "USE " + spaceName;
         try {
             result = session.execute(useSpace);
-        } catch (IOErrorException | UnsupportedEncodingException e) {
+        } catch (IOErrorException e) {
             e.printStackTrace();
         }
         if( result == null){

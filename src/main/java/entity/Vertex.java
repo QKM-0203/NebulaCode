@@ -25,6 +25,10 @@ public class Vertex extends Entity{
         this.propMap = propMap;
     }
 
+    public Object getVid() {
+        return vid;
+    }
+
     public void setVid(Object vid) {
         this.vid = vid;
     }

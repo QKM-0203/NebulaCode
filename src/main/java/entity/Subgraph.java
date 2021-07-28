@@ -16,7 +16,6 @@ public class Subgraph{
     private List<Relationship> relationshipsList;
 
 
-
     public Subgraph(List<Vertex> vertexList, List<Relationship> relationshipsList) {
           init(vertexList,relationshipsList);
     }

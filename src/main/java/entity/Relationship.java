@@ -11,9 +11,9 @@ import java.util.Objects;
 
 public class Relationship extends Entity{
 
-    private Vertex startVertex;
+    private Object startVertex;
 
-    private Vertex endVertex;
+    private Object endVertex;
 
     private String edgeName;
 
@@ -23,7 +23,7 @@ public class Relationship extends Entity{
 
 
 
-    public Relationship(Vertex startVertex, Vertex endVertex, String edgeName, HashMap<String, Object> propMap, int rank) {
+    public Relationship(Object startVertex, Object endVertex, String edgeName, HashMap<String, Object> propMap, int rank) {
         this.startVertex = startVertex;
         this.endVertex = endVertex;
         this.edgeName = edgeName;
@@ -34,7 +34,7 @@ public class Relationship extends Entity{
     /**
      * edgeType propertyList is null
      */
-    public Relationship(Vertex startVertex, Vertex endVertex, String edgeName, int rank) {
+    public Relationship(Object startVertex, Object endVertex, String edgeName, int rank) {
         this.startVertex = startVertex;
         this.endVertex = endVertex;
         this.edgeName = edgeName;
@@ -89,13 +89,6 @@ public class Relationship extends Entity{
         return graph;
     }
 
-    public Vertex getStartVertex() {
-        return startVertex;
-    }
-
-    public Vertex getEndVertex() {
-        return endVertex;
-    }
 
     public HashMap<String,Object> properties(){
         return propMap;
@@ -109,15 +102,23 @@ public class Relationship extends Entity{
         return propMap;
     }
 
+    public Object getStartVertex() {
+        return startVertex;
+    }
+
+    public Object getEndVertex() {
+        return endVertex;
+    }
+
     public int getRank() {
         return rank;
     }
 
-    //("2" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})-[:asd@1{name: "asd", age: 19}]
-   // ->("1" :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
+   //("1")-[:p_t_r@0{startTime: 2021-03-05, salve: 34}]->("4")
+    //(1)-[:friend@1{name: "wer"}]->(2)
     @Override
     public String toString() {
-        String result = startVertex.toString()+ "-" + "[:" +edgeName+"@"+ rank + "%s" + "]" + "->" +endVertex.toString();
+        String result = "(%s)"+ "-" + "[:" +edgeName+"@"+ rank + "%s" + "]" + "->" +"(%s)";
         ArrayList<String> prop = new ArrayList<>();
         StringBuilder part = new StringBuilder("{");
         for (String propName : propMap.keySet()) {
@@ -127,6 +128,10 @@ public class Relationship extends Entity{
                  prop.add(String.format("%s: "+"%s",propName,propMap.get(propName)));
              }
         }
-        return String.format(result,part.append(String.join(", ",prop)).append("}"));
+
+        return String.format(result,
+                (startVertex instanceof String)? "\""+startVertex+"\"":startVertex,
+                part.append(String.join(", ",prop)).append("}"),
+                (endVertex instanceof String)? "\""+endVertex+"\"":endVertex);
     }
 }

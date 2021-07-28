@@ -28,12 +28,12 @@ import java.util.Properties;
 
 public class GraphService  {
 
-    public   String username = "root";
-    public   String password = "nebula";
-    public   String host = "127.0.0.1";
-    public   int port = 9669;
-    private boolean reconnect = false;
-    public   NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
+    private   String username;
+    private   String password;
+    private   String host = "127.0.0.1";
+    private   int port = 9669;
+    private   boolean reconnect = false;
+    public    NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
 
 
 
@@ -144,11 +144,11 @@ public class GraphService  {
         Session session = getSession();
         String createSpace = null;
         if (space.getVidDateType().equals(DateType.FIXED_STRING)) {
-            createSpace = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
+            createSpace = String.format("CREATE SPACE IF NOT EXISTS %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
                     , space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
                     String.format("%s(%d" + ")", space.getVidDateType(), space.getVidDateType().getLength()));
         } else {
-            createSpace = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
+            createSpace = String.format("CREATE SPACE IF NOT EXISTS %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
                     , space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
                     space.getVidDateType());
         }
@@ -167,7 +167,7 @@ public class GraphService  {
         }
         Session session = getSession();
         for (String spaceName : spaceNameList) {
-            session.execute(String.format("DROP SPACE %s",spaceName));
+            session.execute(String.format("DROP IF EXISTS SPACE %s",spaceName));
         }
         return true;
     }
