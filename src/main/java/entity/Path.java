@@ -27,6 +27,9 @@ public class Path extends Walkable {
      * if is a right path
      */
     public void init(List<Part> path){
+        if(path == null){
+            throw new NullPointerException("path object is null");
+        }
         sequence.add(path.get(0).getStartVertex());
         for (int index = 0; index < path.size(); index++) {
             Vertex lastVertex = (Vertex)sequence.get(sequence.size() - 1);
