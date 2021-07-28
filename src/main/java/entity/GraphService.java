@@ -15,9 +15,11 @@ import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.exception.NotValidConnectionException;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
+import error.ExecuteException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
@@ -132,19 +134,30 @@ public class GraphService  {
     }
 
 
-    public void createSpace(Space space) throws UnknownHostException, IOErrorException, AuthFailedException, NotValidConnectionException {
-        Session session = getSession();
-        String result = null;
-        if(space.getVidDateType().equals(DateType.FIXED_STRING)){
-           result = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
-                    ,space.getSpaceName(),space.getPartitionNumber(),space.getReplicaFactor(),
-                    String.format("%s(%d"+")",space.getVidDateType(),space.getVidDateType().getLength()));
-        }else{
-            result = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
-                    ,space.getSpaceName(),space.getPartitionNumber(),space.getReplicaFactor(),
-                     space.getVidDateType());
+    public boolean createSpace(Space space) throws IOErrorException, UnsupportedEncodingException {
+        if (space == null) {
+            throw new NullPointerException("space object is not null");
+        } else if (space.getSpaceName() == null) {
+            throw new NullPointerException("spaceName is not null");
         }
-        System.out.println(result);
+        Session session = getSession();
+        String createSpace = null;
+        if (space.getVidDateType().equals(DateType.FIXED_STRING)) {
+            createSpace = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
+                    , space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
+                    String.format("%s(%d" + ")", space.getVidDateType(), space.getVidDateType().getLength()));
+        } else {
+            createSpace = String.format("CREATE SPACE %s(partition_num = %d,replica_factor = %d,vid_type = %s)"
+                    , space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
+                    space.getVidDateType());
+        }
+
+        ResultSet result = session.execute(createSpace);
+
+        if(result == null){
+            throw new ExecuteException("session is broken");
+        }else return result.isSucceeded();
+
     }
 
     public void dropSpaces(List<String> spaceNameList){
