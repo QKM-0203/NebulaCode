@@ -137,7 +137,8 @@ public class GraphService  {
     public boolean createSpace(Space space) throws IOErrorException, UnsupportedEncodingException {
         if (space == null) {
             throw new NullPointerException("space object cannot be null");
-        } else if (space.getSpaceName() == null) {
+        }
+        if(space.getSpaceName() == null) {
             throw new NullPointerException("spaceName cannot be null");
         }
         Session session = getSession();
@@ -160,8 +161,11 @@ public class GraphService  {
 
     }
 
-    public void dropSpaces(List<String> spaceNameList){
-
+    public boolean dropSpaces(List<String> spaceNameList){
+        if (spaceNameList == null) {
+            return false;
+        }
+        return true;
     }
 
 
