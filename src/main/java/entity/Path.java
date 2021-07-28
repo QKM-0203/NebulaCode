@@ -19,6 +19,9 @@ public class Path extends Walkable {
           init(relationships);
     }
 
+    public List<Object> getSequence() {
+        return sequence;
+    }
 
     /**
      * if is a right path
