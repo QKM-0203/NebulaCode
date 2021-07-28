@@ -17,74 +17,26 @@ import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
 import error.ExecuteException;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 
 public class GraphService  {
 
     private   String username;
     private   String password;
-    private   String host = "127.0.0.1";
-    private   int port = 9669;
+    private   List<HostAddress> hostAddresses;
     private   boolean reconnect = false;
     public    NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
 
 
 
     /**
-     * read configuration file (nebula.properties)
-     */
-    public GraphService() {
-            Properties pro = new Properties();
-            //use classLoader to load the configuration file and get the byte input stream
-            InputStream is = GraphService.class.getClassLoader().getResourceAsStream("nebula.properties");
-            try {
-               pro.load(is);
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-            if(pro.getProperty("username") != null){
-                username = pro.getProperty("username");
-            }
-            if(pro.getProperty("password") != null){
-                password = pro.getProperty("password");
-            }
-            if(pro.getProperty("maxConnSize") != null){
-                nebulaPoolConfig.setMaxConnSize(Integer.parseInt(pro.getProperty("maxConnSize")));
-            }
-            if(pro.getProperty("minConnSize") != null){
-                nebulaPoolConfig.setMinConnSize(Integer.parseInt(pro.getProperty("minConnSize")));
-            }
-            if(pro.getProperty("timeout") != null){
-                nebulaPoolConfig.setTimeout(Integer.parseInt(pro.getProperty("timeout")));
-            }
-            if(pro.getProperty("reconnect") != null){
-                reconnect = Boolean.parseBoolean(pro.getProperty("reconnect"));
-            }
-            if(pro.getProperty("idleTime") != null){
-                nebulaPoolConfig.setIdleTime(Integer.parseInt(pro.getProperty("idleTime")));
-            }
-            if(pro.getProperty("port") != null){
-                port = Integer.parseInt(pro.getProperty("port"));
-            }
-            if(pro.getProperty("host") != null){
-                host = pro.getProperty("host");
-            }
-    }
-
-
-    /**
      * pass in parameters use default connectionPool
      */
-    public GraphService(String host, int port, String username, String password,boolean reconnect){
-        this.host = host;
-        this.port = port;
+    public GraphService(List<HostAddress> hostAddresses, String username, String password,boolean reconnect){
+        this.hostAddresses = hostAddresses;
         this.username = username;
         this.password = password;
         this.reconnect = reconnect;
@@ -95,9 +47,8 @@ public class GraphService  {
     /**
      * pass in parameters use self-connectionPool config
      */
-    public GraphService(String host, int port, String username, String password,boolean reconnect,NebulaPoolConfig nebulaPoolConfig){
-        this.host = host;
-        this.port = port;
+    public GraphService(List<HostAddress> hostAddresses,String username, String password,boolean reconnect,NebulaPoolConfig nebulaPoolConfig){
+        this.hostAddresses = hostAddresses;
         this.username = username;
         this.password = password;
         this.reconnect = reconnect;
@@ -107,9 +58,8 @@ public class GraphService  {
     private Session getSession(){
         NebulaPool nebulaPool = new NebulaPool();
         Session session = null;
-        List<HostAddress> addresses = Arrays.asList(new HostAddress(host,port));
         try {
-            nebulaPool.init(addresses, nebulaPoolConfig);
+            nebulaPool.init(hostAddresses, nebulaPoolConfig);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
