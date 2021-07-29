@@ -4,9 +4,10 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package ngql;
+package com.vesoft.nebula.orm.ngql;
 
-import entity.Vertex;
+import com.vesoft.nebula.orm.entity.Vertex;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 

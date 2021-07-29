@@ -4,7 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package exception;
+package com.vesoft.nebula.orm.exception;
 
 /**
  * execute nGql sentence raise an exception.

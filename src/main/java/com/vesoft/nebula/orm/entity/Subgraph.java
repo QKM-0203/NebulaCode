@@ -4,9 +4,9 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package entity;
+package com.vesoft.nebula.orm.entity;
 
-import exception.InitException;
+import com.vesoft.nebula.orm.exception.InitException;
 import java.util.List;
 
 /**

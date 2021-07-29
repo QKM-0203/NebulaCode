@@ -4,7 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package entity;
+package com.vesoft.nebula.orm.entity;
 
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
@@ -14,10 +14,10 @@ import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.exception.NotValidConnectionException;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
-import exception.ExecuteException;
+import com.vesoft.nebula.orm.exception.ExecuteException;
+import com.vesoft.nebula.orm.operator.DataType;
 import java.net.UnknownHostException;
 import java.util.List;
-import operator.DataType;
 
 
 /**

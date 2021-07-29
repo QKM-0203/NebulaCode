@@ -4,9 +4,9 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package entity;
+package com.vesoft.nebula.orm.entity;
 
-import operator.DataType;
+import com.vesoft.nebula.orm.operator.DataType;
 
 /**
  * you can set the property name, property value type, and property value settings for a property.
@@ -17,10 +17,10 @@ import operator.DataType;
  * @author Qi Kai Meng
  */
 public class Property {
-    private  String propName;
+    private String propName;
     private DataType dataType;
-    private  boolean isNullable;
-    private  Object defaultValue;
+    private boolean isNullable;
+    private Object defaultValue;
 
     /**
      * user pass in propName、dataType、isNullable、defaultValue can create

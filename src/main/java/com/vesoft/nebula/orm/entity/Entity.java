@@ -4,7 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package entity;
+package com.vesoft.nebula.orm.entity;
 
 /**
  *  {@code Entity} is used to bind points, edges, subgraph and corresponding
