@@ -6,6 +6,7 @@
 
 package entity;
 
+import error.InitException;
 import java.util.List;
 
 /**
@@ -22,8 +23,9 @@ public class Subgraph {
   protected void init(List<Vertex> vertexList, List<Relationship> relationshipsList) {
     this.vertexList = vertexList;
     this.relationshipsList = relationshipsList;
-    //Get nodes from inside edges and add them to vertexList
-    //Judge that the subgraph cannot be empty. There must be at least one vertex
+    if (vertexList == null || vertexList.isEmpty()) {
+      throw new InitException("the subgraph contains at least one point");
+    }
   }
 
   /**
@@ -33,7 +35,7 @@ public class Subgraph {
    */
   public  List<Vertex>  vertexes() {
     if (vertexList == null || vertexList.isEmpty()) {
-      throw new NullPointerException("vertexList is null");
+      return null;
     }
     return  vertexList;
   }
@@ -45,7 +47,7 @@ public class Subgraph {
    */
   public List<Relationship> relationships() {
     if (relationshipsList == null || relationshipsList.isEmpty()) {
-      throw new NullPointerException("relationshipsList is null");
+      return null;
     }
     return relationshipsList;
   }
@@ -58,7 +60,7 @@ public class Subgraph {
   public Graph graph() {
     if ((vertexList == null || vertexList.isEmpty())
         && (relationshipsList == null || relationshipsList.isEmpty())) {
-      throw new NullPointerException("subgraph is null");
+      return null;
     } else {
       if (vertexList != null && !vertexList.isEmpty()) {
         return vertexList.get(0).getGraph();

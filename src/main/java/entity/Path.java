@@ -7,10 +7,8 @@
 package entity;
 
 import error.ExecuteException;
-import error.InitPathException;
-
+import error.InitException;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,8 +98,8 @@ public class Path extends Walkable {
    * traversal {@link #sequence} output.
    */
   public void walk() {
-    if(sequence.isEmpty()){
-      throw new InitPathException("path cannot be traversed");
+    if (sequence.isEmpty()) {
+      throw new InitException("path cannot be traversed");
     }
     for (Object o : sequence) {
       System.out.println(o);
@@ -118,9 +116,9 @@ public class Path extends Walkable {
         ArrayList<String> prop = new ArrayList<>();
         HashMap<String, Object> propMap = ((Relationship) sequence.get(index)).getPropMap();
         StringBuilder propValue = new StringBuilder();
-        if(propMap == null || propMap.isEmpty()){
+        if (propMap == null || propMap.isEmpty()) {
           propValue.append("");
-        }else{
+        } else {
           for (String propName : ((Relationship) sequence.get(index)).getPropMap().keySet()) {
             if (propMap.get(propName) instanceof String) {
               prop.add(String.format("%s: \"%s\"", propName, propMap.get(propName)));

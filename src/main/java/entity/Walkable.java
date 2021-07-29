@@ -22,15 +22,25 @@ public class Walkable {
     this.vertices = vertices;
   }
 
+  /**
+   * get startVertex from vertexList.
+   *
+   * @return startVertex
+   */
   public Vertex getStartVertex() {
-    if(vertices == null || vertices.isEmpty()){
+    if (vertices == null || vertices.isEmpty()) {
       return null;
     }
     return vertices.get(0);
   }
 
+  /**
+   * get endVertex from vertexList.
+   *
+   * @return endVertex
+   */
   public Vertex getEndVertex() {
-    if(vertices == null || vertices.isEmpty()){
+    if (vertices == null || vertices.isEmpty()) {
       return null;
     }
     return vertices.get(vertices.size() - 1);
@@ -40,7 +50,7 @@ public class Walkable {
    * get all vertices.
    */
   public List<Vertex> getVertices() {
-    if(vertices == null || vertices.isEmpty()){
+    if (vertices == null || vertices.isEmpty()) {
       return null;
     }
     return vertices;
@@ -50,14 +60,19 @@ public class Walkable {
    * get all relationships.
    */
   public List<Relationship> getRelationships() {
-    if(relationships == null || relationships.isEmpty()){
+    if (relationships == null || relationships.isEmpty()) {
       return null;
     }
     return relationships;
   }
 
+  /**
+   * get size of relationships.
+   *
+   * @return relationships size
+   */
   public int steps() {
-    if(relationships == null || relationships.isEmpty()){
+    if (relationships == null || relationships.isEmpty()) {
       return 0;
     }
     return relationships.size();

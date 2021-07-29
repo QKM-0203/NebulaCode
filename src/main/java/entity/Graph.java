@@ -57,10 +57,7 @@ public class Graph {
    * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path.
    */
   public void create(Object graphObject) {
-    StringBuilder result = new StringBuilder();
-    if (graphObject instanceof Vertex) {
 
-    }
   }
 
   /**
