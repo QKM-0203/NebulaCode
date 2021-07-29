@@ -7,14 +7,16 @@
 package exception;
 
 /**
- * execute nGql sentence raise an exception.
+ * init data raise exception,eg:path、subgraph.
+ *
+ * @author Qi Kai Meng
  */
-public class ExecuteException extends RuntimeException{
+public class InitException extends ExecuteException {
+    public InitException() {
 
-    public ExecuteException() {
     }
 
-    public ExecuteException(String message) {
+    public InitException(String message) {
         super(message);
     }
 }

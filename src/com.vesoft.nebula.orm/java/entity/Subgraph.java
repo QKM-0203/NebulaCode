@@ -11,6 +11,8 @@ import java.util.List;
 
 /**
  * a subgraph is a set of points and edges.
+ *
+ * @author Qi Kai Meng
  */
 public class Subgraph {
     private List<Vertex> vertexList;
@@ -70,13 +72,15 @@ public class Subgraph {
         }
     }
 
-    //{"Person", "Employee"}
+
     public List<String> tags() {
+        //{"Person", "Employee"}
         return null;
     }
 
-    //{"KNOWS", "LIKES", "DISLIKES","MARRIED_TO", "WORKS_FOR"}
+
     public List<String> types() {
+        //{"KNOWS", "LIKES", "DISLIKES","MARRIED_TO", "WORKS_FOR"}
         return null;
     }
 

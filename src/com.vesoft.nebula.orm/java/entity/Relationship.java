@@ -20,6 +20,7 @@ import java.util.Objects;
  * starting point and destination point)
  * and the attributes of the edge ({@link #propMap})</p>
  *
+ * @author Qi Kai Meng
  */
 public class Relationship extends Entity {
     private Object startVid;
@@ -44,7 +45,7 @@ public class Relationship extends Entity {
         this.edgeName = edgeName;
         this.propMap = propMap;
         this.rank = rank;
-   }
+    }
 
     /**
      * create relationship and edgeType propertyList is null.
@@ -100,6 +101,7 @@ public class Relationship extends Entity {
         return Objects.hash(startVid, endVid, edgeName, rank, propMap);
     }
 
+    @Override
     public Graph getGraph() {
         return getGraph();
     }
@@ -128,10 +130,11 @@ public class Relationship extends Entity {
         return rank;
     }
 
-    //("1")-[:p_t_r@0{startTime: 2021-03-05, salve: 34}]->("4")
-    //(1)-[:friend@1{name: "wer"}]->(2)
+
     @Override
     public String toString() {
+        //("1")-[:p_t_r@0{startTime: 2021-03-05, salve: 34}]->("4")
+        //(1)-[:friend@1{name: "wer"}]->(2)
         String result = "(%s)-[:%s@%s{%s}]->(%s)";
         ArrayList<String> prop = new ArrayList<>();
         StringBuilder propValue = new StringBuilder();

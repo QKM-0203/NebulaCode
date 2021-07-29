@@ -9,6 +9,8 @@ package entity;
 /**
  *  {@code Entity} is used to bind points, edges, subgraph and corresponding
  *  graph spaces.
+ *
+ * @author Qi Kai Meng
  */
 public class Entity {
     private Graph graph;
@@ -22,11 +24,6 @@ public class Entity {
         this.graph = graph;
     }
 
-    /**
-     * get the corresponding graph space object.
-     *
-     * @return graph space object.
-     */
     public Graph getGraph() {
         return graph;
     }

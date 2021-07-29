@@ -8,6 +8,8 @@ package entity;
 
 /**
  * a set of vertex and edge vertex forms of {@link Path} like.
+ *
+ * @author Qi Kai Meng
  */
 public class Part {
     private Vertex startVertex;

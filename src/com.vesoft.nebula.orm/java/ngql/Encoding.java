@@ -12,6 +12,8 @@ import java.util.HashMap;
 
 /**
  * used to splice objects into nGql statements.
+ *
+ * @author Qi Kai Meng
  */
 public class Encoding {
     /**
@@ -38,10 +40,11 @@ public class Encoding {
         return String.join(",", tagStringList);
     }
 
-    public static String vertexValueJoin(Vertex vertex){
+    public static String vertexValueJoin(Vertex vertex) {
         Object vid = vertex.getVid();
         StringBuilder values = new StringBuilder();
-        String result = String.format("%s:(%s)",(vid instanceof String) ? "\"" + vid + "\"" : vid,"%s");
+        String result = String.format("%s:(%s)",
+            (vid instanceof String) ? "\"" + vid + "\"" : vid,"%s");
         HashMap<String, HashMap<String, Object>> propMap = vertex.getPropMap();
         for (String tagName : propMap.keySet()) {
             HashMap<String, Object> propValueMap = propMap.get(tagName);

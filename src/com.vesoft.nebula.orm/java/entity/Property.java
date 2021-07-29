@@ -13,6 +13,8 @@ import operator.DataType;
  *
  * <p>{@link #propName} is attribute name,{@link #dataType} is attribute type,
  * {@link #isNullable} whether is null,{@link #defaultValue} attribute default value.</p>
+ *
+ * @author Qi Kai Meng
  */
 public class Property {
     private  String propName;

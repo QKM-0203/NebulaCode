@@ -14,6 +14,7 @@ import java.util.List;
  * <p>{@link #name} is tagName or edgeTypeName,{@link #propertyList} is attribute list,
  * you can also set a specific expiration timestamp for a property.</p>
  *
+ * @author Qi Kai Meng
  */
 public class Schema {
     private final String name;

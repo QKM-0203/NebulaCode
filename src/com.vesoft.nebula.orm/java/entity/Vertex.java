@@ -22,6 +22,8 @@ import java.util.Objects;
  * judge whether the tag exists({@link #hasTag(String)}),
  * add a new tag({@link #addTag(String, HashMap)}), etc</p>
  *
+ * @author Qi Kai Meng
+ *
  */
 public class Vertex extends Entity {
     private Object vid;
@@ -106,9 +108,9 @@ public class Vertex extends Entity {
         return true;
     }
 
-    //(1 :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
     @Override
     public String toString() {
+        //(1 :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
         String result = (vid instanceof String) ? "(\"%s\"%s)" : "(%s%s)";
         StringBuilder part = new StringBuilder();
         for (String tagName : propMap.keySet()) {

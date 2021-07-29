@@ -19,6 +19,8 @@ import java.util.List;
  *
  * <p>You can add, delete, modify, update and obtain the data structure of graph space
  * through graph space objects.</p>
+ *
+ * @author Qi Kai Meng
  */
 public class Graph {
     private final Session session;

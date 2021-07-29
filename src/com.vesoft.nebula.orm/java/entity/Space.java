@@ -11,6 +11,7 @@ import operator.DataType;
 /**
  * create a space.
  *
+ * @author Qi Kai Meng
  */
 public class Space {
     private String spaceName;

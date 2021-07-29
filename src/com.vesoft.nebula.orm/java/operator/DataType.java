@@ -10,6 +10,8 @@ package operator;
  * the data type used to represent data.
  *
  * <p>users pass in data types by enumerating instances</p>
+ *
+ * @author Qi Kai Meng
  */
 public enum DataType {
     DATE(1),

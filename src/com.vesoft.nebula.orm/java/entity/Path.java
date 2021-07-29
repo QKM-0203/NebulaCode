@@ -27,13 +27,15 @@ import java.util.List;
  * {@link Walkable#getStartVertex()}.
  * The user can call {@link #walk()} to traverse the path and output the form of points and edges
  * </p>
+ *
+ * @author Qi Kai Meng
  */
 public class Path extends Walkable {
     private List<Object> sequence = new ArrayList<>();
 
     public Path(List<Part> path) {
-    init(path);
-  }
+        init(path);
+    }
 
 
     /**
@@ -59,7 +61,7 @@ public class Path extends Walkable {
                         throw new ExecuteException(String.format("%s can not connect %s",
                             part.getRelationship().getEndVid(), part.getEndVertex()));
 
-                   }
+                    }
                 } else if (lastVertex.getVid().equals(part.getRelationship().getEndVid())) {
                     sequence.add(part.getRelationship());
                     if (part.getEndVertex().getVid().equals(part.getRelationship().getStartVid())) {
@@ -73,7 +75,7 @@ public class Path extends Walkable {
                     sequence.clear();
                     throw new ExecuteException(String.format("%s can not connect %s",
                         lastVertex, part.getStartVertex()));
-               }
+                }
             } else {
                 sequence.clear();
                 throw new ExecuteException(String.format("%s can not connect %s",
@@ -117,7 +119,8 @@ public class Path extends Walkable {
                 if (propMap == null || propMap.isEmpty()) {
                     propValue.append("");
                 } else {
-                    for (String propName : ((Relationship) sequence.get(index)).getPropMap().keySet()) {
+                    for (String propName : ((Relationship)
+                        sequence.get(index)).getPropMap().keySet()) {
                         if (propMap.get(propName) instanceof String) {
                             prop.add(String.format("%s: \"%s\"", propName, propMap.get(propName)));
                         } else {

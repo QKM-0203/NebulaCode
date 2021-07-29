@@ -26,6 +26,8 @@ import operator.DataType;
  *<p>The user can pass in the host IP, port, user name and password,
  * establish a connection with the nebula service, and obtain the graph object
  * through the {@link #getGraph(String spaceName)} method.</p>
+ *
+ * @author Qi Kai Meng
  */
 public class GraphService  {
     private String username;
@@ -56,23 +58,23 @@ public class GraphService  {
         this.password = password;
         this.reconnect = reconnect;
         this.nebulaPoolConfig = nebulaPoolConfig;
-   }
+    }
 
-   private Session getSession() {
-       NebulaPool nebulaPool = new NebulaPool();
-       Session session = null;
-       try {
-       nebulaPool.init(hostAddresses, nebulaPoolConfig);
-       } catch (UnknownHostException e) {
-           e.printStackTrace();
-       }
-       try {
-           session = nebulaPool.getSession(username, password, reconnect);
-       } catch (NotValidConnectionException | IOErrorException | AuthFailedException e) {
-           e.printStackTrace();
-       }
-       return session;
-   }
+    private Session getSession() {
+        NebulaPool nebulaPool = new NebulaPool();
+        Session session = null;
+        try {
+            nebulaPool.init(hostAddresses, nebulaPoolConfig);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        try {
+            session = nebulaPool.getSession(username, password, reconnect);
+        } catch (NotValidConnectionException | IOErrorException | AuthFailedException e) {
+            e.printStackTrace();
+        }
+        return session;
+    }
 
     /**
      * pass in spaceName get graph object.
@@ -105,7 +107,8 @@ public class GraphService  {
             createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
                 space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
-                String.format("%s(%d" + ")", space.getVidDataType(), space.getVidDataType().getLength()));
+                String.format("%s(%d" + ")",
+                    space.getVidDataType(), space.getVidDataType().getLength()));
         } else {
             createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
