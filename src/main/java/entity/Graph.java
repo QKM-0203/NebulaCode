@@ -41,7 +41,7 @@ public class Graph {
   }
 
   /**
-   * execute sentence(nGql) statement.
+   * execute sentence(ngql) statement.
    *
    * @param sentence sentence statement
    * @return execute result
@@ -57,7 +57,10 @@ public class Graph {
    * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path.
    */
   public void create(Object graphObject) {
+    StringBuilder result = new StringBuilder();
+    if (graphObject instanceof Vertex) {
 
+    }
   }
 
   /**

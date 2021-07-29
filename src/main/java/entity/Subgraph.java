@@ -32,7 +32,7 @@ public class Subgraph {
    * @return collection of all vertexes
    */
   public  List<Vertex>  vertexes() {
-    if (vertexList == null) {
+    if (vertexList == null || vertexList.isEmpty()) {
       throw new NullPointerException("vertexList is null");
     }
     return  vertexList;
@@ -44,7 +44,7 @@ public class Subgraph {
    * @return collection of all relationships
    */
   public List<Relationship> relationships() {
-    if (relationshipsList == null) {
+    if (relationshipsList == null || relationshipsList.isEmpty()) {
       throw new NullPointerException("relationshipsList is null");
     }
     return relationshipsList;
@@ -56,10 +56,16 @@ public class Subgraph {
    * @return graph space object
    */
   public Graph graph() {
-    if (vertexList == null) {
-      throw new NullPointerException("vertexList is null");
+    if ((vertexList == null || vertexList.isEmpty())
+        && (relationshipsList == null || relationshipsList.isEmpty())) {
+      throw new NullPointerException("subgraph is null");
+    } else {
+      if (vertexList != null && !vertexList.isEmpty()) {
+        return vertexList.get(0).getGraph();
+      } else {
+        return relationshipsList.get(0).getGraph();
+      }
     }
-    return vertexList.get(0).getGraph();
   }
 
   //{"Person", "Employee"}

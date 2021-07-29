@@ -6,7 +6,7 @@
 
 package entity;
 
-import operator.DateType;
+import operator.DataType;
 
 /**
  * create a space.
@@ -16,21 +16,20 @@ public class Space {
   private String spaceName;
   private int partitionNumber = 100;
   private int replicaFactor = 1;
-  private DateType vidDateType = DateType.FIXED_STRING;
+  private DataType vidDataType = DataType.FIXED_STRING;
 
   /**
    * create space by constructor.
-   *
-   * @param spaceName  spaceName
+   *  @param spaceName  spaceName
    * @param partitionNumber  the number of partitions in graph space
    * @param replicaFactor number of copies per slice
-   * @param vidDateType optional value for data type of id is FIXED_STRING(N)和INT64
+   * @param vidDataType optional value for data type of id is FIXED_STRING(N)和INT64
    */
-  public Space(String spaceName, int partitionNumber, int replicaFactor, DateType vidDateType) {
+  public Space(String spaceName, int partitionNumber, int replicaFactor, DataType vidDataType) {
     this.spaceName = spaceName;
     this.partitionNumber = partitionNumber;
     this.replicaFactor = replicaFactor;
-    this.vidDateType = vidDateType;
+    this.vidDataType = vidDataType;
   }
 
   public String getSpaceName() {
@@ -49,8 +48,8 @@ public class Space {
     this.replicaFactor = replicaFactor;
   }
 
-  public void setVidType(DateType vidType) {
-    this.vidDateType = vidType;
+  public void setVidType(DataType vidType) {
+    this.vidDataType = vidType;
   }
 
   public int getPartitionNumber() {
@@ -61,7 +60,7 @@ public class Space {
     return replicaFactor;
   }
 
-  public DateType getVidDateType() {
-    return vidDateType;
+  public DataType getVidDataType() {
+    return vidDataType;
   }
 }

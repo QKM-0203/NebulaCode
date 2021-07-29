@@ -26,7 +26,7 @@ public class Relationship extends Entity {
   private Object endVid;
   private String edgeName;
   private int rank = 0;
-  private HashMap<String, Object>  propMap;
+  private HashMap<String, Object>  propMap = null;
 
   /**
    * user pass in parameter creates a directional edge.
@@ -100,7 +100,7 @@ public class Relationship extends Entity {
     return Objects.hash(startVid, endVid, edgeName, rank, propMap);
   }
 
-  public Graph graph() {
+  public Graph getGraph() {
     return getGraph();
   }
 
@@ -132,20 +132,24 @@ public class Relationship extends Entity {
   //(1)-[:friend@1{name: "wer"}]->(2)
   @Override
   public String toString() {
-    String result = "(%s)" +  "-" + "[:" + edgeName + "@" + rank + "%s" + "]" + "->" + "(%s)";
+    String result = "(%s)-[:%s@%s{%s}]->(%s)";
     ArrayList<String> prop = new ArrayList<>();
-    StringBuilder part = new StringBuilder("{");
-    for (String propName : propMap.keySet()) {
-      if (propMap.get(propName) instanceof  String) {
-        prop.add(String.format("%s: " + "\"" + "%s" + "\"", propName, propMap.get(propName)));
-      } else {
-        prop.add(String.format("%s: " + "%s", propName, propMap.get(propName)));
+    StringBuilder propValue = new StringBuilder();
+    if (propMap == null || propMap.isEmpty()) {
+      propValue.append("");
+    } else {
+      for (String propName : propMap.keySet()) {
+        if (propMap.get(propName) instanceof String) {
+          prop.add(String.format("%s: \"%s\"", propName, propMap.get(propName)));
+        } else {
+          prop.add(String.format("%s: %s", propName, propMap.get(propName)));
+        }
       }
+      propValue.append(String.join(", ", prop));
     }
-
     return String.format(result,
-      (startVid instanceof String) ? "\"" + startVid + "\"" : startVid,
-        part.append(String.join(", ", prop)).append("}"),
+        (startVid instanceof String) ? "\"" + startVid + "\"" : startVid,
+        edgeName, rank, propValue,
         (endVid instanceof String) ? "\"" + endVid + "\"" : endVid);
   }
 }

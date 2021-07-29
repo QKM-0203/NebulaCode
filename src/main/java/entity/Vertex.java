@@ -6,7 +6,6 @@
 
 package entity;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +30,10 @@ public class Vertex extends Entity {
   public Vertex(Object vid, HashMap<String, HashMap<String, Object>> propMap) {
     this.vid = vid;
     this.propMap = propMap;
+  }
+
+  public HashMap<String, HashMap<String, Object>> getPropMap() {
+    return propMap;
   }
 
   public Object getVid() {
@@ -106,22 +109,25 @@ public class Vertex extends Entity {
   //(1 :QKM3{name: "asd", age: 19} :QKM2{name: "asd", age: 19})
   @Override
   public String toString() {
-    String result = (vid instanceof String) ? "(" + "\"" + "%s" + "\"" + "%s" + ")" :
-        "(" + "%s" + "%s" + ")";
+    String result = (vid instanceof String) ? "(\"%s\"%s)" :
+        "(%s%s)";
     StringBuilder part = new StringBuilder();
     for (String tagName : propMap.keySet()) {
       HashMap<String, Object> propValueMap = propMap.get(tagName);
       part.append(String.format(" :%s{", tagName));
-      ArrayList<String> prop = new ArrayList<>();
-      for (String propName : propValueMap.keySet()) {
-        if (propValueMap.get(propName) instanceof String) {
-          prop.add(String.format("%s: " + "\"" + "%s"
-              + "\"", propName, propValueMap.get(propName)));
-        } else {
-          prop.add(String.format("%s: " + "%s", propName, propValueMap.get(propName)));
+      if (propValueMap == null || propValueMap.isEmpty()) {
+        part.append("}");
+      } else {
+        ArrayList<String> prop = new ArrayList<>();
+        for (String propName : propValueMap.keySet()) {
+          if (propValueMap.get(propName) instanceof String) {
+            prop.add(String.format("%s: \"%s\"", propName, propValueMap.get(propName)));
+          } else {
+            prop.add(String.format("%s: %s", propName, propValueMap.get(propName)));
+          }
         }
+        part.append(String.join(", ", prop)).append("}");
       }
-      part.append(String.join(", ", prop)).append("}");
     }
     return String.format(result, vid, part);
   }

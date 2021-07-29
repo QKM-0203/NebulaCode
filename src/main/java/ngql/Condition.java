@@ -1,4 +1,9 @@
-package nGql;
+/* Copyright (c) 2021 vesoft inc. All rights reserved.
+ *
+ * This source code is licensed under Apache 2.0 License,
+ * attached with Common Clause Condition 1.0, found in the LICENSES directory.
+ */
+package ngql;
 
 public class Condition {
     protected Object value;
@@ -17,7 +22,7 @@ class Equal extends  Condition{
 
     @Override
     protected String encode(){
-        return "%s " +"=="+" "+value;
+        return "%s " + "==" + " " + value;
     }
 
 }
@@ -27,7 +32,7 @@ class NE extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s " +"!="+" "+value;
+        return "%s " + "!=" + " "+value;
     }
 
 }
@@ -37,7 +42,7 @@ class IsNull extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"is null";
+        return "%s " + "is null";
     }
 }
 class IsNotNull extends Condition{
@@ -45,7 +50,7 @@ class IsNotNull extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"is not null";
+        return "%s " + "is not null";
     }
 }
 class LT extends Condition{
@@ -54,7 +59,7 @@ class LT extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"<"+" "+value;
+        return "%s " + "<" + " " + value;
     }
 }
 class LE extends Condition{
@@ -63,7 +68,7 @@ class LE extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"<="+" "+value;
+        return "%s " + "<=" + " " + value;
     }
 }
 class GT extends Condition{
@@ -72,7 +77,7 @@ class GT extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+">"+" "+value;
+        return "%s " + ">" + " " + value;
     }
 }
 class GE extends Condition{
@@ -81,7 +86,7 @@ class GE extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+">="+" "+value;
+        return "%s " + ">=" + " " + value;
     }
 }
 class StartsWith extends Condition{
@@ -90,7 +95,7 @@ class StartsWith extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"STARTS WITH"+""+value;
+        return "%s " + "STARTS WITH" + "" + value;
     }
 }
 class EndsWith extends Condition{
@@ -99,7 +104,7 @@ class EndsWith extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"ENDS WITH"+" "+value;
+        return "%s " + "ENDS WITH" + " " + value;
     }
 }
 class Contains extends Condition{
@@ -108,7 +113,7 @@ class Contains extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"CONTAINS"+" "+value;
+        return "%s " + "CONTAINS" + " " + value;
     }
 }
 class In extends Condition{
@@ -117,7 +122,7 @@ class In extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s "+"IN"+" "+value;
+        return "%s " + "IN" + " "+value;
     }
 }
 class And extends Condition{
@@ -128,7 +133,7 @@ class And extends Condition{
     }
     @Override
     protected String encode(){
-        return value1.encode()+"and "+value2.encode() ;
+        return value1.encode() + "and " + value2.encode() ;
     }
 }
 class Or extends Condition{
@@ -138,7 +143,7 @@ class Or extends Condition{
     }
     @Override
     protected String encode(){
-        return value1.encode()+"or "+value2.encode() ;
+        return value1.encode()+"or " + value2.encode() ;
     }
 }
 class Regular extends Condition{
@@ -147,7 +152,7 @@ class Regular extends Condition{
     }
     @Override
     protected String encode(){
-        return "%s"+" =~ "+value;
+        return "%s" + " =~ " + value;
     }
 }
 

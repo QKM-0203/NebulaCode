@@ -6,7 +6,6 @@
 
 package entity;
 
-
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
 import com.vesoft.nebula.client.graph.data.ResultSet;
@@ -18,7 +17,7 @@ import com.vesoft.nebula.client.graph.net.Session;
 import error.ExecuteException;
 import java.net.UnknownHostException;
 import java.util.List;
-import operator.DateType;
+import operator.DataType;
 
 
 /**
@@ -102,16 +101,16 @@ public class GraphService  {
     }
     Session session = getSession();
     String createSpace = null;
-    if (space.getVidDateType().equals(DateType.FIXED_STRING)) {
+    if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
       createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
               + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
           space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
-          String.format("%s(%d" + ")", space.getVidDateType(), space.getVidDateType().getLength()));
+          String.format("%s(%d" + ")", space.getVidDataType(), space.getVidDataType().getLength()));
     } else {
       createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
               + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
           space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
-          space.getVidDateType());
+          space.getVidDataType());
     }
 
     ResultSet result = session.execute(createSpace);
@@ -131,7 +130,7 @@ public class GraphService  {
    * @throws IOErrorException IOErrorException when execute dropSpace sentence
    */
   public boolean dropSpaces(List<String> spaceNameList) throws IOErrorException {
-    if (spaceNameList == null) {
+    if (spaceNameList == null || spaceNameList.isEmpty()) {
       return false;
     }
     Session session = getSession();

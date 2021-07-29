@@ -11,7 +11,7 @@ package operator;
  *
  * <p>users pass in data types by enumerating instances</p>
  */
-public enum DateType {
+public enum DataType {
   DATE(1),
   DATETIME(2),
   DOUBLE(3),
@@ -28,7 +28,7 @@ public enum DateType {
 
   int length = 0;
 
-  DateType(int length) {
+  DataType(int length) {
     this.length = length;
   }
 
@@ -36,7 +36,7 @@ public enum DateType {
     return length;
   }
 
-  public DateType setLength(int length) {
+  public DataType setLength(int length) {
     this.length = length;
     return this;
   }

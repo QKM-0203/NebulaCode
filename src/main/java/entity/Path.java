@@ -7,7 +7,10 @@
 package entity;
 
 import error.ExecuteException;
+import error.InitPathException;
+
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,9 +37,6 @@ public class Path extends Walkable {
     init(path);
   }
 
-  public List<Object> getSequence() {
-    return sequence;
-  }
 
   /**
    * judge whether it is a path. If so, store the traversal order in the {@link #sequence}
@@ -58,6 +58,7 @@ public class Path extends Walkable {
               part.getRelationship().getEndVid())) {
             sequence.add(part.getEndVertex());
           } else {
+            sequence.clear();
             throw new ExecuteException(String.format("%s can not connect %s",
                 part.getRelationship().getEndVid(), part.getEndVertex()));
           }
@@ -67,14 +68,17 @@ public class Path extends Walkable {
               part.getRelationship().getStartVid())) {
             sequence.add(part.getEndVertex());
           } else {
+            sequence.clear();
             throw new ExecuteException(String.format("%s can not connect %s",
                 part.getRelationship().getStartVid(), part.getEndVertex()));
           }
         } else {
+          sequence.clear();
           throw new ExecuteException(String.format("%s can not connect %s",
               lastVertex, part.getStartVertex()));
         }
       } else {
+        sequence.clear();
         throw new ExecuteException(String.format("%s can not connect %s",
             lastVertex, part.getStartVertex()));
       }
@@ -96,6 +100,9 @@ public class Path extends Walkable {
    * traversal {@link #sequence} output.
    */
   public void walk() {
+    if(sequence.isEmpty()){
+      throw new InitPathException("path cannot be traversed");
+    }
     for (Object o : sequence) {
       System.out.println(o);
     }
@@ -109,26 +116,31 @@ public class Path extends Walkable {
         result.append((Vertex) sequence.get(index));
       } else {
         ArrayList<String> prop = new ArrayList<>();
-        StringBuilder part = new StringBuilder("{");
         HashMap<String, Object> propMap = ((Relationship) sequence.get(index)).getPropMap();
-        for (String propName : ((Relationship) sequence.get(index)).getPropMap().keySet()) {
-          if (propMap.get(propName) instanceof String) {
-            prop.add(String.format("%s: " + "\"" + "%s" + "\"", propName, propMap.get(propName)));
-          } else {
-            prop.add(String.format("%s: " + "%s", propName, propMap.get(propName)));
+        StringBuilder propValue = new StringBuilder();
+        if(propMap == null || propMap.isEmpty()){
+          propValue.append("");
+        }else{
+          for (String propName : ((Relationship) sequence.get(index)).getPropMap().keySet()) {
+            if (propMap.get(propName) instanceof String) {
+              prop.add(String.format("%s: \"%s\"", propName, propMap.get(propName)));
+            } else {
+              prop.add(String.format("%s: %s", propName, propMap.get(propName)));
+            }
           }
+          propValue.append(String.join(", ", prop));
         }
         if (((Relationship) sequence.get(index)).getStartVid().equals(
             ((Vertex) sequence.get(index - 1)).getVid())) {
-          result.append(String.format("-" + "[:"
-                  + ((Relationship) sequence.get(index)).getEdgeName()
-                  + "@" + ((Relationship) sequence.get(index)).getRank() + "%s" + "]" + "->",
-              part.append(String.join(", ", prop)).append("}")));
+          result.append(String.format("-[:%s@%s{%s}]->",
+              ((Relationship) sequence.get(index)).getEdgeName(),
+              ((Relationship) sequence.get(index)).getRank(),
+              propValue));
         } else {
-          result.append(String.format("<-" + "[:"
-                  + ((Relationship) sequence.get(index)).getEdgeName() + "@"
-                  + ((Relationship) sequence.get(index)).getRank() + "%s" + "]" + "-",
-              part.append(String.join(", ", prop)).append("}")));
+          result.append(String.format("<-[:%s@%s{%s}]-",
+              ((Relationship) sequence.get(index)).getEdgeName(),
+              ((Relationship) sequence.get(index)).getRank(),
+              propValue));
         }
       }
     }

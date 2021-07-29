@@ -6,7 +6,7 @@
 
 package entity;
 
-import operator.DateType;
+import operator.DataType;
 
 /**
  * you can set the property name, property value type, and property value settings for a property.
@@ -16,20 +16,20 @@ import operator.DateType;
  */
 public class Property {
   private  String propName;
-  private DateType dataType;
+  private DataType dataType;
   private  boolean isNullable;
   private  Object defaultValue;
 
   /**
    * user pass in propName、dataType、isNullable、defaultValue can create
-   * a satisfactory attribute .
+   * a satisfactory attribute.
    *
-   * @param propName attribute name
+   *  @param propName attribute name
    * @param dataType  attribute data type
    * @param isNullable whether is null
    * @param defaultValue default value
    */
-  public Property(String propName, DateType dataType, boolean isNullable, Object defaultValue) {
+  public Property(String propName, DataType dataType, boolean isNullable, Object defaultValue) {
     this.propName = propName;
     this.dataType = dataType;
     this.isNullable = isNullable;
@@ -44,12 +44,12 @@ public class Property {
     this.propName = propName;
   }
 
-  public DateType getDataType() {
+  public DataType getDataType() {
     return dataType;
   }
 
-  public void setDataType(DateType dataDateType) {
-    this.dataType = dataDateType;
+  public void setDataType(DataType dataType) {
+    this.dataType = dataType;
   }
 
   public boolean isNullable() {
