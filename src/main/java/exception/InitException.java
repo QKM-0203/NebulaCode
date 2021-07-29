@@ -1,4 +1,4 @@
-package error;
+package exception;
 
 public class InitException extends ExecuteException{
   public InitException() {

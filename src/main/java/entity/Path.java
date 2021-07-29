@@ -6,8 +6,8 @@
 
 package entity;
 
-import error.ExecuteException;
-import error.InitException;
+import exception.ExecuteException;
+import exception.InitException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

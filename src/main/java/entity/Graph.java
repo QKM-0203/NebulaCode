@@ -9,7 +9,7 @@ package entity;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
-import error.ExecuteException;
+import exception.ExecuteException;
 import java.util.HashMap;
 import java.util.List;
 

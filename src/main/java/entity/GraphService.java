@@ -14,7 +14,7 @@ import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.exception.NotValidConnectionException;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
-import error.ExecuteException;
+import exception.ExecuteException;
 import java.net.UnknownHostException;
 import java.util.List;
 import operator.DataType;

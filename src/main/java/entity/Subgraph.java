@@ -6,7 +6,7 @@
 
 package entity;
 
-import error.InitException;
+import exception.InitException;
 import java.util.List;
 
 /**
