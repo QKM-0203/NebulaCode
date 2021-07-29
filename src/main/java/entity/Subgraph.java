@@ -13,82 +13,82 @@ import java.util.List;
  * a subgraph is a set of points and edges.
  */
 public class Subgraph {
-  private List<Vertex> vertexList;
-  private List<Relationship> relationshipsList;
+    private List<Vertex> vertexList;
+    private List<Relationship> relationshipsList;
 
-  public Subgraph(List<Vertex> vertexList, List<Relationship> relationshipsList) {
-    init(vertexList, relationshipsList);
-  }
-
-  protected void init(List<Vertex> vertexList, List<Relationship> relationshipsList) {
-    this.vertexList = vertexList;
-    this.relationshipsList = relationshipsList;
-    if (vertexList == null || vertexList.isEmpty()) {
-      throw new InitException("the subgraph contains at least one point");
+    public Subgraph(List<Vertex> vertexList, List<Relationship> relationshipsList) {
+        init(vertexList, relationshipsList);
     }
-  }
 
-  /**
-   * get all vertexes from subgraph.
-   *
-   * @return collection of all vertexes
-   */
-  public  List<Vertex>  vertexes() {
-    if (vertexList == null || vertexList.isEmpty()) {
-      return null;
+    protected void init(List<Vertex> vertexList, List<Relationship> relationshipsList) {
+        this.vertexList = vertexList;
+        this.relationshipsList = relationshipsList;
+        if (vertexList == null || vertexList.isEmpty()) {
+            throw new InitException("the subgraph contains at least one point");
+        }
     }
-    return  vertexList;
-  }
 
-  /**
-   * get all relationship from subgraph.
-   *
-   * @return collection of all relationships
-   */
-  public List<Relationship> relationships() {
-    if (relationshipsList == null || relationshipsList.isEmpty()) {
-      return null;
+    /**
+     * get all vertexes from subgraph.
+     *
+     * @return collection of all vertexes
+     */
+    public  List<Vertex>  vertexes() {
+        if (vertexList == null || vertexList.isEmpty()) {
+            return null;
+        }
+        return  vertexList;
     }
-    return relationshipsList;
-  }
 
-  /**
-   * gets the graph space object bound by the subgraph.
-   *
-   * @return graph space object
-   */
-  public Graph graph() {
-    if ((vertexList == null || vertexList.isEmpty())
-        && (relationshipsList == null || relationshipsList.isEmpty())) {
-      return null;
-    } else {
-      if (vertexList != null && !vertexList.isEmpty()) {
-        return vertexList.get(0).getGraph();
-      } else {
-        return relationshipsList.get(0).getGraph();
-      }
+    /**
+     * get all relationship from subgraph.
+     *
+     * @return collection of all relationships
+     */
+    public List<Relationship> relationships() {
+        if (relationshipsList == null || relationshipsList.isEmpty()) {
+            return null;
+        }
+        return relationshipsList;
     }
-  }
 
-  //{"Person", "Employee"}
-  public List<String> tags() {
-    return null;
-  }
+    /**
+     * gets the graph space object bound by the subgraph.
+     *
+     * @return graph space object
+     */
+    public Graph graph() {
+        if ((vertexList == null || vertexList.isEmpty())
+            && (relationshipsList == null || relationshipsList.isEmpty())) {
+            return null;
+        } else {
+            if (vertexList != null && !vertexList.isEmpty()) {
+                return vertexList.get(0).getGraph();
+            } else {
+                return relationshipsList.get(0).getGraph();
+            }
+        }
+    }
 
-  //{"KNOWS", "LIKES", "DISLIKES","MARRIED_TO", "WORKS_FOR"}
-  public List<String> types() {
-    return null;
-  }
+    //{"Person", "Employee"}
+    public List<String> tags() {
+        return null;
+    }
 
-  public List<Property> properties() {
-    return null;
-  }
+    //{"KNOWS", "LIKES", "DISLIKES","MARRIED_TO", "WORKS_FOR"}
+    public List<String> types() {
+        return null;
+    }
 
-  @Override
-  public String toString() {
-    return "Subgraph{"
-        + "vertex" + vertexList
-        + ", relationships" + relationshipsList
-        + '}';
-  }
+    public List<Property> properties() {
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "Subgraph{"
+            + "vertex" + vertexList
+            + ", relationships" + relationshipsList
+            + '}';
+    }
 }

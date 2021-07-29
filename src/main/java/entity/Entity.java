@@ -11,23 +11,23 @@ package entity;
  *  graph spaces.
  */
 public class Entity {
-  private Graph graph;
+    private Graph graph;
 
-  /**
-   * Bind the corresponding graph space object.
-   *
-   * @param graph graph space object
-   */
-  public void setGraph(Graph graph) {
-    this.graph = graph;
-  }
+    /**
+     * Bind the corresponding graph space object.
+     *
+     * @param graph graph space object
+     */
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
 
-  /**
-   * get the corresponding graph space object.
-   *
-   * @return graph space object.
-   */
-  public Graph getGraph() {
-    return graph;
-  }
+    /**
+     * get the corresponding graph space object.
+     *
+     * @return graph space object.
+     */
+    public Graph getGraph() {
+        return graph;
+    }
 }
