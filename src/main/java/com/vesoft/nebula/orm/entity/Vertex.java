@@ -6,6 +6,7 @@
 
 package com.vesoft.nebula.orm.entity;
 
+import com.vesoft.nebula.orm.exception.InitException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,11 +32,18 @@ public class Vertex extends Entity {
 
     public Vertex(Object vid, HashMap<String, HashMap<String, Object>> propMap) {
         this.vid = vid;
+        if (propMap == null || propMap.isEmpty()) {
+            throw new InitException("the vertex contains at least one tag");
+        }
         this.propMap = propMap;
     }
 
     public HashMap<String, HashMap<String, Object>> getPropMap() {
         return propMap;
+    }
+
+    public void setPropMap(HashMap<String, HashMap<String, Object>> propMap) {
+        this.propMap = propMap;
     }
 
     public Object getVid() {
@@ -44,10 +52,6 @@ public class Vertex extends Entity {
 
     public void setVid(Object vid) {
         this.vid = vid;
-    }
-
-    public void setPropMap(HashMap<String, HashMap<String, Object>> propMap) {
-        this.propMap = propMap;
     }
 
     @Override
@@ -65,10 +69,6 @@ public class Vertex extends Entity {
     @Override
     public int hashCode() {
         return Objects.hash(vid, propMap);
-    }
-
-    public Graph graph() {
-        return getGraph();
     }
 
     public List<String> getTags() {
@@ -92,9 +92,14 @@ public class Vertex extends Entity {
         return true;
     }
 
+    @Override
+    public Graph getGraph() {
+        return super.getGraph();
+    }
+
     /**
-    * delete vertex.
-    */
+     * delete vertex.
+     */
     public boolean clearAllTags() {
         getGraph().delete(this);
         return true;
@@ -126,8 +131,8 @@ public class Vertex extends Entity {
                     } else {
                         prop.add(String.format("%s: %s", propName, propValueMap.get(propName)));
                     }
-                    part.append(String.join(", ", prop)).append("}");
                 }
+                part.append(String.join(", ", prop)).append("}");
             }
         }
         return String.format(result, vid, part);

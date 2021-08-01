@@ -39,7 +39,7 @@ public class Relationship extends Entity {
      * @param rank distinguish edges with the same edge type, starting point and destination point.
      */
     public Relationship(Object startVid, Object endVid, String edgeName,
-                      HashMap<String, Object> propMap, int rank) {
+                        HashMap<String, Object> propMap, int rank) {
         this.startVid = startVid;
         this.endVid = endVid;
         this.edgeName = edgeName;
@@ -101,11 +101,6 @@ public class Relationship extends Entity {
         return Objects.hash(startVid, endVid, edgeName, rank, propMap);
     }
 
-    @Override
-    public Graph getGraph() {
-        return getGraph();
-    }
-
     public HashMap<String, Object> properties() {
         return propMap;
     }
@@ -130,6 +125,10 @@ public class Relationship extends Entity {
         return rank;
     }
 
+    @Override
+    public Graph getGraph() {
+        return super.getGraph();
+    }
 
     @Override
     public String toString() {

@@ -29,7 +29,7 @@ public class Property {
      * @param propName attribute name
      * @param dataType  attribute data type
      * @param isNullable whether is null
-     * @param defaultValue default value
+     * @param defaultValue default value if have not default value,pass in null
      */
     public Property(String propName, DataType dataType, boolean isNullable, Object defaultValue) {
         this.propName = propName;

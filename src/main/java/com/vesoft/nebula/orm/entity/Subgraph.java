@@ -35,7 +35,7 @@ public class Subgraph {
      *
      * @return collection of all vertexes
      */
-    public  List<Vertex>  vertexes() {
+    public  List<Vertex>  getVertexes() {
         if (vertexList == null || vertexList.isEmpty()) {
             return null;
         }
@@ -47,7 +47,7 @@ public class Subgraph {
      *
      * @return collection of all relationships
      */
-    public List<Relationship> relationships() {
+    public List<Relationship> getRelationships() {
         if (relationshipsList == null || relationshipsList.isEmpty()) {
             return null;
         }

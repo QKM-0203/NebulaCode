@@ -40,7 +40,7 @@ public class GraphService  {
      * pass in parameters use default connectionPool.
      */
     public GraphService(List<HostAddress> hostAddresses, String username, String password,
-                      boolean reconnect) {
+                        boolean reconnect) {
         this.hostAddresses = hostAddresses;
         this.username = username;
         this.password = password;
@@ -52,7 +52,7 @@ public class GraphService  {
      * pass in parameters use self-connectionPool config.
      */
     public GraphService(List<HostAddress> hostAddresses, String username, String password,
-                      boolean reconnect, NebulaPoolConfig nebulaPoolConfig) {
+                        boolean reconnect, NebulaPoolConfig nebulaPoolConfig) {
         this.hostAddresses = hostAddresses;
         this.username = username;
         this.password = password;
@@ -91,10 +91,8 @@ public class GraphService  {
      * create space by space objects.
      *
      * @param space spaceObject
-     * @return whether create space success
-     * @throws IOErrorException IOErrorException when execute createSpace sentence
      */
-    public boolean createSpace(Space space) throws IOErrorException {
+    public void createSpace(Space space)  {
         if (space == null) {
             throw new NullPointerException("space object cannot be null");
         }
@@ -104,40 +102,59 @@ public class GraphService  {
         Session session = getSession();
         String createSpace = null;
         if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
-            createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
+            createSpace = String.format("CREATE SPACE `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
-                space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
-                String.format("%s(%d" + ")",
+                space.getSpaceName(), space.getPartitionNumber(),
+                space.getReplicaFactor(), String.format("%s(%d" + ")",
                     space.getVidDataType(), space.getVidDataType().getLength()));
         } else {
-            createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
+            createSpace = String.format("CREATE SPACE `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
-                space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
-                space.getVidDataType());
+                space.getSpaceName(), space.getPartitionNumber(),
+                space.getReplicaFactor(), space.getVidDataType());
         }
-
-        ResultSet result = session.execute(createSpace);
-        if (result == null) {
-            throw new ExecuteException("session is broken");
-        } else {
-            return result.isSucceeded();
+        ResultSet result = run(createSpace);
+        if (!result.isSucceeded()) {
+            throw new ExecuteException(result.getErrorMessage());
         }
     }
+
+
+    /**
+     * execute sentence(nGgl) statement.
+     *
+     * @param sentence sentence statement
+     * @return execute result
+     */
+    public ResultSet run(String sentence)  {
+        ResultSet resultSet = null;
+        try {
+            resultSet = getSession().execute(sentence);
+        } catch (IOErrorException e) {
+            e.printStackTrace();
+        }
+        if (resultSet == null) {
+            throw new ExecuteException("session is broken");
+        }
+        return resultSet;
+    }
+
 
     /**
      * delete space by spaceNameList.
      *
      * @param spaceNameList spaceNameList
      * @return whether drop space success
-     * @throws IOErrorException IOErrorException when execute dropSpace sentence
      */
-    public boolean dropSpaces(List<String> spaceNameList) throws IOErrorException {
+    public boolean dropSpaces(List<String> spaceNameList) {
         if (spaceNameList == null || spaceNameList.isEmpty()) {
             return false;
         }
-        Session session = getSession();
         for (String spaceName : spaceNameList) {
-            session.execute(String.format("DROP IF EXISTS SPACE %s", spaceName));
+            ResultSet resultSet = run(String.format("DROP SPACE `%s`", spaceName));
+            if (!resultSet.isSucceeded()) {
+                throw new ExecuteException(resultSet.getErrorMessage());
+            }
         }
         return true;
     }
@@ -156,8 +173,8 @@ public class GraphService  {
      *
      * @return cluster information
      */
-    public ResultSet  showHosts() {
-        return null;
+    public ResultSet  showHosts() throws IOErrorException {
+        return getSession().execute("SHOW HOSTS");
     }
 
     /**
