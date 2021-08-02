@@ -6,11 +6,14 @@
 
 package com.vesoft.nebula.orm.entity;
 
+import com.vesoft.nebula.client.graph.data.ResultSet;
+import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
+import com.vesoft.nebula.orm.ngql.Encoding;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
+import javax.naming.NameNotFoundException;
 
 /**
  * vertex object with ID and attribute.
@@ -71,12 +74,15 @@ public class Vertex extends Entity {
         return Objects.hash(vid, propMap);
     }
 
-    public List<String> getTags() {
-        return null;
+    public ResultSet getTags() {
+        return getGraph().run("FETCH PROP ON * " + (this.getVid() instanceof String
+            ? "\"" + this.getVid() + "\"" : this.getVid()));
     }
 
     public boolean hasTag(String tagName) {
-        return true;
+        ResultSet run = getGraph().run("FETCH PROP ON " + tagName + (this.getVid() instanceof String
+            ? "\"" + this.getVid() + "\"" : this.getVid()));
+        return run.getRows().size() != 0;
     }
 
     /**
@@ -84,12 +90,11 @@ public class Vertex extends Entity {
      *
      * @param name tagName
      * @param propMap attribute Map
-     * @return whether add success
      */
-    public boolean addTag(String name, HashMap<String, Object> propMap) {
-        //update local
-        //update db (insert vertex)
-        return true;
+    public void addTag(String name, HashMap<String, Object> propMap) {
+        HashMap<String, HashMap<String, Object>> tagMap = this.getPropMap();
+        tagMap.put(name, propMap);
+        getGraph().create(this);
     }
 
     @Override
@@ -100,17 +105,28 @@ public class Vertex extends Entity {
     /**
      * delete vertex.
      */
-    public boolean clearAllTags() {
+    public void clearAllTags() {
         getGraph().delete(this);
-        return true;
     }
 
     /**
      * update propertyValue of tag.
      */
-    public boolean updateTag(String name, HashMap<String, Object> propMap) {
-        //judge vertex if exist in graph
-        return true;
+    public void updateTag(String name, HashMap<String, Object> propMap) throws
+        NameNotFoundException {
+        boolean hasTag = hasTag(name);
+        if (hasTag) {
+            ResultSet resultSet = getGraph().run("UPDATE VERTEX ON " + "`" + name + "`" + (this.getVid() instanceof String
+                ? "\"" + this.getVid() + "\"" : this.getVid()) + "SET "
+                + Encoding.updateSchemaValue(propMap));
+            if (resultSet.isSucceeded()) {
+                this.getPropMap().put(name, propMap);
+            } else {
+                throw new ExecuteException(resultSet.getErrorMessage());
+            }
+        } else {
+            throw new NameNotFoundException("tag" + name + "is not found");
+        }
     }
 
     @Override

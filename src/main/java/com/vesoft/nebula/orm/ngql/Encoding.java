@@ -15,9 +15,7 @@ import com.vesoft.nebula.orm.entity.Schema;
 import com.vesoft.nebula.orm.entity.Vertex;
 import com.vesoft.nebula.orm.exception.DataTypeException;
 import com.vesoft.nebula.orm.exception.InitException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * used to splice objects into nGql statements.
@@ -31,7 +29,7 @@ public class Encoding {
      * @param propMap tagMap
      * @return tagString spliced by tagMap, eg:player(name,age)
      */
-    public static String vertexTagJoin(HashMap<String,
+    public static String joinTag(HashMap<String,
         HashMap<String, Object>> propMap) {
         ArrayList<String> tagStringList = new ArrayList<>();
         StringBuilder tagPartFormat = new StringBuilder();
@@ -62,7 +60,7 @@ public class Encoding {
      * @return attribute values of vertex, eg:"1":("qkm",19)
      * @throws DataTypeException the data type passed in does not match the given condition
      */
-    public static String vertexValueJoin(Vertex vertex) {
+    public static String joinVertexValue(Vertex vertex) {
         ArrayList<String> values = new ArrayList<>();
         String result = "%s:(%s)";
         HashMap<String, HashMap<String, Object>> propMap = vertex.getPropMap();
@@ -84,22 +82,15 @@ public class Encoding {
      * use edgeName and attribute name to connect.
      *
      * @param edgeName edgeName
-     * @param propMap propMap
+     * @param propNameList propNameList
      * @return edgeTypeString, eg: relation(name,salve).
      * @throws DataTypeException the data type passed in does not match the given condition
      */
-    public static String relationshipEdgeJoin(String edgeName, HashMap<String,Object> propMap) {
+    public static String joinEdge(String edgeName, Set<String> propNameList) {
         if (edgeName == null) {
             throw new DataTypeException("edgeType name cannot be null");
         }
-        if (propMap == null) {
-            return String.format("`%s`(%s)", edgeName, "");
-        }
-        if (propMap.containsKey(null)) {
-            throw new DataTypeException("attribute name cannot be null");
-        }
-        return String.format("`%s`(%s)", edgeName,
-            useCommaSplitAddBackQuote(new ArrayList<>(propMap.keySet())));
+        return String.format("`%s`(%s)", edgeName, Objects.requireNonNullElse(propNameList, ""));
 
     }
 
@@ -110,7 +101,7 @@ public class Encoding {
      * @return edgeValues eg:"1"->"2":("qkm",19)
      * @throws DataTypeException the data type passed in does not match the given condition
      */
-    public static String relationshipValueJoin(Relationship relationship) {
+    public static String joinRelationshipValue(Relationship relationship) {
         if (relationship.getStartVid() == null || relationship.getEndVid() == null) {
             throw new InitException("vid cannot be null");
         }
@@ -196,7 +187,7 @@ public class Encoding {
      * @param schema tag or edge
      * @return create sentence
      */
-    public static String schemaJoin(Schema schema) {
+    public static String joinSchema(Schema schema) {
         List<Property> propertyList = schema.getPropertyList();
         StringBuilder prop = new StringBuilder();
         ArrayList<String> expired = new ArrayList<>();
@@ -209,28 +200,8 @@ public class Encoding {
                 expired.add("TTL_COL = \"" + schema.getTtlCol() + "\"");
             }
         }
-        return String.format(schema.getFlag() == 0
-                ? "CREATE TAG `%s`(%s)%s" : "CREATE EDGE `%s`(%s)%s",
+        return String.format("`%s`(%s)%s",
             schema.getName(),prop, String.join(",", expired));
-    }
-
-    /**
-     * join propertyList ,add or change
-     * @param propertyList propertyList
-     * @return ALTER %s `%s` %s (%s)","%s","%s
-     */
-    public static String propJoin(List<Property> propertyList) {
-        return String.format("ALTER %s `%s` %s (%s)","%s","%s","%s",traversalProp(propertyList));
-    }
-
-    /**
-     * delete some attribute for tag or edge
-     * @param propNames  propNameList
-     * @return ALTER %s %s DROP
-     */
-    public static String delPropJoin(List<String> propNames) {
-        return String.format("ALTER %s `%s` DROP (%s)","%s","%s",
-            useCommaSplitAddBackQuote(propNames));
     }
 
 
@@ -260,4 +231,37 @@ public class Encoding {
         }
         return String.join(",", prop);
     }
+
+    /**
+     *
+     * @param propMap attribute value of schema
+     * @return eg: set name = "qkm",age = 10
+     */
+    public static String updateSchemaValue(HashMap<String,Object> propMap) {
+        ArrayList<String> keyValue = new ArrayList<>();
+        for (String propName : propMap.keySet()) {
+            keyValue.add(String.format("%s = %s",propName, judgeDataType(propMap.get(propName))));
+        }
+        return String.join(",",keyValue);
+    }
+
+
+    /**
+     * connect the property to be indexed with the index length to be set.
+     *
+     * @param indexMap indexMap,String is attribute name ,Integer is index length
+     */
+    public static String joinSIndexProp(HashMap<String,Integer> indexMap) {
+        ArrayList<String> indexList = new ArrayList<>();
+        for (String propName : indexMap.keySet()) {
+            if (indexMap.get(propName) != null) {
+                indexList.add(String.format("%s(%d)",propName,indexMap.get(propName)));
+            } else {
+                indexList.add(String.format("%s",propName));
+            }
+
+        }
+        return String.join(",",indexList);
+    }
+
 }

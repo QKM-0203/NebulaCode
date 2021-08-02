@@ -10,10 +10,10 @@ import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
-import com.vesoft.nebula.orm.Common;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.ngql.Encoding;
+import com.vesoft.nebula.orm.util.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +29,10 @@ import java.util.List;
  */
 public class Graph {
     private final Session session;
+    private final String spaceName;
 
     protected Graph(String spaceName, Session session) {
+        this.spaceName = spaceName;
         this.session = session;
         ResultSet result = null;
         String useSpace = "USE " + "`" + spaceName + "`";
@@ -72,7 +74,7 @@ public class Graph {
         }
         ArrayList<Vertex> vertices = new ArrayList<>();
         ArrayList<Relationship> relationships = new ArrayList<>();
-        Common.judgeGraphObject(vertices,relationships,graphObject);
+        Util.judgeGraphObject(vertices,relationships,graphObject);
         createVertexes(vertices);
         createRelationships(relationships);
     }
@@ -87,7 +89,7 @@ public class Graph {
     public void delete(Object graphObject) {
         ArrayList<Vertex> vertices = new ArrayList<>();
         ArrayList<Relationship> relationships = new ArrayList<>();
-        Common.judgeGraphObject(vertices,relationships,graphObject);
+        Util.judgeGraphObject(vertices,relationships,graphObject);
         deleteVertexes(vertices);
         deleteRelationships(relationships);
     }
@@ -103,13 +105,8 @@ public class Graph {
             vidList.add(vertex.getVid() instanceof String
                 ? "\"" + vertex.getVid() + "\"" : vertex.getVid().toString());
         }
-//        System.out.printf("DELETE VERTEX %s%n", String.join(",", vidList));
         ResultSet resultSet = run(String.format("DELETE VERTEX %s", String.join(",", vidList)));
-        if (resultSet.isSucceeded()) {
-            for (Vertex vertex : vertices) {
-                vertex.setGraph(null);
-            }
-        } else {
+        if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
         }
     }
@@ -120,7 +117,8 @@ public class Graph {
      * @param relationships relationships
      */
     public void deleteRelationships(List<Relationship> relationships) {
-        HashMap<String, List<Relationship>> classifyByEdge = Common.classifyByEdge(relationships, 1);
+        HashMap<String, List<Relationship>> classifyByEdge =
+            Util.joinSameEdgeRelationships(relationships, 1);
         ArrayList<String>  relationshipString = new ArrayList<>();
         for (String edgeName : classifyByEdge.keySet()) {
             List<Relationship> relationshipList = classifyByEdge.get(edgeName);
@@ -132,15 +130,9 @@ public class Graph {
                             ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
                         relationship.getRank()));
             }
-//            System.out.println(String.format("DELETE EDGE `" + edgeName + "` %s",
-//                String.join(",", relationshipString)));
             ResultSet resultSet = run(String.format("DELETE EDGE `" + edgeName + "` %s",
                 String.join(",", relationshipString)));
-            if (resultSet.isSucceeded()) {
-                for (Relationship relationship : relationshipList) {
-                    relationship.setGraph(null);
-                }
-            } else {
+            if (!resultSet.isSucceeded()) {
                 throw new ExecuteException(resultSet.getErrorMessage());
             }
         }
@@ -148,62 +140,70 @@ public class Graph {
 
 
     /**
-     * insert some vertexes
+     * insert some vertexes.
+     *
+     * <p>In this method, the points of the same tag form an insertion statement for operation,
+     * Therefore, once an error occurs during the execution of a statement,
+     * the user has to find out the errors of those points corresponding to the wrong tag.
+     * Then ure execute the method. At the same time, when an error occurs,
+     * the user will be returned which tags correspond to which vertexes are successfully executed,
+     * which is convenient for the user to correct.</p>
+     *
      * @param vertices vertexList
      */
     public void createVertexes(List<Vertex> vertices) {
-        HashMap<String, List<Vertex>> classifyByTagAndProp = Common.classifyByTagAndProp(vertices);
+        HashMap<String, List<Vertex>> classifyByTagAndProp = Util.joinSameTagVertices(vertices);
         ArrayList<String> vertexValues = new ArrayList<>();
+        ArrayList<Vertex> success = new ArrayList<>();
         for (String tagJoin : classifyByTagAndProp.keySet()) {
             List<Vertex> vertexList = classifyByTagAndProp.get(tagJoin);
             for (Vertex vertex : vertexList) {
-                vertexValues.add(Encoding.vertexValueJoin(vertex));
+                vertexValues.add(Encoding.joinVertexValue(vertex));
             }
             ResultSet resultSet = run(String.format("INSERT VERTEX %s VALUES %s",
                 tagJoin,String.join(",", vertexValues)));
             vertexValues.clear();
-            if (resultSet.isSucceeded()) {
-                for (Vertex vertex : vertexList) {
-                    vertex.setGraph(this);
-                }
-            } else {
-                throw new ExecuteException(resultSet.getErrorMessage());
+            if (!resultSet.isSucceeded()) {
+                throw new ExecuteException(resultSet.getErrorMessage()
+                + "\nSuccessful tag execution is " + success);
             }
+            success.addAll(vertexList);
         }
     }
 
     /**
-     * insert some relationships
+     * insert some relationships.
+     *
+     * <p>In this method, the points of the same edge form an insertion statement for operation,
+     * Therefore, once an error occurs during the execution of a statement,
+     * the user has to find out the errors of those relationships corresponding to the wrong edge.
+     * Then re execute the method. At the same time, when an error occurs,
+     * the user will be returned which edges correspond to which
+     * relationships are successfully executed,which is convenient for the user to correct.</p>
+     *
      * @param relationships relationships
      */
     public void createRelationships(List<Relationship> relationships) {
-        HashMap<String, List<Relationship>> classifyByEdge = Common.classifyByEdge(relationships,0);
+        HashMap<String, List<Relationship>> classifyByEdge =
+            Util.joinSameEdgeRelationships(relationships,0);
         ArrayList<String> edgeValues = new ArrayList<>();
+        ArrayList<Relationship> success = new ArrayList<>();
         for (String edgeJoin : classifyByEdge.keySet()) {
             List<Relationship> relationshipList = classifyByEdge.get(edgeJoin);
             for (Relationship relationship : relationshipList) {
-                edgeValues.add(Encoding.relationshipValueJoin(relationship));
+                edgeValues.add(Encoding.joinRelationshipValue(relationship));
             }
             ResultSet resultSet = run(String.format("INSERT EDGE %s VALUES %s",
                 edgeJoin,String.join(",", edgeValues)));
             edgeValues.clear();
-            if (resultSet.isSucceeded()) {
-                for (Relationship relationship : relationshipList) {
-                    relationship.setGraph(this);
-                }
-            } else {
-                throw new ExecuteException(resultSet.getErrorMessage());
+            if (!resultSet.isSucceeded()) {
+                throw new ExecuteException(resultSet.getErrorMessage()
+                + "\nSuccessful edge execution is" + success);
             }
+            success.addAll(relationshipList);
         }
     }
 
-
-    /**
-     * delete all edges and vertex of space.
-     */
-    public void deleteAll() {
-
-    }
 
     /**
      * update graphObject.
@@ -211,7 +211,64 @@ public class Graph {
      * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path
      */
     public void update(Object graphObject) {
+        ArrayList<Vertex> vertices = new ArrayList<>();
+        ArrayList<Relationship> relationships = new ArrayList<>();
+        Util.judgeGraphObject(vertices,relationships,graphObject);
+        updateVertexes(vertices);
+        updateRelationship(relationships);
+    }
 
+    /**
+     * update vertex tag attribute value
+     * @param vertices vertices
+     */
+    public void updateVertexes(List<Vertex> vertices) {
+        for (Vertex vertex : vertices) {
+            HashMap<String, HashMap<String, Object>> propMap = vertex.getPropMap();
+            for (String tagName : propMap.keySet()) {
+                if (propMap.get(tagName) != null) {
+                    String updateTagValue = Encoding.updateSchemaValue(propMap.get(tagName));
+                    ResultSet resultSet = run(String.format("UPSERT VERTEX ON `%s` %s SET %s",
+                        tagName, vertex.getVid() instanceof String
+                            ? "\"" + vertex.getVid() + "\"" : vertex.getVid(), updateTagValue));
+                    if (!resultSet.isSucceeded()) {
+                        throw new ExecuteException(resultSet.getErrorMessage()
+                            + "\n the tag " + tagName + " corresponding to " + vertex + " is fail");
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * update relationship edge attribute value
+     * @param relationships relationships
+     */
+    public void updateRelationship(List<Relationship> relationships) {
+        for (Relationship relationship : relationships) {
+            HashMap<String, Object> propMap = relationship.getPropMap();
+            if (propMap != null) {
+                String updateEdgeValue = Encoding.updateSchemaValue(propMap);
+                System.out.println(String.format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
+                    relationship.getEdgeName(), relationship.getStartVid() instanceof String
+                        ? "\"" + relationship.getStartVid() + "\"" : relationship.getStartVid(),
+                    relationship.getEndVid() instanceof String
+                        ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
+                    relationship.getRank(), updateEdgeValue));
+                ResultSet resultSet = run(String.format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
+                    relationship.getEdgeName(), relationship.getStartVid() instanceof String
+                        ? "\"" + relationship.getStartVid() + "\"" : relationship.getStartVid(),
+                    relationship.getEndVid() instanceof String
+                        ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
+                    relationship.getRank(), updateEdgeValue));
+                if (!resultSet.isSucceeded()) {
+                    throw new ExecuteException(resultSet.getErrorMessage()
+                        + "\n the edge " + relationship.getEdgeName()
+                        + " corresponding to  " + relationship + " is fail");
+                }
+            }
+        }
     }
 
     /**
@@ -225,17 +282,48 @@ public class Graph {
     }
 
     /**
-     * create an index with the specified name for tagName and or edgeName
-     * according to the given attribute map, {@code Integer} is index length.
+     * create an index with the specified name for tagName
+     * according to the given attribute map, {@code Integer} is index length,
+     * length is for string dataType,others can be directly transmitted to null
      *
-     * @param name      tagName or edgeName
+     * @param tagName   tagName
      * @param indexName indexName
      * @param propList  indexList
-     * @return whether create success
      */
-    public boolean createSchemaIndex(String name, String indexName,
+    public void createTagIndex(String tagName, String indexName,
                                      HashMap<String, Integer> propList) {
-        return true;
+        ResultSet resultSet = run(String.format("CREATE TAG INDEX %s ON %s(%s)",
+            indexName, tagName, Encoding.joinSIndexProp(propList)));
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+        ResultSet rebuildIndex = run(" REBUILD TAG INDEX " + indexName);
+        if (!rebuildIndex.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+    }
+
+
+    /**
+     * create an index with the specified name for  edgeName
+     * according to the given attribute map, {@code Integer} is index length.
+     *
+     * @param edgeName  edgeName
+     * @param indexName indexName
+     * @param propList  indexList
+     */
+    public void createEdgeIndex(String edgeName, String indexName,
+                                     HashMap<String, Integer> propList) {
+        ResultSet resultSet = run(String.format("CREATE EDGE INDEX %s ON %s(%s)",
+            indexName, edgeName, Encoding.joinSIndexProp(propList)));
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+        ResultSet rebuildIndex = run(" REBUILD EDGE INDEX " + indexName);
+        if (!rebuildIndex.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+
     }
 
     /**
@@ -269,8 +357,24 @@ public class Graph {
      *
      * @param indexName indexName
      */
-    public void dropIndex(String indexName) {
+    public void dropTagIndex(String indexName) {
+        ResultSet resultSet = run("DROP TAG INDEX " + indexName);
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+    }
 
+
+    /**
+     * delete Index by index name.
+     *
+     * @param indexName indexName
+     */
+    public void dropEdgeIndex(String indexName) {
+        ResultSet resultSet = run("DROP EDGE INDEX " + indexName);
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
     }
 
     /**
@@ -289,53 +393,63 @@ public class Graph {
      * @param edgeName edgeName
      * @return indexList
      */
-    public List<String> getEdgeTypeIndexes(String edgeName) {
+    public List<String> getEdgeIndexes(String edgeName) {
         return null;
     }
 
+
     /**
-     * create schema.
+     * create tag.
      *
-     * @param schema tagObject or edgeTypeObject
+     * @param schema tagObject
      */
-    public void createSchema(Schema schema) {
-        String tagJoin = Encoding.schemaJoin(schema);
+    public void createTag(Schema schema) {
+        String tagJoin = "CREATE TAG " + Encoding.joinSchema(schema);
         ResultSet resultSet = run(tagJoin);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
         }
-        schema.setGraph(this);
     }
 
+
     /**
-     * drop schema.
+     * create edge.
      *
-     * @param schemaName edgeName or tagName
-     * @param flag edge or tag,flag == 0
+     * @param schema edgeTypeObject
      */
-    public void dropSchema(String schemaName,int flag) {
-        ResultSet resultSet = null;
-        if (flag == 0) {
-            resultSet = run("DROP TAG " + "`" + schemaName + "`");
-        } else {
-            resultSet = run("DROP EDGE " + "`" + schemaName + "`");
-        }
+    public void createEdge(Schema schema) {
+        String edgeJoin = "CREATE EDGE " + Encoding.joinSchema(schema);
+        ResultSet resultSet = run(edgeJoin);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
         }
     }
 
     /**
-     * add property or update property DateType or update TTL,
-     * if is null don not modify.
+     * drop tag.
      *
-     * @param schema  tagObject or edgeTypeObject
-     * @return whether modify success
+     * @param tagName tagName
      */
-    public boolean modifySchema(Schema schema) {
-        return true;
+    public void dropTag(String tagName) {
+        ResultSet resultSet = null;
+        resultSet = run("DROP TAG " + "`" + tagName + "`");
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
     }
 
 
+    /**
+     * drop edge.
+     *
+     * @param edgeName edgeName
+     */
+    public void dropEdge(String edgeName) {
+        ResultSet resultSet = null;
+        resultSet = run("DROP EDGE " + "`" + edgeName + "`");
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+    }
 
 }
