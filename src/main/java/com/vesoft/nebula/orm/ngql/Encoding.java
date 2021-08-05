@@ -9,6 +9,7 @@ package com.vesoft.nebula.orm.ngql;
 import com.vesoft.nebula.Date;
 import com.vesoft.nebula.DateTime;
 import com.vesoft.nebula.Time;
+import com.vesoft.nebula.client.graph.data.*;
 import com.vesoft.nebula.orm.entity.Property;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Schema;
@@ -46,9 +47,9 @@ public class Encoding {
             } else {
                 tagPartFormat.append(String.format(tagPart.toString(), ""));
             }
-            tagPart.delete(0,tagPart.length());
+            tagPart.delete(0, tagPart.length());
             tagStringList.add(tagPartFormat.toString());
-            tagPartFormat.delete(0,tagPartFormat.length());
+            tagPartFormat.delete(0, tagPartFormat.length());
         }
         return String.join(",", tagStringList);
     }
@@ -74,14 +75,14 @@ public class Encoding {
                 values.add(judgeDataType(object));
             }
         }
-        return String.format(result,(vertex.getVid() instanceof String)
-            ? "\"" + vertex.getVid() + "\"" : vertex.getVid(),String.join(",",values));
+        return String.format(result, (vertex.getVid() instanceof String)
+            ? "\"" + vertex.getVid() + "\"" : vertex.getVid(), String.join(",", values));
     }
 
     /**
      * use edgeName and attribute name to connect.
      *
-     * @param edgeName edgeName
+     * @param edgeName     edgeName
      * @param propNameList propNameList
      * @return edgeTypeString, eg: relation(name,salve).
      * @throws DataTypeException the data type passed in does not match the given condition
@@ -90,7 +91,10 @@ public class Encoding {
         if (edgeName == null) {
             throw new DataTypeException("edgeType name cannot be null");
         }
-        return String.format("`%s`(%s)", edgeName, Objects.requireNonNullElse(propNameList, ""));
+        if (propNameList == null || propNameList.size() == 0) {
+            return String.format("`%s`(%s)", edgeName, "");
+        }
+        return String.format("`%s`(%s)", edgeName, String.join(",", propNameList));
 
     }
 
@@ -128,9 +132,26 @@ public class Encoding {
             dateTime.getSec(), dateTime.getMicrosec());
     }
 
+    public static String encodeDateTimeWrapper(DateTimeWrapper dateTimeWrapper) {
+        return String.format("%d-%02d-%02dT%02d:%02d:%02d:%2d", dateTimeWrapper.getYear(),
+            dateTimeWrapper.getMonth(), dateTimeWrapper.getDay(),
+            dateTimeWrapper.getHour(), dateTimeWrapper.getMinute(),
+            dateTimeWrapper.getSecond(), dateTimeWrapper.getMicrosec());
+    }
+
     public static String encodeTime(Time time) {
         return String.format("%02d:%02d:%02d:%d", time.getHour(), time.getMinute(),
             time.getSec(), time.getMicrosec());
+    }
+
+    public static String encodeTimeWrapper(TimeWrapper timeWrapper) {
+        return String.format("%02d:%02d:%02d:%d", timeWrapper.getHour(), timeWrapper.getMinute(),
+            timeWrapper.getSecond(), timeWrapper.getMicrosec());
+    }
+
+    public static String encodeDateWrapper(DateWrapper dateWrapper) {
+        return String.format("%d-%02d-%02d", dateWrapper.getYear(), dateWrapper.getMonth(),
+            dateWrapper.getDay());
     }
 
     public static String encodeDate(Date date) {
@@ -138,9 +159,9 @@ public class Encoding {
             date.getDay());
     }
 
-
     /**
      * judge object what data type is it.
+     *
      * @param object object
      * @return data format
      * @throws DataTypeException the data type passed in does not match the given condition
@@ -162,6 +183,30 @@ public class Encoding {
             return String.format("date(\"%s\")", encodeDate((Date) object));
         } else if (object instanceof Boolean) {
             return String.format("%s", object);
+        } else if (object instanceof ValueWrapper) {
+            if (((ValueWrapper) object).isBoolean()) {
+                return String.format("%s", object);
+            }
+            if (((ValueWrapper) object).isDate()) {
+                return String.format("date(\"%s\")",
+                    encodeDateWrapper(((ValueWrapper) object).asDate()));
+            }
+            if (((ValueWrapper) object).isDateTime()) {
+                return String.format("datetime(\"%s\")",
+                    encodeDateTimeWrapper(((ValueWrapper) object).asDateTime()));
+            }
+            if (((ValueWrapper) object).isDouble() || ((ValueWrapper) object).isLong()) {
+                return object.toString();
+            }
+            if (((ValueWrapper) object).isString()) {
+                return object.toString();
+            }
+            if (((ValueWrapper) object).isTime()) {
+                return String.format("time(\"%s\")",
+                    encodeTimeWrapper(((ValueWrapper) object).asTime()));
+            } else {
+                throw new DataTypeException("dataType is not support");
+            }
         } else {
             throw new DataTypeException(String.format("nGql does not support type %s",
                 object.getClass().getName()));
@@ -170,8 +215,9 @@ public class Encoding {
 
     /**
      * add BackQuote for attribute name and split use comma
+     *
      * @param nameList name List
-     * @return (%s,%s,%s)
+     * @return (% s, % s, % s)
      */
     public static String useCommaSplitAddBackQuote(List<String> nameList) {
         ArrayList<String> propNameAddBackQuote = new ArrayList<>();
@@ -181,9 +227,9 @@ public class Encoding {
         return String.join(",", propNameAddBackQuote);
     }
 
-
     /**
      * sentence of create schema
+     *
      * @param schema tag or edge
      * @return create sentence
      */
@@ -201,12 +247,12 @@ public class Encoding {
             }
         }
         return String.format("`%s`(%s)%s",
-            schema.getName(),prop, String.join(",", expired));
+            schema.getName(), prop, String.join(",", expired));
     }
-
 
     /**
      * traversal property List
+     *
      * @param propertyList property List
      * @return `name` string not null default 20,`age` int not null
      */
@@ -221,47 +267,47 @@ public class Encoding {
             if (property.isNullable()) {
                 part.append("NULL");
             } else {
-                part.append("NOT null");
+                part.append("NOT NULL");
             }
             if (property.getDefaultValue() != null) {
                 part.append(" DEFAULT ").append(Encoding.judgeDataType(property.getDefaultValue()));
             }
             prop.add(part.toString());
-            part.delete(0,part.length());
+            part.delete(0, part.length());
         }
         return String.join(",", prop);
     }
 
     /**
-     *
      * @param propMap attribute value of schema
      * @return eg: set name = "qkm",age = 10
      */
-    public static String updateSchemaValue(HashMap<String,Object> propMap) {
+    public static String updateSchemaValue(HashMap<String, Object> propMap) {
         ArrayList<String> keyValue = new ArrayList<>();
         for (String propName : propMap.keySet()) {
-            keyValue.add(String.format("%s = %s",propName, judgeDataType(propMap.get(propName))));
+            keyValue.add(String.format("%s = %s", propName, judgeDataType(propMap.get(propName))));
         }
-        return String.join(",",keyValue);
+        return String.join(",", keyValue);
     }
-
 
     /**
      * connect the property to be indexed with the index length to be set.
      *
      * @param indexMap indexMap,String is attribute name ,Integer is index length
      */
-    public static String joinSIndexProp(HashMap<String,Integer> indexMap) {
+    public static String joinIndexProp(HashMap<String, Integer> indexMap) {
         ArrayList<String> indexList = new ArrayList<>();
+        if (indexMap == null) {
+            return null;
+        }
         for (String propName : indexMap.keySet()) {
             if (indexMap.get(propName) != null) {
-                indexList.add(String.format("%s(%d)",propName,indexMap.get(propName)));
+                indexList.add(String.format("%s(%d)", propName, indexMap.get(propName)));
             } else {
-                indexList.add(String.format("%s",propName));
+                indexList.add(String.format("%s", propName));
             }
 
         }
-        return String.join(",",indexList);
+        return String.join(",", indexList);
     }
-
 }

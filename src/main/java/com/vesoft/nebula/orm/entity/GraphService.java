@@ -19,17 +19,16 @@ import com.vesoft.nebula.orm.operator.DataType;
 import java.net.UnknownHostException;
 import java.util.List;
 
-
 /**
  * {@code GraphService} Managing the entire Nebula graph cluster.
  *
- *<p>The user can pass in the host IP, port, user name and password,
+ * <p>The user can pass in the host IP, port, user name and password,
  * establish a connection with the nebula service, and obtain the graph object
  * through the {@link #getGraph(String spaceName)} method.</p>
  *
  * @author Qi Kai Meng
  */
-public class GraphService  {
+public class GraphService {
     private String username;
     private String password;
     private List<HostAddress> hostAddresses;
@@ -92,7 +91,7 @@ public class GraphService  {
      *
      * @param space spaceObject
      */
-    public void createSpace(Space space)  {
+    public void createSpace(Space space) {
         if (space == null) {
             throw new NullPointerException("space object cannot be null");
         }
@@ -100,7 +99,7 @@ public class GraphService  {
             throw new IllegalArgumentException("spaceName cannot be null");
         }
         Session session = getSession();
-        String createSpace = null;
+        String createSpace;
         if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
             createSpace = String.format("CREATE SPACE `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
@@ -119,14 +118,13 @@ public class GraphService  {
         }
     }
 
-
     /**
      * execute sentence(nGgl) statement.
      *
      * @param sentence sentence statement
      * @return execute result
      */
-    public ResultSet run(String sentence)  {
+    public ResultSet run(String sentence) {
         ResultSet resultSet = null;
         try {
             resultSet = getSession().execute(sentence);
@@ -138,7 +136,6 @@ public class GraphService  {
         }
         return resultSet;
     }
-
 
     /**
      * delete space by spaceNameList.
@@ -160,12 +157,30 @@ public class GraphService  {
     }
 
     /**
+     * delete space by spaceNameList.
+     *
+     * @param spaceName spaceName
+     * @return whether drop space success
+     */
+    public boolean dropSpace(String spaceName) {
+        if (spaceName == null) {
+            return false;
+        }
+        ResultSet resultSet = run(String.format("DROP SPACE `%s`", spaceName));
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+
+        return true;
+    }
+
+    /**
      * get the user status of the cluster.
      *
      * @return users information
      */
     public ResultSet showUser() {
-        return null;
+        return run("SHOW USERS;");
     }
 
     /**
@@ -173,17 +188,17 @@ public class GraphService  {
      *
      * @return cluster information
      */
-    public ResultSet  showHosts() throws IOErrorException {
+    public ResultSet showHosts() throws IOErrorException {
         return getSession().execute("SHOW HOSTS");
     }
 
     /**
-     * get the configuration information of the cluster.
+     * get the snapshot information of the cluster.
      *
      * @return configs information
      */
-    public ResultSet getConfigs() {
-        return null;
+    public ResultSet getSnapshot() {
+        return run("SHOW SNAPSHOTS;");
     }
 
     /**
@@ -192,6 +207,6 @@ public class GraphService  {
      * @return space part information
      */
     public ResultSet getParts() {
-        return null;
+        return run("SHOW PARTS");
     }
 }
