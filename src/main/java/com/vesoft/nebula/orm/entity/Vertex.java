@@ -6,14 +6,11 @@
 
 package com.vesoft.nebula.orm.entity;
 
-import com.vesoft.nebula.client.graph.data.ResultSet;
-import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
-import com.vesoft.nebula.orm.ngql.Encoding;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
-import javax.naming.NameNotFoundException;
 
 /**
  * vertex object with ID and attribute.
@@ -22,12 +19,10 @@ import javax.naming.NameNotFoundException;
  * the tag attribute list of the point,and then create the point
  * according to the graph object.</p>
  *
- * <p>you can update the tag attribute of the vertex({@link #updateTag(String, HashMap)}),
- * judge whether the tag exists({@link #hasTag(String)}),
+ * <p>judge whether the tag exists({@link #hasTag(String)}),
  * add a new tag({@link #addTag(String, HashMap)}), etc</p>
  *
  * @author Qi Kai Meng
- *
  */
 public class Vertex extends Entity {
     private Object vid;
@@ -74,27 +69,44 @@ public class Vertex extends Entity {
         return Objects.hash(vid, propMap);
     }
 
-    public ResultSet getTags() {
-        return getGraph().run("FETCH PROP ON * " + (this.getVid() instanceof String
-            ? "\"" + this.getVid() + "\"" : this.getVid()));
+    /**
+     * <p>if users want to get the latest remote data,  can use {@link Graph#pull}</p>
+     *
+     * @param tagName tagName
+     * @return specify the properties of the tag
+     */
+    public HashMap<String, Object> getTag(String tagName) {
+        return this.getPropMap().get(tagName);
     }
 
-    public boolean hasTag(String tagName) {
-        ResultSet run = getGraph().run("FETCH PROP ON " + tagName + (this.getVid() instanceof String
-            ? "\"" + this.getVid() + "\"" : this.getVid()));
-        return run.getRows().size() != 0;
+
+    /**
+     * <p>if users want to get the latest remote data,  can use {@link Graph#pull}</p>
+     *
+     * @return all tagNames
+     */
+    public List<String> getTagNames() {
+        return new ArrayList<>(this.getPropMap().keySet());
     }
 
     /**
-     * pass in tagName and attribute Map to add tag for vertex.
+     * <p>if users want to get the latest remote data,  can use {@link Graph#pull}</p>
      *
-     * @param name tagName
+     * @return true or false
+     */
+    public boolean hasTag(String tagName) {
+        return this.getPropMap().containsKey(tagName);
+    }
+
+    /**
+     * pass in tagName and attribute Map to add tag for vertex,
+     * if want to update to remote database use {@link Graph#push}
+     *
+     * @param name    tagName
      * @param propMap attribute Map
      */
     public void addTag(String name, HashMap<String, Object> propMap) {
-        HashMap<String, HashMap<String, Object>> tagMap = this.getPropMap();
-        tagMap.put(name, propMap);
-        getGraph().create(this);
+        this.getPropMap().put(name, propMap);
     }
 
     @Override
@@ -103,30 +115,11 @@ public class Vertex extends Entity {
     }
 
     /**
-     * delete vertex.
+     * this operation means deleting the vertex,
+     * If you want to update to the remote, use {@link Graph#push}
      */
     public void clearAllTags() {
-        getGraph().delete(this);
-    }
-
-    /**
-     * update propertyValue of tag.
-     */
-    public void updateTag(String name, HashMap<String, Object> propMap) throws
-        NameNotFoundException {
-        boolean hasTag = hasTag(name);
-        if (hasTag) {
-            ResultSet resultSet = getGraph().run("UPDATE VERTEX ON " + "`" + name + "`" + (this.getVid() instanceof String
-                ? "\"" + this.getVid() + "\"" : this.getVid()) + "SET "
-                + Encoding.updateSchemaValue(propMap));
-            if (resultSet.isSucceeded()) {
-                this.getPropMap().put(name, propMap);
-            } else {
-                throw new ExecuteException(resultSet.getErrorMessage());
-            }
-        } else {
-            throw new NameNotFoundException("tag" + name + "is not found");
-        }
+        this.getPropMap().clear();
     }
 
     @Override
