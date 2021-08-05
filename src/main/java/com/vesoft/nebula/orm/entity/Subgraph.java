@@ -7,7 +7,9 @@
 package com.vesoft.nebula.orm.entity;
 
 import com.vesoft.nebula.orm.exception.InitException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * a subgraph is a set of points and edges.
@@ -35,11 +37,11 @@ public class Subgraph {
      *
      * @return collection of all vertexes
      */
-    public  List<Vertex>  getVertexes() {
+    public List<Vertex> getVertexes() {
         if (vertexList == null || vertexList.isEmpty()) {
             return null;
         }
-        return  vertexList;
+        return vertexList;
     }
 
     /**
@@ -72,20 +74,57 @@ public class Subgraph {
         }
     }
 
-
-    public List<String> tags() {
-        //{"Person", "Employee"}
-        return null;
+    /**
+     * include all tagNames at all vertexes and is de weighted.
+     *
+     * <p>if user want to get the latest,please use {@link Graph#pull} from remote get latest data
+     * </p>
+     *
+     * @return Set
+     */
+    public Set<String> tags() {
+        Set<String> tagNames = new HashSet<>();
+        for (Vertex vertex : vertexList) {
+            tagNames.addAll(vertex.getTagNames());
+        }
+        return tagNames;
     }
 
-
-    public List<String> types() {
-        //{"KNOWS", "LIKES", "DISLIKES","MARRIED_TO", "WORKS_FOR"}
-        return null;
+    /**
+     * include all edgeNames at all relationships and is de weighted.
+     *
+     * <p>if user want to get the latest,please use {@link Graph#pull} from remote get latest data
+     * </p>
+     *
+     * @return Set
+     */
+    public Set<String> types() {
+        Set<String> edgeTypes = new HashSet<>();
+        for (Relationship relationship : relationshipsList) {
+            edgeTypes.add(relationship.getEdgeName());
+        }
+        return edgeTypes;
     }
 
-    public List<Property> properties() {
-        return null;
+    /**
+     * get attribute name List from tag and edge and is de weighted.
+     *
+     * <p>if user want to get the latest,please use {@link Graph#pull} from remote get latest data
+     * </p>
+     *
+     * @return attribute name List ,is de weighted
+     */
+    public Set<String> properties() {
+        Set<String> properties = new HashSet<>();
+        for (Vertex vertex : vertexList) {
+            for (String tagName : vertex.getTagNames()) {
+                properties.addAll(vertex.getTag(tagName).keySet());
+            }
+        }
+        for (Relationship relationship : relationshipsList) {
+            properties.addAll(relationship.getPropMap().keySet());
+        }
+        return properties;
     }
 
     @Override
