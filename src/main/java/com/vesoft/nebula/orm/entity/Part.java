@@ -21,7 +21,7 @@ public class Part {
      *
      * @param startVertex  startVertex
      * @param relationship relationship
-     * @param endVertex endVertex
+     * @param endVertex    endVertex
      */
     public Part(Vertex startVertex, Relationship relationship, Vertex endVertex) {
         this.startVertex = startVertex;

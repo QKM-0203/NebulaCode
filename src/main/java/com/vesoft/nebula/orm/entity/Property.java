@@ -26,9 +26,9 @@ public class Property {
      * user pass in propName、dataType、isNullable、defaultValue can create
      * a satisfactory attribute.
      *
-     * @param propName attribute name
-     * @param dataType  attribute data type
-     * @param isNullable whether is null
+     * @param propName     attribute name
+     * @param dataType     attribute data type
+     * @param isNullable   whether is null
      * @param defaultValue default value if have not default value,pass in null
      */
     public Property(String propName, DataType dataType, boolean isNullable, Object defaultValue) {

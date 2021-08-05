@@ -22,10 +22,10 @@ public class Space {
     /**
      * create space by constructor.
      *
-     * @param spaceName  spaceName
-     * @param partitionNumber  the number of partitions in graph space
-     * @param replicaFactor number of copies per slice
-     * @param vidDataType optional value for data type of id is FIXED_STRING(N)和INT64
+     * @param spaceName       spaceName
+     * @param partitionNumber the number of partitions in graph space
+     * @param replicaFactor   number of copies per slice
+     * @param vidDataType     optional value for data type of id is FIXED_STRING(N)和INT64
      */
     public Space(String spaceName, int partitionNumber, int replicaFactor, DataType vidDataType) {
         this.spaceName = spaceName;

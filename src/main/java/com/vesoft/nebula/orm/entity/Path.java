@@ -37,7 +37,6 @@ public class Path extends Walkable {
         init(path);
     }
 
-
     /**
      * judge whether it is a path. If so, store the traversal order in the {@link #sequence}
      * at the same time.
@@ -111,7 +110,7 @@ public class Path extends Walkable {
         StringBuilder result = new StringBuilder();
         for (int index = 0; index < sequence.size(); index++) {
             if (sequence.get(index) instanceof Vertex) {
-                result.append((Vertex) sequence.get(index));
+                result.append(sequence.get(index));
             } else {
                 ArrayList<String> prop = new ArrayList<>();
                 HashMap<String, Object> propMap = ((Relationship) sequence.get(index)).getPropMap();

@@ -27,16 +27,16 @@ public class Relationship extends Entity {
     private Object endVid;
     private String edgeName;
     private int rank = 0;
-    private HashMap<String, Object>  propMap = null;
+    private HashMap<String, Object> propMap = null;
 
     /**
      * user pass in parameter creates a directional edge.
      *
      * @param startVid startVid
-     * @param endVid endVid
+     * @param endVid   endVid
      * @param edgeName edgeName
-     * @param propMap attribute Map
-     * @param rank distinguish edges with the same edge type, starting point and destination point.
+     * @param propMap  attribute Map
+     * @param rank     distinguish edges with the same edge type, starting point and destination point.
      */
     public Relationship(Object startVid, Object endVid, String edgeName,
                         HashMap<String, Object> propMap, int rank) {
@@ -105,10 +105,6 @@ public class Relationship extends Entity {
         return propMap;
     }
 
-    public boolean updateProp(HashMap<String, Object> propMap) {
-        return true;
-    }
-
     public HashMap<String, Object> getPropMap() {
         return propMap;
     }
@@ -123,11 +119,6 @@ public class Relationship extends Entity {
 
     public int getRank() {
         return rank;
-    }
-
-    @Override
-    public Graph getGraph() {
-        return super.getGraph();
     }
 
     @Override
