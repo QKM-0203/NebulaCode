@@ -65,12 +65,12 @@ public class TestDelete {
         vertices.add(vertexTwo);
         vertices.add(vertexThird);
         subgraph = new Subgraph(vertices, relationshipList);
-        Part part12 = new Part(vertexOne, relationship12, vertexTwo);
-        Part part23 = new Part(vertexTwo, relationship23, vertexThird);
-        List<Part> parts = new ArrayList<>();
-        parts.add(part12);
-        parts.add(part23);
-        path = new Path(parts);
+        Segment segment12 = new Segment(vertexOne, relationship12, vertexTwo);
+        Segment segment23 = new Segment(vertexTwo, relationship23, vertexThird);
+        List<Segment> segments = new ArrayList<>();
+        segments.add(segment12);
+        segments.add(segment23);
+        path = new Path(segments);
     }
 
     @Test

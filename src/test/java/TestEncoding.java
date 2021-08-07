@@ -7,17 +7,28 @@
 import com.vesoft.nebula.Date;
 import com.vesoft.nebula.DateTime;
 import com.vesoft.nebula.Time;
+import com.vesoft.nebula.client.graph.data.DateWrapper;
+import com.vesoft.nebula.client.graph.data.HostAddress;
+import com.vesoft.nebula.orm.entity.Graph;
+import com.vesoft.nebula.orm.entity.GraphService;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Vertex;
 import com.vesoft.nebula.orm.ngql.Encoding;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import org.junit.Test;
 
 public class TestEncoding {
+    private GraphService graphService = new GraphService(
+        Arrays.asList(new HostAddress("127.0.0.1", 9669),
+            new HostAddress("127.0.0.1", 9898)),
+        "root", "nebula", false);
+    private Graph graph = graphService.getGraph("test");
     HashMap<String, HashMap<String, Object>> propMap = new HashMap<>();
     HashMap<String, Object> propValueOne = new HashMap<>();
     HashMap<String, Object> propValueTwo = new HashMap<>();
+    HashMap<String, Object> propValueThird= new HashMap<>();
     short year = 2021;
     byte month = 7;
     byte day = 29;
@@ -41,10 +52,11 @@ public class TestEncoding {
         propValueOne.put("etime", time);
         propValueTwo.put("bool", true);
         propValueTwo.put("null", null);
+        propValueThird.put("birth",date);
         propMap.put("QKM2", propValueOne);
         propMap.put("QKM3", propValueTwo);
-        propMap.put("QKM4", null);
-        vertex = new Vertex("1", propMap);
+        propMap.put("demo9", propValueThird);
+        vertex = new Vertex("4", propMap);
 
     }
 
@@ -77,5 +89,6 @@ public class TestEncoding {
         assert Encoding.joinRelationshipValue(relationship).equals("\"1\"->\"2\"@1:(true,null)");
 
     }
+
 }
 

@@ -41,8 +41,8 @@ public class TestUpdate {
 
     {
         vertexMapOne.put("QKM1", null);
-        vertexValueOne.put("name", "qkm");
-        vertexValueOne.put("age", 12);
+        vertexValueOne.put("name", "QKM");
+        vertexValueOne.put("age", 2123);
         vertexValueTwo.put("salve", 20000);
         vertexValueTwo.put("sex", "女");
         vertexMapOne.put("QKM2", vertexValueOne);
@@ -67,18 +67,19 @@ public class TestUpdate {
         vertices.add(vertexTwo);
         vertices.add(vertexThird);
         subgraph = new Subgraph(vertices, relationshipList);
-        Part part12 = new Part(vertexOne, relationship12, vertexTwo);
-        Part part23 = new Part(vertexTwo, relationship23, vertexThird);
-        List<Part> parts = new ArrayList<>();
-        parts.add(part12);
-        parts.add(part23);
-        path = new Path(parts);
+        Segment segment12 = new Segment(vertexOne, relationship12, vertexTwo);
+        Segment segment23 = new Segment(vertexTwo, relationship23, vertexThird);
+        List<Segment> segments = new ArrayList<>();
+        segments.add(segment12);
+        segments.add(segment23);
+        path = new Path(segments);
     }
 
     @Test
     public void testAddTagForVertex() throws UnsupportedEncodingException {
         graph.create(vertexOne);
         vertexMapOne.put("QKM3", null);
+        vertexMapOne.put("QKM8", null);
         graph.push(vertexOne);
         assertHasTag("QKM3", vertexOne.getVid() instanceof String
             ? "\"" + vertexOne.getVid() + "\"" : vertexOne.getVid().toString());

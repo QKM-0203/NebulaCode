@@ -68,12 +68,12 @@ public class TestCreate {
         vertices.add(vertexTwo);
         vertices.add(vertexThird);
         subgraph = new Subgraph(vertices, relationshipList);
-        Part part12 = new Part(vertexOne, relationship12, vertexTwo);
-        Part part23 = new Part(vertexTwo, relationship23, vertexThird);
-        List<Part> parts = new ArrayList<>();
-        parts.add(part12);
-        parts.add(part23);
-        path = new Path(parts);
+        Segment segment12 = new Segment(vertexOne, relationship12, vertexTwo);
+        Segment segment23 = new Segment(vertexTwo, relationship23, vertexThird);
+        List<Segment> segments = new ArrayList<>();
+        segments.add(segment12);
+        segments.add(segment23);
+        path = new Path(segments);
     }
 
     @Test
@@ -140,7 +140,6 @@ public class TestCreate {
         assert graph.getEdgeIndexes("QKM5").contains("\"t_qkm5\"");
     }
 
-
     @Test
     public void createTagIndex() {
         graph.createTag(qkm6);
@@ -199,7 +198,7 @@ public class TestCreate {
                 ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
             relationship.getRank()));
         assert resultSet.colValues("edges_")
-            .get(0).asRelationship().properties().get("teamName").toString().equals("\"China\"");
+            .get(0).asRelationship().properties().get("teamName").asString().equals("China");
 
     }
 
