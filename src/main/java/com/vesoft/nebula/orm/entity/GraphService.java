@@ -59,7 +59,7 @@ public class GraphService {
         this.nebulaPoolConfig = nebulaPoolConfig;
     }
 
-    private Session getSession() {
+    public Session getSession() {
         NebulaPool nebulaPool = new NebulaPool();
         Session session = null;
         try {

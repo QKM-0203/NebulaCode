@@ -129,7 +129,7 @@ public class Relationship extends Entity {
         ArrayList<String> prop = new ArrayList<>();
         StringBuilder propValue = new StringBuilder();
         if (propMap == null || propMap.isEmpty()) {
-            propValue.append("");
+
         } else {
             for (String propName : propMap.keySet()) {
                 if (propMap.get(propName) instanceof String) {
