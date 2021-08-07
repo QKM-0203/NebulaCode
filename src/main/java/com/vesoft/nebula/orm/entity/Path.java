@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * users can create a path by passing in List<{@link Part}> to insert data,
+ * users can create a path by passing in List<{@link Segment}> to insert data,
  * and can also accept the post query path.
  *
  * <p>after the user passes in a group of paths,
@@ -33,7 +33,7 @@ import java.util.List;
 public class Path extends Walkable {
     private List<Object> sequence = new ArrayList<>();
 
-    public Path(List<Part> path) {
+    public Path(List<Segment> path) {
         init(path);
     }
 
@@ -43,42 +43,42 @@ public class Path extends Walkable {
      *
      * @param path path information
      */
-    public void init(List<Part> path) {
+    public void init(List<Segment> path) {
         if (path == null) {
             throw new NullPointerException("path object is null");
         }
         sequence.add(path.get(0).getStartVertex());
-        for (Part part : path) {
+        for (Segment segment : path) {
             Vertex lastVertex = (Vertex) sequence.get(sequence.size() - 1);
-            if (lastVertex.getVid().equals(part.getStartVertex().getVid())) {
-                if (lastVertex.getVid().equals(part.getRelationship().getStartVid())) {
-                    sequence.add(part.getRelationship());
-                    if (part.getEndVertex().getVid().equals(part.getRelationship().getEndVid())) {
-                        sequence.add(part.getEndVertex());
+            if (lastVertex.getVid().equals(segment.getStartVertex().getVid())) {
+                if (lastVertex.getVid().equals(segment.getRelationship().getStartVid())) {
+                    sequence.add(segment.getRelationship());
+                    if (segment.getEndVertex().getVid().equals(segment.getRelationship().getEndVid())) {
+                        sequence.add(segment.getEndVertex());
                     } else {
                         sequence.clear();
                         throw new ExecuteException(String.format("%s can not connect %s",
-                            part.getRelationship().getEndVid(), part.getEndVertex()));
+                            segment.getRelationship().getEndVid(), segment.getEndVertex()));
 
                     }
-                } else if (lastVertex.getVid().equals(part.getRelationship().getEndVid())) {
-                    sequence.add(part.getRelationship());
-                    if (part.getEndVertex().getVid().equals(part.getRelationship().getStartVid())) {
-                        sequence.add(part.getEndVertex());
+                } else if (lastVertex.getVid().equals(segment.getRelationship().getEndVid())) {
+                    sequence.add(segment.getRelationship());
+                    if (segment.getEndVertex().getVid().equals(segment.getRelationship().getStartVid())) {
+                        sequence.add(segment.getEndVertex());
                     } else {
                         sequence.clear();
                         throw new ExecuteException(String.format("%s can not connect %s",
-                            part.getRelationship().getStartVid(), part.getEndVertex()));
+                            segment.getRelationship().getStartVid(), segment.getEndVertex()));
                     }
                 } else {
                     sequence.clear();
                     throw new ExecuteException(String.format("%s can not connect %s",
-                        lastVertex, part.getStartVertex()));
+                        lastVertex, segment.getStartVertex()));
                 }
             } else {
                 sequence.clear();
                 throw new ExecuteException(String.format("%s can not connect %s",
-                    lastVertex, part.getStartVertex()));
+                    lastVertex, segment.getStartVertex()));
             }
         }
         ArrayList<Vertex> vertices = new ArrayList<>();
@@ -116,7 +116,7 @@ public class Path extends Walkable {
                 HashMap<String, Object> propMap = ((Relationship) sequence.get(index)).getPropMap();
                 StringBuilder propValue = new StringBuilder();
                 if (propMap == null || propMap.isEmpty()) {
-                    propValue.append("");
+
                 } else {
                     for (String propName : ((Relationship)
                         sequence.get(index)).getPropMap().keySet()) {
