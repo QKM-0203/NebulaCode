@@ -105,7 +105,6 @@ public class Graph {
                 }
                 successVertexes.addAll(vertexList);
             }
-
         }
         if (relationships.size() != 0) {
             HashMap<String, List<Relationship>> joinSameEdgeRelationships =
@@ -130,7 +129,6 @@ public class Graph {
                 successEdges.addAll(relationshipList);
             }
         }
-
     }
 
     /**
@@ -210,20 +208,26 @@ public class Graph {
                         create(relationship);
                     }
                 } else {
-                    String updateEdgeValue = Encoding.updateSchemaValue(relationship.getPropMap());
-                    ResultSet resultSet = run(String.format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
-                        relationship.getEdgeName(), relationship.getStartVid() instanceof String
-                            ? "\"" + relationship.getStartVid() + "\"" : relationship.getStartVid(),
-                        relationship.getEndVid() instanceof String
-                            ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
-                        relationship.getRank(), updateEdgeValue));
-                    if (!resultSet.isSucceeded()) {
-                        throw new ExecuteException(resultSet.getErrorMessage()
-                            + "\n the tag " + schemaName[0] + " corresponding to "
-                            + relationship + " merge fail");
+                    if (relationship.getPropMap() != null
+                        && relationship.getPropMap().size() != 0) {
+                        String updateEdgeValue =
+                            Encoding.updateSchemaValue(relationship.getPropMap());
+                        ResultSet resultSet = run(String
+                            .format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
+                                relationship.getEdgeName(), relationship.getStartVid() instanceof String
+                                    ? "\"" + relationship.getStartVid()
+                                    + "\"" : relationship.getStartVid(),
+                                relationship.getEndVid() instanceof String
+                                    ? "\"" + relationship.getEndVid()
+                                    + "\"" : relationship.getEndVid(),
+                                relationship.getRank(), updateEdgeValue));
+                        if (!resultSet.isSucceeded()) {
+                            throw new ExecuteException(resultSet.getErrorMessage()
+                                + "\n the tag " + schemaName[0] + " corresponding to "
+                                + relationship + " merge fail");
+                        }
                     }
                 }
-
             }
         }
         if (vertices.size() != 0) {
@@ -234,20 +238,22 @@ public class Graph {
                 if (resultSet.rowsSize() == 0) {
                     create(vertex);
                 } else {
-                    String updateTagValue =
-                        Encoding.updateSchemaValue(vertex.getPropMap().get(schemaName[0]));
-                    ResultSet result = run(String.format("UPSERT VERTEX ON `%s` %s SET %s",
-                        schemaName[0], vertex.getVid() instanceof String
-                            ? "\"" + vertex.getVid() + "\"" : vertex.getVid(), updateTagValue));
-                    if (!result.isSucceeded()) {
-                        throw new ExecuteException(resultSet.getErrorMessage()
-                            + "\n the tag " + schemaName[0] + " corresponding to "
-                            + vertex + " merge fail");
+                    if (vertex.getPropMap().get(schemaName[0]) != null
+                        && vertex.getPropMap().get(schemaName[0]).size() != 0) {
+                        String updateTagValue =
+                            Encoding.updateSchemaValue(vertex.getPropMap().get(schemaName[0]));
+                        ResultSet result = run(String.format("UPSERT VERTEX ON `%s` %s SET %s",
+                            schemaName[0], vertex.getVid() instanceof String
+                                ? "\"" + vertex.getVid() + "\"" : vertex.getVid(), updateTagValue));
+                        if (!result.isSucceeded()) {
+                            throw new ExecuteException(resultSet.getErrorMessage()
+                                + "\n the tag " + schemaName[0] + " corresponding to "
+                                + vertex + " merge fail");
+                        }
                     }
                 }
             }
         }
-
     }
 
 
@@ -284,7 +290,10 @@ public class Graph {
                         Vertex vertex = idVertexMap.get(node.getId().toString());
                         HashMap<String, HashMap<String, Object>> propMap = new HashMap<>();
                         for (String tagName : node.tagNames()) {
-                            propMap.put(tagName, new HashMap<>(node.properties(tagName)));
+                            HashMap<String, ValueWrapper> properties = node.properties(tagName);
+                            HashMap<String, Object> tagMap = new HashMap<>();
+                            Util.judgeValueWrapper(tagMap, properties);
+                            propMap.put(tagName, tagMap);
                         }
                         vertex.setPropMap(propMap);
                     }
@@ -304,14 +313,16 @@ public class Graph {
                 List<ValueWrapper> remoteEdges = relationshipResultSet.colValues("edges_");
 
                 if (relationshipResultSet.isSucceeded()) {
-                    relationship.setPropMap(
-                        new HashMap<>(remoteEdges.get(0).asRelationship().properties()));
+                    HashMap<String, ValueWrapper> properties =
+                        remoteEdges.get(0).asRelationship().properties();
+                    HashMap<String, Object> edgeMap = new HashMap<>();
+                    Util.judgeValueWrapper(edgeMap, properties);
+                    relationship.setPropMap(edgeMap);
                 } else {
                     throw new ExecuteException(relationshipResultSet.getErrorMessage());
                 }
             }
         }
-
     }
 
     /**
@@ -336,14 +347,40 @@ public class Graph {
                     throw new ExecuteException("the vertex " + vertex
                         + " is not found at remote database");
                 }
+                HashMap<String, HashMap<String, Object>> propMapAdd =
+                    new HashMap<>(vertex.getPropMap());
+                HashMap<String, HashMap<String, Object>> propMapDel =
+                    new HashMap<>(vertex.getPropMap());
                 List<String> remoteTags = remoteVertex.get(0).asNode().labels();
                 Set<String> localTags = vertex.getPropMap().keySet();
-                //add tags or update tag
-                if (localTags.equals(new HashSet<>(remoteTags))
-                    || remoteTags.containsAll(localTags)
-                    || localTags.removeAll(new HashSet<>(remoteTags))) {
-                    create(vertex);
+                //update tag
+                if (localTags.retainAll(remoteTags)) {
+                    for (String tagName : vertex.getPropMap().keySet()) {
+                        if (vertex.getPropMap().get(tagName) != null
+                            && vertex.getPropMap().get(tagName).size() != 0) {
+                            String updateTagValue =
+                                Encoding.updateSchemaValue(vertex.getPropMap().get(tagName));
+                            ResultSet result = run(String.format("UPSERT VERTEX ON `%s` %s SET %s",
+                                tagName, vertex.getVid() instanceof String
+                                    ? "\"" + vertex.getVid() + "\"" : vertex.getVid(), updateTagValue));
+                            if (!result.isSucceeded()) {
+                                throw new ExecuteException(resultSet.getErrorMessage()
+                                    + "\n the tag " + tagName + " corresponding to "
+                                    + vertex + " push fail");
+                            }
+                        }
+                    }
                 }
+                vertex.setPropMap(propMapAdd);
+                localTags = vertex.getPropMap().keySet();
+                //add tag
+                if (localTags.removeAll(new HashSet<>(remoteTags))) {
+                    if (vertex.getPropMap().size() != 0) {
+                        create(vertex);
+                    }
+                }
+                vertex.setPropMap(propMapDel);
+                localTags = vertex.getPropMap().keySet();
                 //delete tag,TODO: depends on  https://github.com/vesoft-inc/nebula-graph/pull/1303
                 if (remoteTags.removeAll(localTags)) {
                     System.out.println(remoteTags);
@@ -364,23 +401,29 @@ public class Graph {
                         + relationship + " is not found at remote database");
                 }
                 if (relationship.getPropMap() != null) {
-                    String updateEdgeValue = Encoding.updateSchemaValue(relationship.getPropMap());
-                    ResultSet updateRemote =
-                        run(String.format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
-                            relationship.getEdgeName(), relationship.getStartVid() instanceof String
-                                ? "\"" + relationship.getStartVid() + "\"" : relationship.getStartVid(),
-                            relationship.getEndVid() instanceof String
-                                ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
-                            relationship.getRank(), updateEdgeValue));
-                    if (!updateRemote.isSucceeded()) {
-                        throw new ExecuteException(updateRemote.getErrorMessage()
-                            + "\n the edge " + relationship.getEdgeName()
-                            + " corresponding to  " + relationship + " push fail");
+                    if (relationship.getPropMap() != null
+                        && relationship.getPropMap().size() != 0) {
+                        String updateEdgeValue = Encoding
+                            .updateSchemaValue(relationship.getPropMap());
+                        ResultSet updateRemote =
+                            run(String.format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
+                                relationship.getEdgeName(),
+                                relationship.getStartVid() instanceof String
+                                    ? "\"" + relationship.getStartVid()
+                                    + "\"" : relationship.getStartVid(),
+                                relationship.getEndVid() instanceof String
+                                    ? "\"" + relationship.getEndVid()
+                                    + "\"" : relationship.getEndVid(),
+                                relationship.getRank(), updateEdgeValue));
+                        if (!updateRemote.isSucceeded()) {
+                            throw new ExecuteException(updateRemote.getErrorMessage()
+                                + "\n the edge " + relationship.getEdgeName()
+                                + " corresponding to  " + relationship + " push fail");
+                        }
                     }
                 }
             }
         }
-
     }
 
 
@@ -451,7 +494,13 @@ public class Graph {
     public List<String> getTags() {
         ArrayList<String> tagNames = new ArrayList<>();
         run("SHOW TAGS").colValues("Name")
-            .forEach(tagName -> tagNames.add(tagName.toString()));
+            .forEach(tagName -> {
+                try {
+                    tagNames.add(tagName.asString());
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            });
         return tagNames;
     }
 
@@ -464,7 +513,13 @@ public class Graph {
     public List<String> getEdges() {
         ArrayList<String> edgeNames = new ArrayList<>();
         run("SHOW EDGES").colValues("Name")
-            .forEach(tagName -> edgeNames.add(tagName.toString()));
+            .forEach(tagName -> {
+                try {
+                    edgeNames.add(tagName.asString());
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            });
         return edgeNames;
     }
 
@@ -570,5 +625,4 @@ public class Graph {
             throw new ExecuteException(resultSet.getErrorMessage());
         }
     }
-
 }
