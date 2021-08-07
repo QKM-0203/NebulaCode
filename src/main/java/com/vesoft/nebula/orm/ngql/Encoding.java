@@ -7,9 +7,8 @@
 package com.vesoft.nebula.orm.ngql;
 
 import com.vesoft.nebula.Date;
-import com.vesoft.nebula.DateTime;
-import com.vesoft.nebula.Time;
-import com.vesoft.nebula.client.graph.data.*;
+import com.vesoft.nebula.orm.datatype.DateTime;
+import com.vesoft.nebula.orm.datatype.Time;
 import com.vesoft.nebula.orm.entity.Property;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Schema;
@@ -111,7 +110,7 @@ public class Encoding {
         }
         ArrayList<String> values = new ArrayList<>();
         if (relationship.getPropMap() == null || relationship.getPropMap().isEmpty()) {
-            values.add("");
+
         } else {
             for (String value : relationship.getPropMap().keySet()) {
                 Object object = relationship.getPropMap().get(value);
@@ -124,34 +123,6 @@ public class Encoding {
             relationship.getEndVid() instanceof String
                 ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
             relationship.getRank(), String.join(",", values));
-    }
-
-    public static String encodeDateTime(DateTime dateTime) {
-        return String.format("%d-%02d-%02dT%02d:%02d:%02d:%2d", dateTime.getYear(),
-            dateTime.getMonth(), dateTime.getDay(), dateTime.getHour(), dateTime.getMinute(),
-            dateTime.getSec(), dateTime.getMicrosec());
-    }
-
-    public static String encodeDateTimeWrapper(DateTimeWrapper dateTimeWrapper) {
-        return String.format("%d-%02d-%02dT%02d:%02d:%02d:%2d", dateTimeWrapper.getYear(),
-            dateTimeWrapper.getMonth(), dateTimeWrapper.getDay(),
-            dateTimeWrapper.getHour(), dateTimeWrapper.getMinute(),
-            dateTimeWrapper.getSecond(), dateTimeWrapper.getMicrosec());
-    }
-
-    public static String encodeTime(Time time) {
-        return String.format("%02d:%02d:%02d:%d", time.getHour(), time.getMinute(),
-            time.getSec(), time.getMicrosec());
-    }
-
-    public static String encodeTimeWrapper(TimeWrapper timeWrapper) {
-        return String.format("%02d:%02d:%02d:%d", timeWrapper.getHour(), timeWrapper.getMinute(),
-            timeWrapper.getSecond(), timeWrapper.getMicrosec());
-    }
-
-    public static String encodeDateWrapper(DateWrapper dateWrapper) {
-        return String.format("%d-%02d-%02d", dateWrapper.getYear(), dateWrapper.getMonth(),
-            dateWrapper.getDay());
     }
 
     public static String encodeDate(Date date) {
@@ -176,37 +147,13 @@ public class Encoding {
         } else if (object instanceof String) {
             return "\"" + object + "\"";
         } else if (object instanceof DateTime) {
-            return String.format("datetime(\"%s\")", encodeDateTime((DateTime) object));
+            return String.format("datetime(\"%s\")", ((DateTime) object).getDateTimeString());
         } else if (object instanceof Time) {
-            return String.format("time(\"%s\")", encodeTime((Time) object));
+            return String.format("time(\"%s\")", ((Time) object).getTimeString());
         } else if (object instanceof Date) {
             return String.format("date(\"%s\")", encodeDate((Date) object));
         } else if (object instanceof Boolean) {
             return String.format("%s", object);
-        } else if (object instanceof ValueWrapper) {
-            if (((ValueWrapper) object).isBoolean()) {
-                return String.format("%s", object);
-            }
-            if (((ValueWrapper) object).isDate()) {
-                return String.format("date(\"%s\")",
-                    encodeDateWrapper(((ValueWrapper) object).asDate()));
-            }
-            if (((ValueWrapper) object).isDateTime()) {
-                return String.format("datetime(\"%s\")",
-                    encodeDateTimeWrapper(((ValueWrapper) object).asDateTime()));
-            }
-            if (((ValueWrapper) object).isDouble() || ((ValueWrapper) object).isLong()) {
-                return object.toString();
-            }
-            if (((ValueWrapper) object).isString()) {
-                return object.toString();
-            }
-            if (((ValueWrapper) object).isTime()) {
-                return String.format("time(\"%s\")",
-                    encodeTimeWrapper(((ValueWrapper) object).asTime()));
-            } else {
-                throw new DataTypeException("dataType is not support");
-            }
         } else {
             throw new DataTypeException(String.format("nGql does not support type %s",
                 object.getClass().getName()));
