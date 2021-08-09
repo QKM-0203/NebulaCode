@@ -5,7 +5,6 @@
  */
 
 import com.vesoft.nebula.client.graph.data.HostAddress;
-import com.vesoft.nebula.client.graph.data.TimeWrapper;
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.operator.DataType;
 import java.io.UnsupportedEncodingException;
@@ -105,7 +104,9 @@ public class TestGet {
         propMap.put("QKM2", vertexValue);
         Vertex vertex = new Vertex("2", propMap);
         graph.pull(vertex);
+        System.out.println(vertex);
         assert vertex.hasTag("QKM3");
+        assert vertex.hasTag("QKM2");
     }
 
     @Test
@@ -118,16 +119,13 @@ public class TestGet {
     }
 
     @Test
-    public void testPullSubgraph() throws UnsupportedEncodingException {
+    public void testPullSubgraph() {
         graph.create(subgraph);
         graph.run("upsert edge on team \"1\"->\"2\"@1 set teamName = \"XuXin\"");
         graph.run("upsert vertex on QKM4 \"3\" set sex = \"女\"");
-        graph.pull(subgraph);
-        System.out.println(subgraph);
         assert subgraph.getVertexes().get(2).getPropMap().get("QKM4")
             .get("sex").toString().equals("女");
         assert subgraph.getRelationships().get(0).getPropMap()
             .get("teamName").toString().equals("XuXin");
     }
-
 }

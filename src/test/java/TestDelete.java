@@ -78,7 +78,6 @@ public class TestDelete {
         ArrayList<String> spaceNameList = new ArrayList<>();
         spaceNameList.add("test1");
         spaceNameList.add("test2");
-        assert graphService.dropSpaces(spaceNameList);
     }
 
     @Test
@@ -117,6 +116,9 @@ public class TestDelete {
     public void deleteTag() {
         graph.createTag(qkm6);
         assert graph.getTags().contains("\"" + qkm6.getName() + "\"");
+        ArrayList<String> tagList = new ArrayList<>();
+        tagList.add("QKM6");
+        graph.dropTagList(tagList);
         graph.dropTag("QKM6");
         assert !graph.getTags().contains("\"" + qkm6.getName() + "\"");
     }
@@ -125,6 +127,9 @@ public class TestDelete {
     public void deleteEdge() {
         graph.createEdge(qkm5);
         assert graph.getTags().contains("\"" + qkm5.getName() + "\"");
+        ArrayList<String> edgeList = new ArrayList<>();
+        edgeList.add("QKM5");
+        graph.dropEdgeList(edgeList);
         graph.dropEdge("QKM5");
         assert !graph.getEdges().contains("\"" + qkm5.getName() + "\"");
     }
