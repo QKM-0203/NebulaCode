@@ -11,10 +11,7 @@ import com.vesoft.nebula.client.graph.data.TimeWrapper;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.datatype.DateTime;
 import com.vesoft.nebula.orm.datatype.Time;
-import com.vesoft.nebula.orm.entity.Path;
-import com.vesoft.nebula.orm.entity.Relationship;
-import com.vesoft.nebula.orm.entity.Subgraph;
-import com.vesoft.nebula.orm.entity.Vertex;
+import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.ngql.Encoding;
 import java.io.UnsupportedEncodingException;
@@ -120,36 +117,37 @@ public class Util {
     /**
      * the valueWrapper type obtained by executing the run method
      * needs to determine the actual type and convert it
-     * @param propMap  convert it and save
+     *
+     * @param propMap         convert it and save
      * @param valueWrapperMap value of execute run method
      * @throws UnsupportedEncodingException convert it arise question
      */
-    public static void judgeValueWrapper(HashMap<String,Object> propMap,
-                                  HashMap<String, ValueWrapper> valueWrapperMap)
+    public static void judgeValueWrapper(HashMap<String, Object> propMap,
+                                         HashMap<String, ValueWrapper> valueWrapperMap)
         throws UnsupportedEncodingException {
         for (String propName : valueWrapperMap.keySet()) {
             if (valueWrapperMap.get(propName).isString()) {
-                propMap.put(propName,valueWrapperMap.get(propName).asString());
+                propMap.put(propName, valueWrapperMap.get(propName).asString());
             } else if (valueWrapperMap.get(propName).isDate()) {
-                propMap.put(propName,valueWrapperMap.get(propName).asDate());
+                propMap.put(propName, valueWrapperMap.get(propName).asDate());
             } else if (valueWrapperMap.get(propName).isBoolean()) {
-                propMap.put(propName,valueWrapperMap.get(propName).asBoolean());
+                propMap.put(propName, valueWrapperMap.get(propName).asBoolean());
             } else if (valueWrapperMap.get(propName).isDateTime()) {
                 DateTimeWrapper dateTimeWrapper = valueWrapperMap.get(propName).asDateTime();
                 DateTime dateTime = new DateTime(dateTimeWrapper.getLocalDateTimeStr());
                 dateTime.setDateTimeWrapper(dateTimeWrapper);
-                propMap.put(propName,dateTime);
+                propMap.put(propName, dateTime);
             } else if (valueWrapperMap.get(propName).isTime()) {
                 TimeWrapper timeWrapper = valueWrapperMap.get(propName).asTime();
                 Time time = new Time(timeWrapper.getLocalTimeStr());
                 time.setTimeWrapper(timeWrapper);
-                propMap.put(propName,time);
+                propMap.put(propName, time);
             } else if (valueWrapperMap.get(propName).isDouble()) {
-                propMap.put(propName,valueWrapperMap.get(propName).asDouble());
+                propMap.put(propName, valueWrapperMap.get(propName).asDouble());
             } else if (valueWrapperMap.get(propName).isLong()) {
-                propMap.put(propName,valueWrapperMap.get(propName).asLong());
+                propMap.put(propName, valueWrapperMap.get(propName).asLong());
             } else {
-                propMap.put(propName,valueWrapperMap.get(propName).asNull());
+                propMap.put(propName, valueWrapperMap.get(propName).asNull());
             }
         }
     }
