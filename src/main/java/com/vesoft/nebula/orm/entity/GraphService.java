@@ -17,6 +17,7 @@ import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.operator.DataType;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -101,13 +102,13 @@ public class GraphService {
         Session session = getSession();
         String createSpace;
         if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
-            createSpace = String.format("CREATE SPACE `%s`"
+            createSpace = String.format("CREATE SPACE IF NOT EXIST `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
                 space.getSpaceName(), space.getPartitionNumber(),
                 space.getReplicaFactor(), String.format("%s(%d" + ")",
                     space.getVidDataType(), space.getVidDataType().getLength()));
         } else {
-            createSpace = String.format("CREATE SPACE `%s`"
+            createSpace = String.format("CREATE SPACE IF NOT EXIST `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
                 space.getSpaceName(), space.getPartitionNumber(),
                 space.getReplicaFactor(), space.getVidDataType());
@@ -141,37 +142,18 @@ public class GraphService {
      * delete space by spaceNameList.
      *
      * @param spaceNameList spaceNameList
-     * @return whether drop space success
      */
-    public boolean dropSpaces(List<String> spaceNameList) {
-        if (spaceNameList == null || spaceNameList.isEmpty()) {
-            return false;
-        }
-        for (String spaceName : spaceNameList) {
-            ResultSet resultSet = run(String.format("DROP SPACE `%s`", spaceName));
+    public void dropSpaces(List<String> spaceNameList) {
+        if (spaceNameList != null && !spaceNameList.isEmpty()) {
+            ArrayList<String> spaceSentences = new ArrayList<>();
+            for (String spaceName : spaceNameList) {
+                spaceSentences.add(String.format("DROP SPACE IF EXIST `%s`", spaceName));
+            }
+            ResultSet resultSet = run(String.join(";", spaceSentences));
             if (!resultSet.isSucceeded()) {
                 throw new ExecuteException(resultSet.getErrorMessage());
             }
         }
-        return true;
-    }
-
-    /**
-     * delete space by spaceNameList.
-     *
-     * @param spaceName spaceName
-     * @return whether drop space success
-     */
-    public boolean dropSpace(String spaceName) {
-        if (spaceName == null) {
-            return false;
-        }
-        ResultSet resultSet = run(String.format("DROP SPACE `%s`", spaceName));
-        if (!resultSet.isSucceeded()) {
-            throw new ExecuteException(resultSet.getErrorMessage());
-        }
-
-        return true;
     }
 
     /**
@@ -188,8 +170,8 @@ public class GraphService {
      *
      * @return cluster information
      */
-    public ResultSet showHosts() throws IOErrorException {
-        return getSession().execute("SHOW HOSTS");
+    public ResultSet showHosts() {
+        return run("SHOW HOSTS");
     }
 
     /**
