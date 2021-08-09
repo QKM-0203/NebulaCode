@@ -128,9 +128,7 @@ public class Relationship extends Entity {
         String result = "(%s)-[:%s@%s{%s}]->(%s)";
         ArrayList<String> prop = new ArrayList<>();
         StringBuilder propValue = new StringBuilder();
-        if (propMap == null || propMap.isEmpty()) {
-
-        } else {
+        if (propMap != null && !propMap.isEmpty()) {
             for (String propName : propMap.keySet()) {
                 if (propMap.get(propName) instanceof String) {
                     prop.add(String.format("%s: \"%s\"", propName, propMap.get(propName)));

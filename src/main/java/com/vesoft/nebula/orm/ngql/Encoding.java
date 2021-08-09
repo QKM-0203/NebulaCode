@@ -109,9 +109,7 @@ public class Encoding {
             throw new InitException("vid cannot be null");
         }
         ArrayList<String> values = new ArrayList<>();
-        if (relationship.getPropMap() == null || relationship.getPropMap().isEmpty()) {
-
-        } else {
+        if (relationship.getPropMap() != null && !relationship.getPropMap().isEmpty()) {
             for (String value : relationship.getPropMap().keySet()) {
                 Object object = relationship.getPropMap().get(value);
                 values.add(judgeDataType(object));

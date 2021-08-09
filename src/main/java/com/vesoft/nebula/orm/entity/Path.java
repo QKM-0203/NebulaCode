@@ -115,9 +115,7 @@ public class Path extends Walkable {
                 ArrayList<String> prop = new ArrayList<>();
                 HashMap<String, Object> propMap = ((Relationship) sequence.get(index)).getPropMap();
                 StringBuilder propValue = new StringBuilder();
-                if (propMap == null || propMap.isEmpty()) {
-
-                } else {
+                if (propMap != null && !propMap.isEmpty()) {
                     for (String propName : ((Relationship)
                         sequence.get(index)).getPropMap().keySet()) {
                         if (propMap.get(propName) instanceof String) {
