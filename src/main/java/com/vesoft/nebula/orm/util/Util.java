@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * this class is a tool class
+ *
+ * @author Qi Kai Meng
+ */
 public class Util {
     /**
      * classify Vertex use tag.
