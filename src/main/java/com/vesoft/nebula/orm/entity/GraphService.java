@@ -102,13 +102,13 @@ public class GraphService {
         Session session = getSession();
         String createSpace;
         if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
-            createSpace = String.format("CREATE SPACE IF NOT EXIST `%s`"
+            createSpace = String.format("CREATE SPACE IF NOT EXISTS `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
                 space.getSpaceName(), space.getPartitionNumber(),
                 space.getReplicaFactor(), String.format("%s(%d" + ")",
                     space.getVidDataType(), space.getVidDataType().getLength()));
         } else {
-            createSpace = String.format("CREATE SPACE IF NOT EXIST `%s`"
+            createSpace = String.format("CREATE SPACE IF NOT EXISTS `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
                 space.getSpaceName(), space.getPartitionNumber(),
                 space.getReplicaFactor(), space.getVidDataType());
@@ -147,7 +147,7 @@ public class GraphService {
         if (spaceNameList != null && !spaceNameList.isEmpty()) {
             ArrayList<String> spaceSentences = new ArrayList<>();
             for (String spaceName : spaceNameList) {
-                spaceSentences.add(String.format("DROP SPACE IF EXIST `%s`", spaceName));
+                spaceSentences.add(String.format("DROP SPACE IF EXISTS `%s`", spaceName));
             }
             ResultSet resultSet = run(String.join(";", spaceSentences));
             if (!resultSet.isSucceeded()) {

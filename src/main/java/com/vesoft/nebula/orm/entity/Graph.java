@@ -15,6 +15,7 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.ngql.Encoding;
 import com.vesoft.nebula.orm.util.Util;
+
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -154,6 +155,7 @@ public class Graph {
             HashMap<String, List<Relationship>> joinSameEdgeRelationships =
                 Util.joinSameEdgeRelationships(relationships, 1);
             ArrayList<String> relationshipString = new ArrayList<>();
+            ArrayList<String> delSuccess = new ArrayList<>();
             for (String edgeName : joinSameEdgeRelationships.keySet()) {
                 List<Relationship> relationshipList = joinSameEdgeRelationships.get(edgeName);
                 for (Relationship relationship : relationshipList) {
@@ -169,8 +171,10 @@ public class Graph {
                 ResultSet resultSet = run(String.format("DELETE EDGE `" + edgeName + "` %s",
                     String.join(",", relationshipString)));
                 if (!resultSet.isSucceeded()) {
-                    throw new ExecuteException(resultSet.getErrorMessage());
+                    throw new ExecuteException(resultSet.getErrorMessage()
+                        + "\nthe edge are " + delSuccess + ",the deletion is successful");
                 }
+                delSuccess.add(edgeName);
             }
         }
     }
@@ -178,20 +182,22 @@ public class Graph {
 
     /**
      * The merge method only judges according to the passed in parameters
-     * schemaName,so it is only part of the condition matching.
+     * schemaName and propName,so it is only part of the condition matching.
      *
-     * <p>For a point, if the tag exists, update the attribute value of the corresponding tag,
-     * otherwise insert the point.</p>
+     * <p>For a point, If the corresponding point is found in the remote according
+     * to the tagName and value of propName, the passed point object
+     * will be overwritten to the remote,otherwise insert the point.</p>
      * <p>For edges, existence is to update the attribute value, otherwise it is to insert.</p>
-     * <p>if you merge relationship,you can not pass in schemaName,because relationship object
-     * has edgeName,if not exist this method can create,otherwise update attribute value</p>
+     * <p>if you merge relationship,you can not pass in schemaName and propName,because
+     * relationship object has edgeName,if not exist this method can create,
+     * otherwise update attribute value</p>
      *
      * <p>If you pass in a subgraph or path, the schemaName
      * you pass in is applied to all points in the subgraph or path</p>
      *
      * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path.
      */
-    public void merge(Object graphObject, String... schemaName) {
+    public void merge(Object graphObject, String... schema) {
         ArrayList<Vertex> vertices = new ArrayList<>();
         ArrayList<Relationship> relationships = new ArrayList<>();
         Util.judgeGraphObject(vertices, relationships, graphObject);
@@ -201,20 +207,32 @@ public class Graph {
             }
         }
         if (vertices.size() != 0) {
-            ArrayList<Vertex> verticesTmp = new ArrayList<>();
-            for (Vertex vertex : vertices) {
-                verticesTmp.add(vertex);
-                ResultSet resultSet = judgeExistVertex(verticesTmp, schemaName[0]);
-                verticesTmp.clear();
-                if (resultSet.rowsSize() == 0) {
-                    create(vertex);
-                } else {
-                    if (vertex.getPropMap().get(schemaName[0]) != null
-                        && vertex.getPropMap().get(schemaName[0]).size() != 0) {
-                        updateVertex(vertex, schemaName[0]);
-                        vertex.setGraph(this);
+            if (schema[0] == null || schema[1] == null) {
+                throw new ExecuteException("tagName and attribute name is "
+                    + "a condition of merge,so cannot null");
+            }
+            ResultSet resultSet = run("DESC TAG " + schema[0]);
+            System.out.println(schema[0]);
+            if (resultSet.isSucceeded()) {
+                List<ValueWrapper> field = resultSet.colValues("Field");
+                ArrayList<String> filedString = new ArrayList<>();
+                field.forEach(filed -> {
+                    try {
+                        filedString.add(filed.asString());
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
                     }
+                });
+                if (filedString.contains(schema[1])) {
+                    for (Vertex vertex : vertices) {
+                        create(vertex);
+                    }
+                } else {
+                    throw new ExecuteException("tag " + schema[0]
+                        + " without " + "attribute " + schema[1]);
                 }
+            } else {
+                throw new ExecuteException(resultSet.getErrorMessage());
             }
         }
     }
@@ -241,7 +259,7 @@ public class Graph {
             for (Vertex vertex : vertices) {
                 idVertexMap.put(vertex.getVid().toString(), vertex);
             }
-            ResultSet vertexResultSet = judgeExistVertex(vertices, "*");
+            ResultSet vertexResultSet = judgeExistVertexes(vertices);
             if (vertexResultSet.rowsSize() != 0) {
                 List<ValueWrapper> remoteVertices = vertexResultSet.colValues(VERTICES_);
                 for (ValueWrapper remoteVertex : remoteVertices) {
@@ -263,16 +281,14 @@ public class Graph {
             for (Relationship relationship : relationships) {
                 ResultSet resultSet = judgeExistEdge(relationship);
                 List<ValueWrapper> remoteEdges = resultSet.colValues(EDGES_);
-                if (resultSet.isSucceeded()) {
+                if (remoteEdges.size() != 0) {
                     HashMap<String, ValueWrapper> properties =
                         remoteEdges.get(0).asRelationship().properties();
                     HashMap<String, Object> edgeMap = new HashMap<>();
                     Util.judgeValueWrapper(edgeMap, properties);
                     relationship.setPropMap(edgeMap);
-                } else {
-                    throw new ExecuteException(resultSet.getErrorMessage());
+                    relationship.setGraph(this);
                 }
-                relationship.setGraph(this);
             }
         }
     }
@@ -291,11 +307,8 @@ public class Graph {
         ArrayList<Relationship> relationships = new ArrayList<>();
         Util.judgeGraphObject(vertices, relationships, graphObject);
         if (vertices.size() != 0) {
-            ArrayList<Vertex> verticesTmp = new ArrayList<>();
             for (Vertex vertex : vertices) {
-                verticesTmp.add(vertex);
-                ResultSet resultSet = judgeExistVertex(verticesTmp, "*");
-                verticesTmp.clear();
+                ResultSet resultSet = judgeExistVertex(vertex);
                 List<ValueWrapper> remoteVertex = resultSet.colValues(VERTICES_);
                 if (remoteVertex.size() == 0) {
                     throw new ExecuteException("the vertex " + vertex
@@ -391,7 +404,7 @@ public class Graph {
      */
     public void createTagIndex(String tagName, String indexName,
                                HashMap<String, Integer> propList) {
-        ResultSet resultSet = run(String.format("CREATE TAG INDEX IF NOT EXIST %s ON %s(%s)",
+        ResultSet resultSet = run(String.format("CREATE TAG INDEX IF NOT EXISTS %s ON %s(%s)",
             indexName, tagName, (Encoding.joinIndexProp(propList)) == null
                 ? "" : Encoding.joinIndexProp(propList)));
         if (!resultSet.isSucceeded()) {
@@ -415,7 +428,7 @@ public class Graph {
      */
     public void createEdgeIndex(String edgeName, String indexName,
                                 HashMap<String, Integer> propList) {
-        ResultSet resultSet = run(String.format("CREATE EDGE INDEX IF NOT EXIST %s ON %s(%s)",
+        ResultSet resultSet = run(String.format("CREATE EDGE INDEX IF NOT EXISTS %s ON %s(%s)",
             indexName, edgeName, (Encoding.joinIndexProp(propList)) == null
                 ? "" : Encoding.joinIndexProp(propList)));
         if (!resultSet.isSucceeded()) {
@@ -470,7 +483,7 @@ public class Graph {
      * @param indexName indexName
      */
     public void dropTagIndex(String indexName) {
-        ResultSet resultSet = run("DROP TAG INDEX IF EXIST " + indexName);
+        ResultSet resultSet = run("DROP TAG INDEX IF EXISTS " + indexName);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
         }
@@ -483,7 +496,7 @@ public class Graph {
      * @param indexName indexName
      */
     public void dropEdgeIndex(String indexName) {
-        ResultSet resultSet = run("DROP EDGE INDEX IF EXIST " + indexName);
+        ResultSet resultSet = run("DROP EDGE INDEX IF EXISTS " + indexName);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
         }
@@ -518,7 +531,7 @@ public class Graph {
      * @param schema tagObject
      */
     public void createTag(Schema schema) {
-        String tagJoin = "CREATE TAG IF NOT EXIST " + Encoding.joinSchema(schema);
+        String tagJoin = "CREATE TAG IF NOT EXISTS " + Encoding.joinSchema(schema);
         ResultSet resultSet = run(tagJoin);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
@@ -532,7 +545,7 @@ public class Graph {
      * @param schema edgeTypeObject
      */
     public void createEdge(Schema schema) {
-        String edgeJoin = "CREATE EDGE IF NOT EXIST " + Encoding.joinSchema(schema);
+        String edgeJoin = "CREATE EDGE IF NOT EXISTS " + Encoding.joinSchema(schema);
         ResultSet resultSet = run(edgeJoin);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
@@ -547,7 +560,7 @@ public class Graph {
     public void dropTagList(List<String> tagNameList) {
         ArrayList<String> tagSentence = new ArrayList<>();
         for (String tagName : tagNameList) {
-            tagSentence.add("DROP TAG IF EXIST " + "`" + tagName + "`");
+            tagSentence.add("DROP TAG IF EXISTS " + "`" + tagName + "`");
         }
         ResultSet resultSet = run(String.join(";", tagSentence));
         if (!resultSet.isSucceeded()) {
@@ -565,7 +578,7 @@ public class Graph {
     public void dropEdgeList(List<String> edgeNameList) {
         ArrayList<String> edgeSentence = new ArrayList<>();
         for (String edgeName : edgeNameList) {
-            edgeSentence.add("DROP EDGE IF EXIST " + "`" + edgeName + "`");
+            edgeSentence.add("DROP EDGE IF EXISTS " + "`" + edgeName + "`");
         }
         ResultSet resultSet = run(String.join(";", edgeSentence));
         if (!resultSet.isSucceeded()) {
@@ -597,19 +610,26 @@ public class Graph {
     }
 
 
-    private ResultSet judgeExistVertex(List<Vertex> vertices, String schema) {
+    private ResultSet judgeExistVertexes(List<Vertex> vertices) {
         ArrayList<String> idList = new ArrayList<>();
         for (Vertex vertex : vertices) {
             idList.add(vertex.getVid() instanceof String
                 ? "\"" + vertex.getVid() + "\"" : vertex.getVid().toString());
         }
         ResultSet findRemote =
-            run(String.format("FETCH PROP ON %s %s", schema,
+            run(String.format("FETCH PROP ON * %s",
                 String.join(",", idList)));
         if (!findRemote.isSucceeded()) {
             throw new ExecuteException(findRemote.getErrorMessage());
         }
         return findRemote;
+    }
+
+
+    private ResultSet judgeExistVertex(Vertex vertex) {
+        ArrayList<Vertex> vertices = new ArrayList<>();
+        vertices.add(vertex);
+        return judgeExistVertexes(vertices);
     }
 
 
