@@ -152,7 +152,7 @@ public class TestCreate {
     public void mergeAddVertex() {
         graph.delete(vertexOne);
         assert !graph.exists(vertexOne);
-        graph.merge(vertexOne, "QKM5");
+        graph.merge(vertexOne, "QKM5","name");
         graph.exists(vertexOne);
     }
 
@@ -161,7 +161,7 @@ public class TestCreate {
         graph.create(vertexOne);
         assert graph.exists(vertexOne);
         vertexValueOne.put("age", 19);
-        graph.merge(vertexOne, "QKM2");
+        graph.merge(vertexOne, "QKM2","age");
         assertTagPropValue("QKM2", vertexOne.getVid() instanceof String
             ? "\"" + vertexOne.getVid() + "\"" : vertexOne.getVid().toString());
     }
@@ -216,7 +216,7 @@ public class TestCreate {
         assert vertexOne.hasTag("QKM2");
         vertexOne.getPropMap().get("QKM2").put("age", 19);
         relationshipValueOne.put("teamName", "China");
-        graph.merge(subgraph, "QKM2");
+        graph.merge(subgraph, "QKM2","name");
         assert graph.exists(vertexTwo);
         assert graph.exists(vertexThird);
         assertTagPropValue("QKM2", vertexOne.getVid() instanceof String
@@ -244,6 +244,6 @@ public class TestCreate {
         assertTagPropValue("QKM2", vertexOne.getVid() instanceof String
             ? "\"" + vertexOne.getVid() + "\"" : vertexOne.getVid().toString());
         assertEdgePropValue(relationship12);
-        graph.merge(path, "QKM2");
+        graph.merge(path, "QKM2","name");
     }
 }
