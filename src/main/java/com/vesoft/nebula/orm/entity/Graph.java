@@ -197,7 +197,7 @@ public class Graph {
      *
      * @param graphObject graphObject can be Vertex or Relationship or Subgraph or path.
      */
-    public void merge(Object graphObject, String... schema) {
+    public void merge(Object graphObject, String... schema) throws UnsupportedEncodingException {
         ArrayList<Vertex> vertices = new ArrayList<>();
         ArrayList<Relationship> relationships = new ArrayList<>();
         Util.judgeGraphObject(vertices, relationships, graphObject);
@@ -212,17 +212,12 @@ public class Graph {
                     + "a condition of merge,so cannot null");
             }
             ResultSet resultSet = run("DESC TAG " + schema[0]);
-            System.out.println(schema[0]);
             if (resultSet.isSucceeded()) {
                 List<ValueWrapper> field = resultSet.colValues("Field");
                 ArrayList<String> filedString = new ArrayList<>();
-                field.forEach(filed -> {
-                    try {
-                        filedString.add(filed.asString());
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                });
+                for (ValueWrapper filed : field) {
+                    filedString.add(filed.asString());
+                }
                 if (filedString.contains(schema[1])) {
                     for (Vertex vertex : vertices) {
                         create(vertex);
@@ -314,31 +309,10 @@ public class Graph {
                     throw new ExecuteException("the vertex " + vertex
                         + " is not found at remote database");
                 }
-                HashMap<String, HashMap<String, Object>> propMapAdd =
-                    new HashMap<>(vertex.getPropMap());
                 List<String> remoteTags = remoteVertex.get(0).asNode().labels();
                 Set<String> localTags = vertex.getPropMap().keySet();
-                //update tag
-                if (localTags.retainAll(remoteTags)) {
-                    for (String tagName : vertex.getPropMap().keySet()) {
-                        if (vertex.getPropMap().get(tagName) != null
-                            && vertex.getPropMap().get(tagName).size() != 0) {
-                            updateVertex(vertex, tagName);
-                        }
-                    }
-                }
-                vertex.setPropMap(propMapAdd);
-                HashMap<String, HashMap<String, Object>> propMapDel =
-                    new HashMap<>(propMapAdd);
-                localTags = vertex.getPropMap().keySet();
-                //add tag
-                if (localTags.removeAll(new HashSet<>(remoteTags))) {
-                    if (vertex.getPropMap().size() != 0) {
-                        create(vertex);
-                    }
-                }
-                vertex.setPropMap(propMapDel);
-                localTags = vertex.getPropMap().keySet();
+                //update and add tag
+                create(vertex);
                 //delete tag,TODO: depends on  https://github.com/vesoft-inc/nebula-graph/pull/1303
                 if (remoteTags.removeAll(localTags)) {
                     System.out.println(remoteTags);
