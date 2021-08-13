@@ -11,7 +11,7 @@ package com.vesoft.nebula.orm.entity;
  *
  * @author Qi Kai Meng
  */
-public class Part {
+public class Segment {
     private Vertex startVertex;
     private Vertex endVertex;
     private Relationship relationship;
@@ -21,9 +21,9 @@ public class Part {
      *
      * @param startVertex  startVertex
      * @param relationship relationship
-     * @param endVertex endVertex
+     * @param endVertex    endVertex
      */
-    public Part(Vertex startVertex, Relationship relationship, Vertex endVertex) {
+    public Segment(Vertex startVertex, Relationship relationship, Vertex endVertex) {
         this.startVertex = startVertex;
         this.endVertex = endVertex;
         this.relationship = relationship;

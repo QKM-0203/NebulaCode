@@ -27,19 +27,19 @@ public class Relationship extends Entity {
     private Object endVid;
     private String edgeName;
     private int rank = 0;
-    private HashMap<String, Object>  propMap = null;
+    private HashMap<String, Object> propMap = null;
 
     /**
      * user pass in parameter creates a directional edge.
      *
      * @param startVid startVid
-     * @param endVid endVid
+     * @param endVid   endVid
      * @param edgeName edgeName
-     * @param propMap attribute Map
-     * @param rank distinguish edges with the same edge type, starting point and destination point.
+     * @param propMap  attribute Map
+     * @param rank     distinguish edges with the same edge type, starting point and destination point.
      */
     public Relationship(Object startVid, Object endVid, String edgeName,
-                      HashMap<String, Object> propMap, int rank) {
+                        HashMap<String, Object> propMap, int rank) {
         this.startVid = startVid;
         this.endVid = endVid;
         this.edgeName = edgeName;
@@ -101,17 +101,8 @@ public class Relationship extends Entity {
         return Objects.hash(startVid, endVid, edgeName, rank, propMap);
     }
 
-    @Override
-    public Graph getGraph() {
-        return getGraph();
-    }
-
     public HashMap<String, Object> properties() {
         return propMap;
-    }
-
-    public boolean updateProp(HashMap<String, Object> propMap) {
-        return true;
     }
 
     public HashMap<String, Object> getPropMap() {
@@ -130,7 +121,6 @@ public class Relationship extends Entity {
         return rank;
     }
 
-
     @Override
     public String toString() {
         //("1")-[:p_t_r@0{startTime: 2021-03-05, salve: 34}]->("4")
@@ -138,9 +128,7 @@ public class Relationship extends Entity {
         String result = "(%s)-[:%s@%s{%s}]->(%s)";
         ArrayList<String> prop = new ArrayList<>();
         StringBuilder propValue = new StringBuilder();
-        if (propMap == null || propMap.isEmpty()) {
-            propValue.append("");
-        } else {
+        if (propMap != null && !propMap.isEmpty()) {
             for (String propName : propMap.keySet()) {
                 if (propMap.get(propName) instanceof String) {
                     prop.add(String.format("%s: \"%s\"", propName, propMap.get(propName)));
