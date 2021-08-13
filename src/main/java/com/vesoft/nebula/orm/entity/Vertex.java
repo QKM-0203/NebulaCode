@@ -6,6 +6,7 @@
 
 package com.vesoft.nebula.orm.entity;
 
+import com.vesoft.nebula.orm.exception.InitException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,12 +19,10 @@ import java.util.Objects;
  * the tag attribute list of the point,and then create the point
  * according to the graph object.</p>
  *
- * <p>you can update the tag attribute of the vertex({@link #updateTag(String, HashMap)}),
- * judge whether the tag exists({@link #hasTag(String)}),
+ * <p>judge whether the tag exists({@link #hasTag(String)}),
  * add a new tag({@link #addTag(String, HashMap)}), etc</p>
  *
  * @author Qi Kai Meng
- *
  */
 public class Vertex extends Entity {
     private Object vid;
@@ -31,11 +30,18 @@ public class Vertex extends Entity {
 
     public Vertex(Object vid, HashMap<String, HashMap<String, Object>> propMap) {
         this.vid = vid;
+        if (propMap == null || propMap.isEmpty()) {
+            throw new InitException("the vertex contains at least one tag");
+        }
         this.propMap = propMap;
     }
 
     public HashMap<String, HashMap<String, Object>> getPropMap() {
         return propMap;
+    }
+
+    public void setPropMap(HashMap<String, HashMap<String, Object>> propMap) {
+        this.propMap = propMap;
     }
 
     public Object getVid() {
@@ -44,10 +50,6 @@ public class Vertex extends Entity {
 
     public void setVid(Object vid) {
         this.vid = vid;
-    }
-
-    public void setPropMap(HashMap<String, HashMap<String, Object>> propMap) {
-        this.propMap = propMap;
     }
 
     @Override
@@ -67,45 +69,57 @@ public class Vertex extends Entity {
         return Objects.hash(vid, propMap);
     }
 
-    public Graph graph() {
-        return getGraph();
-    }
-
-    public List<String> getTags() {
-        return null;
-    }
-
-    public boolean hasTag(String tagName) {
-        return true;
-    }
-
     /**
-     * pass in tagName and attribute Map to add tag for vertex.
+     * <p>if users want to get the latest remote data,  can use {@link Graph#pull}</p>
      *
-     * @param name tagName
+     * @param tagName tagName
+     * @return specify the properties of the tag
+     */
+    public HashMap<String, Object> getTag(String tagName) {
+        return this.getPropMap().get(tagName);
+    }
+
+
+    /**
+     * <p>if users want to get the latest remote data,  can use {@link Graph#pull}</p>
+     *
+     * @return all tagNames
+     */
+    public List<String> getTagNames() {
+        return new ArrayList<>(this.getPropMap().keySet());
+    }
+
+    /**
+     * <p>if users want to get the latest remote data,  can use {@link Graph#pull}</p>
+     *
+     * @return true or false
+     */
+    public boolean hasTag(String tagName) {
+        return this.getPropMap().containsKey(tagName);
+    }
+
+    /**
+     * pass in tagName and attribute Map to add tag for vertex,
+     * if want to update to remote database use {@link Graph#push}
+     *
+     * @param name    tagName
      * @param propMap attribute Map
-     * @return whether add success
      */
-    public boolean addTag(String name, HashMap<String, Object> propMap) {
-        //update local
-        //update db (insert vertex)
-        return true;
+    public void addTag(String name, HashMap<String, Object> propMap) {
+        this.getPropMap().put(name, propMap);
+    }
+
+    @Override
+    public Graph getGraph() {
+        return super.getGraph();
     }
 
     /**
-    * delete vertex.
-    */
-    public boolean clearAllTags() {
-        getGraph().delete(this);
-        return true;
-    }
-
-    /**
-     * update propertyValue of tag.
+     * this operation means deleting the vertex,
+     * If you want to update to the remote, use {@link Graph#push}
      */
-    public boolean updateTag(String name, HashMap<String, Object> propMap) {
-        //judge vertex if exist in graph
-        return true;
+    public void clearAllTags() {
+        this.getPropMap().clear();
     }
 
     @Override
@@ -126,8 +140,8 @@ public class Vertex extends Entity {
                     } else {
                         prop.add(String.format("%s: %s", propName, propValueMap.get(propName)));
                     }
-                    part.append(String.join(", ", prop)).append("}");
                 }
+                part.append(String.join(", ", prop)).append("}");
             }
         }
         return String.format(result, vid, part);

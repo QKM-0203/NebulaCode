@@ -25,8 +25,8 @@ public class Schema {
     /**
      * create an Tag or EdgeType of include property.
      *
-     * @param name tag name or edgeName
-     * @param propertyList  Property List
+     * @param name         tag name or edgeName
+     * @param propertyList Property List
      */
     public Schema(String name, List<Property> propertyList) {
         this.name = name;
@@ -36,13 +36,15 @@ public class Schema {
     /**
      * create an Tag or EdgeType of include property and property time setting.
      *
-     * @param name Tag name or EdgeType name
+     * @param name         Tag name or EdgeType name
      * @param propertyList property List
-     * @param ttlDuration timestamp difference,timestamp difference default value is zero
-     * @param ttlCol to determine which attribute to set the lifetime,
-     *               the type must be int or timestamp
+     * @param ttlDuration  timestamp difference,timestamp difference default value is zero
+     *                     symbol never expire
+     * @param ttlCol       to determine which attribute to set the lifetime,
+     *                     the type must be int or timestamp,if pass in null, symbol not set
      */
-    public Schema(String name, List<Property> propertyList, long ttlDuration, String ttlCol) {
+    public Schema(String name, List<Property> propertyList,
+                  long ttlDuration, String ttlCol) {
         this.name = name;
         this.propertyList = propertyList;
         this.ttlDuration = ttlDuration;
@@ -58,15 +60,32 @@ public class Schema {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public List<Property> getPropertyList() {
+        return propertyList;
+    }
+
+    public void setPropertyList(List<Property> propertyList) {
+        this.propertyList = propertyList;
+    }
+
+    public long getTtlDuration() {
+        return ttlDuration;
+    }
+
     public void setTtlDuration(long ttlDuration) {
         this.ttlDuration = ttlDuration;
+    }
+
+    public String getTtlCol() {
+        return ttlCol;
     }
 
     public void setTtlCol(String ttlCol) {
         this.ttlCol = ttlCol;
     }
 
-    public void setPropertyList(List<Property> propertyList) {
-        this.propertyList = propertyList;
-    }
 }

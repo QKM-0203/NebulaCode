@@ -17,19 +17,19 @@ import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.operator.DataType;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * {@code GraphService} Managing the entire Nebula graph cluster.
  *
- *<p>The user can pass in the host IP, port, user name and password,
+ * <p>The user can pass in the host IP, port, user name and password,
  * establish a connection with the nebula service, and obtain the graph object
  * through the {@link #getGraph(String spaceName)} method.</p>
  *
  * @author Qi Kai Meng
  */
-public class GraphService  {
+public class GraphService {
     private String username;
     private String password;
     private List<HostAddress> hostAddresses;
@@ -40,7 +40,7 @@ public class GraphService  {
      * pass in parameters use default connectionPool.
      */
     public GraphService(List<HostAddress> hostAddresses, String username, String password,
-                      boolean reconnect) {
+                        boolean reconnect) {
         this.hostAddresses = hostAddresses;
         this.username = username;
         this.password = password;
@@ -52,7 +52,7 @@ public class GraphService  {
      * pass in parameters use self-connectionPool config.
      */
     public GraphService(List<HostAddress> hostAddresses, String username, String password,
-                      boolean reconnect, NebulaPoolConfig nebulaPoolConfig) {
+                        boolean reconnect, NebulaPoolConfig nebulaPoolConfig) {
         this.hostAddresses = hostAddresses;
         this.username = username;
         this.password = password;
@@ -60,7 +60,7 @@ public class GraphService  {
         this.nebulaPoolConfig = nebulaPoolConfig;
     }
 
-    private Session getSession() {
+    public Session getSession() {
         NebulaPool nebulaPool = new NebulaPool();
         Session session = null;
         try {
@@ -91,10 +91,8 @@ public class GraphService  {
      * create space by space objects.
      *
      * @param space spaceObject
-     * @return whether create space success
-     * @throws IOErrorException IOErrorException when execute createSpace sentence
      */
-    public boolean createSpace(Space space) throws IOErrorException {
+    public void createSpace(Space space) {
         if (space == null) {
             throw new NullPointerException("space object cannot be null");
         }
@@ -102,44 +100,60 @@ public class GraphService  {
             throw new IllegalArgumentException("spaceName cannot be null");
         }
         Session session = getSession();
-        String createSpace = null;
+        String createSpace;
         if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
-            createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
+            createSpace = String.format("CREATE SPACE IF NOT EXISTS `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
-                space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
-                String.format("%s(%d" + ")",
+                space.getSpaceName(), space.getPartitionNumber(),
+                space.getReplicaFactor(), String.format("%s(%d" + ")",
                     space.getVidDataType(), space.getVidDataType().getLength()));
         } else {
-            createSpace = String.format("CREATE SPACE IF NOT EXISTS %s"
+            createSpace = String.format("CREATE SPACE IF NOT EXISTS `%s`"
                     + "(partition_num = %d,replica_factor = %d,vid_type = %s)",
-                space.getSpaceName(), space.getPartitionNumber(), space.getReplicaFactor(),
-                space.getVidDataType());
+                space.getSpaceName(), space.getPartitionNumber(),
+                space.getReplicaFactor(), space.getVidDataType());
         }
+        ResultSet result = run(createSpace);
+        if (!result.isSucceeded()) {
+            throw new ExecuteException(result.getErrorMessage());
+        }
+    }
 
-        ResultSet result = session.execute(createSpace);
-        if (result == null) {
-            throw new ExecuteException("session is broken");
-        } else {
-            return result.isSucceeded();
+    /**
+     * execute sentence(nGgl) statement.
+     *
+     * @param sentence sentence statement
+     * @return execute result
+     */
+    public ResultSet run(String sentence) {
+        ResultSet resultSet = null;
+        try {
+            resultSet = getSession().execute(sentence);
+        } catch (IOErrorException e) {
+            e.printStackTrace();
         }
+        if (resultSet == null) {
+            throw new ExecuteException("session is broken");
+        }
+        return resultSet;
     }
 
     /**
      * delete space by spaceNameList.
      *
      * @param spaceNameList spaceNameList
-     * @return whether drop space success
-     * @throws IOErrorException IOErrorException when execute dropSpace sentence
      */
-    public boolean dropSpaces(List<String> spaceNameList) throws IOErrorException {
-        if (spaceNameList == null || spaceNameList.isEmpty()) {
-            return false;
+    public void dropSpaces(List<String> spaceNameList) {
+        if (spaceNameList != null && !spaceNameList.isEmpty()) {
+            ArrayList<String> spaceSentences = new ArrayList<>();
+            for (String spaceName : spaceNameList) {
+                spaceSentences.add(String.format("DROP SPACE IF EXISTS `%s`", spaceName));
+            }
+            ResultSet resultSet = run(String.join(";", spaceSentences));
+            if (!resultSet.isSucceeded()) {
+                throw new ExecuteException(resultSet.getErrorMessage());
+            }
         }
-        Session session = getSession();
-        for (String spaceName : spaceNameList) {
-            session.execute(String.format("DROP IF EXISTS SPACE %s", spaceName));
-        }
-        return true;
     }
 
     /**
@@ -148,7 +162,7 @@ public class GraphService  {
      * @return users information
      */
     public ResultSet showUser() {
-        return null;
+        return run("SHOW USERS;");
     }
 
     /**
@@ -156,17 +170,17 @@ public class GraphService  {
      *
      * @return cluster information
      */
-    public ResultSet  showHosts() {
-        return null;
+    public ResultSet showHosts() {
+        return run("SHOW HOSTS");
     }
 
     /**
-     * get the configuration information of the cluster.
+     * get the snapshot information of the cluster.
      *
      * @return configs information
      */
-    public ResultSet getConfigs() {
-        return null;
+    public ResultSet getSnapshot() {
+        return run("SHOW SNAPSHOTS;");
     }
 
     /**
@@ -175,6 +189,6 @@ public class GraphService  {
      * @return space part information
      */
     public ResultSet getParts() {
-        return null;
+        return run("SHOW PARTS");
     }
 }

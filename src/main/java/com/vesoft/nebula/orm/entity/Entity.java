@@ -7,8 +7,8 @@
 package com.vesoft.nebula.orm.entity;
 
 /**
- *  {@code Entity} is used to bind points, edges, subgraph and corresponding
- *  graph spaces.
+ * {@code Entity} is used to bind points, edges, subgraph and corresponding
+ * graph spaces.
  *
  * @author Qi Kai Meng
  */

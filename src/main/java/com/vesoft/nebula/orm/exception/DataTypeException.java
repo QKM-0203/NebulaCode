@@ -7,16 +7,14 @@
 package com.vesoft.nebula.orm.exception;
 
 /**
- * init data raise exception,eg:path、subgraph.
- *
- * @author Qi Kai Meng
+ * when inserting data, the data type passed did not match the type given.
  */
-public class InitException extends RuntimeException {
-    public InitException() {
+public class DataTypeException extends RuntimeException {
+    public DataTypeException() {
 
     }
 
-    public InitException(String message) {
+    public DataTypeException(String message) {
         super(message);
     }
 }
