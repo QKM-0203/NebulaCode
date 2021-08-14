@@ -149,7 +149,7 @@ public class TestCreate {
     }
 
     @Test
-    public void mergeAddVertex() {
+    public void mergeAddVertex() throws UnsupportedEncodingException {
         graph.delete(vertexOne);
         assert !graph.exists(vertexOne);
         graph.merge(vertexOne, "QKM5","name");
@@ -174,7 +174,7 @@ public class TestCreate {
     }
 
     @Test
-    public void mergeAddRelationship() {
+    public void mergeAddRelationship() throws UnsupportedEncodingException {
         graph.delete(relationship12);
         assert !graph.exists(relationship12);
         graph.merge(relationship12);

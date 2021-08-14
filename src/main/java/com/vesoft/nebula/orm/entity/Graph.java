@@ -15,7 +15,6 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.ngql.Encoding;
 import com.vesoft.nebula.orm.util.Util;
-
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -301,13 +300,16 @@ public class Graph {
         ArrayList<Relationship> relationships = new ArrayList<>();
         Util.judgeGraphObject(vertices, relationships, graphObject);
         if (vertices.size() != 0) {
+            HashMap<String, Vertex> idVertexMap = new HashMap<>();
             for (Vertex vertex : vertices) {
-                ResultSet resultSet = judgeExistVertex(vertex);
-                List<ValueWrapper> remoteVertex = resultSet.colValues(VERTICES_);
-                if (remoteVertex.size() == 0) {
-                    continue;
-                }
-                List<String> remoteTags = remoteVertex.get(0).asNode().labels();
+                idVertexMap.put(vertex.getVid().toString(), vertex);
+            }
+            ResultSet resultSet = judgeExistVertexes(vertices);
+            List<ValueWrapper> remoteVertex = resultSet.colValues(VERTICES_);
+            for (ValueWrapper value : remoteVertex) {
+                Node node = value.asNode();
+                Vertex vertex = idVertexMap.get(node.getId().asString());
+                List<String> remoteTags = node.labels();
                 Set<String> localTags = vertex.getPropMap().keySet();
                 //update and add tag
                 create(vertex);
@@ -321,32 +323,8 @@ public class Graph {
             for (Relationship relationship : relationships) {
                 ResultSet resultSet = judgeExistEdge(relationship);
                 List<ValueWrapper> remoteEdge = resultSet.colValues(EDGES_);
-                if (remoteEdge.size() == 0) {
-                    throw new ExecuteException("the relationship "
-                        + relationship
-                        + " is not found at remote database");
-                }
-                if (relationship.getPropMap() != null) {
-                    if (relationship.getPropMap() != null
-                        && relationship.getPropMap().size() != 0) {
-                        String updateEdgeValue = Encoding
-                            .updateSchemaValue(relationship.getPropMap());
-                        ResultSet updateRemote =
-                            run(String.format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
-                                relationship.getEdgeName(),
-                                relationship.getStartVid() instanceof String
-                                    ? "\"" + relationship.getStartVid()
-                                    + "\"" : relationship.getStartVid(),
-                                relationship.getEndVid() instanceof String
-                                    ? "\"" + relationship.getEndVid()
-                                    + "\"" : relationship.getEndVid(),
-                                relationship.getRank(), updateEdgeValue));
-                        if (!updateRemote.isSucceeded()) {
-                            throw new ExecuteException(updateRemote.getErrorMessage()
-                                + "\n the edge " + relationship.getEdgeName()
-                                + " corresponding to  " + relationship + " push fail");
-                        }
-                    }
+                if (remoteEdge.size() != 0) {
+                    create(relationship);
                 }
             }
         }
@@ -597,14 +575,6 @@ public class Graph {
         return findRemote;
     }
 
-
-    private ResultSet judgeExistVertex(Vertex vertex) {
-        ArrayList<Vertex> vertices = new ArrayList<>();
-        vertices.add(vertex);
-        return judgeExistVertexes(vertices);
-    }
-
-
     private ResultSet judgeExistEdge(Relationship relationship) {
         ResultSet findRemote = run(String.format("FETCH PROP ON `%s` %s->%s@%d ",
             relationship.getEdgeName(), relationship.getStartVid() instanceof String
@@ -616,19 +586,5 @@ public class Graph {
             throw new ExecuteException(findRemote.getErrorMessage());
         }
         return findRemote;
-    }
-
-    private void updateVertex(Vertex vertex, String tagName) {
-        String updateTagValue =
-            Encoding.updateSchemaValue(vertex.getPropMap().get(tagName));
-        ResultSet result = run(String.format("UPSERT VERTEX ON `%s` %s SET %s",
-            tagName, vertex.getVid() instanceof String
-                ? "\"" + vertex.getVid()
-                + "\"" : vertex.getVid(), updateTagValue));
-        if (!result.isSucceeded()) {
-            throw new ExecuteException(result.getErrorMessage()
-                + "\n the tag " + tagName + " corresponding to "
-                + vertex + " update fail");
-        }
     }
 }
