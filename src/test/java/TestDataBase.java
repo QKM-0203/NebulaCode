@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class Data {
+public class TestDataBase {
     public GraphService graphService = new GraphService(
         Arrays.asList(new HostAddress("127.0.0.1", 9669),
             new HostAddress("127.0.0.1", 9898)),

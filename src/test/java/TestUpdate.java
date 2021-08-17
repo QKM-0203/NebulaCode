@@ -9,7 +9,7 @@ import com.vesoft.nebula.orm.entity.*;
 import java.io.UnsupportedEncodingException;
 import org.junit.Test;
 
-public class TestUpdate extends Data {
+public class TestUpdate extends TestDataBase {
     @Test
     public void testAddTagForVertex() throws UnsupportedEncodingException {
         graph.create(vertexOne);

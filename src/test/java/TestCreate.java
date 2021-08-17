@@ -9,7 +9,7 @@ import com.vesoft.nebula.orm.operator.DataType;
 import java.util.HashMap;
 import org.junit.Test;
 
-public class TestCreate extends Data {
+public class TestCreate extends TestDataBase {
     @Test
     public void testCreateSpace() {
         Space testOne = new Space("test1", 10, 1, DataType.FIXED_STRING.setLength(30));

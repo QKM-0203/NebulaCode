@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import org.junit.Test;
 
-public class TestPull extends Data {
+public class TestPull extends TestDataBase {
     @Test
     public void testCanNotPullOtherObject() {
         StringBuffer qkm = new StringBuffer("qkm");

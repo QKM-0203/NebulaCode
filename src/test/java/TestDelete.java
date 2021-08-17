@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.junit.Test;
 
-public class TestDelete extends Data {
+public class TestDelete extends TestDataBase {
     @Test
     public void testDropSpace() {
         ArrayList<String> spaceNameList = new ArrayList<>();

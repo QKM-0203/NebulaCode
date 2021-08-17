@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.junit.Test;
 
-public class TestMerge extends Data {
+public class TestMerge extends TestDataBase {
     @Test
     public void mergeVertexThatDoesNotExist() throws UnsupportedEncodingException {
         graph.delete(vertexOne);

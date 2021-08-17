@@ -8,7 +8,7 @@
 import java.util.List;
 import org.junit.Test;
 
-public class TestGet extends Data {
+public class TestGet extends TestDataBase {
     @Test
     public void testGetTags() {
         List<String> tags = graph.getTags();
