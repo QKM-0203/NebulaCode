@@ -15,6 +15,7 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.ngql.Encoding;
 import com.vesoft.nebula.orm.util.Util;
+
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -561,7 +562,9 @@ public class Graph {
     }
 
     /**
-     * get vertex number from space
+     * get vertex number from space,you should execute submit job stats
+     * before executing this method.
+     *
      * @return vertexNumber
      */
     public long vertexNumber() {
@@ -575,11 +578,13 @@ public class Graph {
 
 
     /**
-     * get Relationships number from space
+     * get Relationships number from space,you should execute submit job stats
+     * before executing this method.
+     *
      * @return relationshipNumber
      */
     public long relationshipNumber() {
-        ResultSet showStats = run("SUBMIT JOB STATS;SHOW STATS");
+        ResultSet showStats = run("SHOW STATS");
         if (!showStats.isSucceeded()) {
             throw new ExecuteException(showStats.getErrorMessage());
         }
