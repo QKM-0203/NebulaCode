@@ -10,10 +10,7 @@ import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Vertex;
-import com.vesoft.nebula.orm.operator.Condition;
-import com.vesoft.nebula.orm.operator.Direction;
-import com.vesoft.nebula.orm.operator.EQ;
-import com.vesoft.nebula.orm.operator.Sort;
+import com.vesoft.nebula.orm.operator.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +26,7 @@ public class RelationshipMatch {
     private HashMap<String, Sort> orderBy;
     private String groupBy;
     private Direction direction = Direction.OUT;
-    private HashMap<String, Condition> conMap;
+    private HashMap<String, Filter> conMap;
     private HashMap<String, Object> propMap;
 
     protected RelationshipMatch(Graph graph) {
@@ -59,14 +56,20 @@ public class RelationshipMatch {
     /**
      * filter condition
      *
-     * @param conMap       String is propName,Condition is {@link Condition}
+     * <p>For conMap,if you represents a relationship ,you can pass in
+     * <"name",Relational.EQ.setValue("qkm")>it means v.name == "qkm".</p>
+     * <p>if you represents a logic relationship you can pass in
+     * <"name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
+     * it means v.name == "qkm" or v.name == "SC";</p>
+     * <p>all map elements represents an and logical relationship</p>
+     *
+     * @param conMap       String is propName,Relational is {@link Filter}
      * @param filterString filterString is alternative ,you can pass in
-     *                     "e.name == "qkm" or v.name == "qkm",for conMap,you can
-     *                     pass in <"name",{@link EQ#EQ(Object)}>,
-     *                     pass in conMap means e.name == "qkm"
+     *                     "e.name == "qkm"" or "v.name == "qkm"",or front same to
+     *                     pass in <"name",Relational.EQ.setValue("qkm")> for conMap.
      * @return RelationshipMatch
      */
-    public RelationshipMatch where(HashMap<String, Condition> conMap, String... filterString) {
+    public RelationshipMatch where(HashMap<String, Filter> conMap, String... filterString) {
         this.conMap = conMap;
         this.filterString = Arrays.asList(filterString);
         return this;

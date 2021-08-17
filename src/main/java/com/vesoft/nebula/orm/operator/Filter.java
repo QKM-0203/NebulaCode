@@ -7,14 +7,7 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * used to do isNotNull operate,eg: name is not null
+ * abstract logical relations and relations
  */
-public class IsNotNull extends Condition {
-    public IsNotNull() {
-    }
-
-    @Override
-    protected String encode() {
-        return "%s" + " is not null ";
-    }
+public interface Filter {
 }

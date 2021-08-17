@@ -9,10 +9,8 @@ package com.vesoft.nebula.orm.match;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.entity.Vertex;
-import com.vesoft.nebula.orm.operator.Condition;
-import com.vesoft.nebula.orm.operator.EQ;
+import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Sort;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +26,7 @@ public class VertexMatch {
     private HashMap<String, Sort> orderBy;
     private String groupBy;
     private List<String> filterString;
-    private HashMap<String, Condition> conMap;
+    private HashMap<String, Filter> conMap;
     private HashMap<String, Object> propMap;
 
     protected VertexMatch(Graph graph) {
@@ -48,15 +46,23 @@ public class VertexMatch {
     }
 
     /**
+     * /**
      * filter condition
      *
-     * @param conMap       String is propName,Condition is {@link Condition}
-     * @param filterString filterString is alternative ,you can pass in "v.name=qkm",
-     *                     for conMap you can pass in <"name",{@link EQ#EQ(Object)}>
-     *                     they are common mean.
+     * <p>For conMap,if you represents a relationship ,you can pass in
+     * <"name",Relational.EQ.setValue("qkm")>it means v.name == "qkm".</p>
+     * <p>if you represents a logic relationship you can pass in
+     * <"name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
+     * it means v.name == "qkm" or v.name == "SC";</p>
+     * <p>all map elements represents an and logical relationship</p>
+     *
+     * @param conMap       String is propName,Condition is {@link Filter}
+     * @param filterString filterString is alternative ,you can pass in
+     *                     "v.name == "qkm"",it same to pass in
+     *                     <"name",Relational.EQ.setValue("qkm")> for conMap.
      * @return VertexMatch
      */
-    public VertexMatch where(HashMap<String, Condition> conMap, String... filterString) {
+    public VertexMatch where(HashMap<String, Filter> conMap, String... filterString) {
         this.conMap = conMap;
         this.filterString = Arrays.asList(filterString);
         return this;
