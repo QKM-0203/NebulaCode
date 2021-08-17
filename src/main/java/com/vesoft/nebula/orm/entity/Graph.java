@@ -208,7 +208,7 @@ public class Graph {
         if (vertices.size() != 0) {
             if (schema[0] == null || schema[1] == null) {
                 throw new ExecuteException("tagName and attribute name is "
-                    + "a condition of merge,so cannot null");
+                    + "a condition of merge,so cannot be null");
             }
             ResultSet resultSet = run("DESC TAG " + schema[0]);
             if (resultSet.isSucceeded()) {
@@ -482,6 +482,7 @@ public class Graph {
      */
     public void createTag(Schema schema) {
         String tagJoin = "CREATE TAG IF NOT EXISTS " + Encoding.joinSchema(schema);
+        System.out.println(tagJoin);
         ResultSet resultSet = run(tagJoin);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
@@ -559,6 +560,32 @@ public class Graph {
         dropEdgeList(edgeList);
     }
 
+    /**
+     * get vertex number from space
+     * @return vertexNumber
+     */
+    public long vertexNumber() {
+        ResultSet showStats = run("SUBMIT JOB STATS;SHOW STATS");
+        if (!showStats.isSucceeded()) {
+            throw new ExecuteException(showStats.getErrorMessage());
+        }
+        ResultSet.Record valueWrappers = showStats.rowValues(showStats.rowsSize() - 2);
+        return valueWrappers.get("Count").asLong();
+    }
+
+
+    /**
+     * get Relationships number from space
+     * @return relationshipNumber
+     */
+    public long relationshipNumber() {
+        ResultSet showStats = run("SUBMIT JOB STATS;SHOW STATS");
+        if (!showStats.isSucceeded()) {
+            throw new ExecuteException(showStats.getErrorMessage());
+        }
+        ResultSet.Record valueWrappers = showStats.rowValues(showStats.rowsSize() - 1);
+        return valueWrappers.get("Count").asLong();
+    }
 
     private ResultSet judgeExistVertexes(List<Vertex> vertices) {
         ArrayList<String> idList = new ArrayList<>();
