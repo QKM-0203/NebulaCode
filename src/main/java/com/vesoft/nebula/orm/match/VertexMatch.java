@@ -57,6 +57,7 @@ public class VertexMatch {
      * <p>all map elements represents an and logical relationship</p>
      *
      * @param conMap       String is propName,Condition is {@link Filter}
+     *                     include (Relational、Logical、UnaryOperate)
      * @param filterString filterString is alternative ,you can pass in
      *                     "v.name == "qkm"",it same to pass in
      *                     <"name",Relational.EQ.setValue("qkm")> for conMap.

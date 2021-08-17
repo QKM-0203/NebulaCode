@@ -64,6 +64,7 @@ public class RelationshipMatch {
      * <p>all map elements represents an and logical relationship</p>
      *
      * @param conMap       String is propName,Relational is {@link Filter}
+     *                     include (Relational、Logical、UnaryOperate)
      * @param filterString filterString is alternative ,you can pass in
      *                     "e.name == "qkm"" or "v.name == "qkm"",or front same to
      *                     pass in <"name",Relational.EQ.setValue("qkm")> for conMap.

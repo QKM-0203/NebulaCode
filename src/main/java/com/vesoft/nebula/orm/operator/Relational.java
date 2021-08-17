@@ -17,10 +17,8 @@ public enum Relational implements Filter {
     LT("<"),
     NE("!="),
     Regular("=～"),
-    IsNotNull("IS NOT NULL"),
-    IsNull("IS NULL"),
     ENDSWITH("ENDS WITH"),
-    STARTSWITh("STARTS WITH"),
+    STARTSWITH("STARTS WITH"),
     IN("IN"),
     CONTAINS("CONTAINS");
 
