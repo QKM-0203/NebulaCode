@@ -574,7 +574,6 @@ public class Graph {
      */
     public long vertexNumber(String tagName) throws UnsupportedEncodingException {
         ResultSet showStats = run("SHOW STATS");
-        long flag = -1;
         if (!showStats.isSucceeded()) {
             throw new ExecuteException(showStats.getErrorMessage());
         }
@@ -585,15 +584,11 @@ public class Graph {
             for (int i = 0; i < showStats.rowsSize(); i++) {
                 ResultSet.Record valueWrappers = showStats.rowValues(i);
                 if (valueWrappers.get(NAME).asString().equals(tagName)) {
-                    flag = valueWrappers.get(COUNT).asLong();
-                    break;
+                    return valueWrappers.get(COUNT).asLong();
                 }
             }
-            if (flag == -1) {
-                throw new ExecuteException("the tag not exist");
-            }
         }
-        return flag;
+        return 0;
     }
 
 
@@ -608,7 +603,6 @@ public class Graph {
      */
     public long relationshipNumber(String edgeName) throws UnsupportedEncodingException {
         ResultSet showStats = run("SHOW STATS");
-        long flag = -1;
         if (!showStats.isSucceeded()) {
             throw new ExecuteException(showStats.getErrorMessage());
         }
@@ -619,15 +613,11 @@ public class Graph {
             for (int i = 0; i < showStats.rowsSize(); i++) {
                 ResultSet.Record valueWrappers = showStats.rowValues(i);
                 if (valueWrappers.get(NAME).asString().equals(edgeName)) {
-                    flag = valueWrappers.get(COUNT).asLong();
-                    break;
+                    return valueWrappers.get(COUNT).asLong();
                 }
             }
-            if (flag == -1) {
-                throw new ExecuteException("the edge not exist");
-            }
         }
-        return flag;
+        return 0;
     }
 
     private ResultSet judgeExistVertexes(List<Vertex> vertices) {
