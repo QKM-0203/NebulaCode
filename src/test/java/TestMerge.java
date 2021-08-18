@@ -1,3 +1,9 @@
+/* Copyright (c) 2021 vesoft inc. All rights reserved.
+ *
+ * This source code is licensed under Apache 2.0 License,
+ * attached with Common Clause Condition 1.0, found in the LICENSES directory.
+ */
+
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.*;
 import java.io.UnsupportedEncodingException;
@@ -5,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.junit.Test;
 
+/**
+ * test merge
+ */
 public class TestMerge extends TestDataBase {
     @Test
     public void mergeVertexThatDoesNotExist() throws UnsupportedEncodingException {
@@ -18,9 +27,9 @@ public class TestMerge extends TestDataBase {
     public void mergeVertexThatDoesExist() throws UnsupportedEncodingException {
         graph.create(vertexOne);
         assert graph.exists(vertexOne);
-        final long oldVertexNumber = graph.vertexNumber();
+        final long oldVertexNumber = graph.vertexNumber(null);
         graph.merge(vertexOne, "QKM2", "name");
-        final long newVertexNumber = graph.vertexNumber();
+        final long newVertexNumber = graph.vertexNumber(null);
         assert newVertexNumber == oldVertexNumber;
     }
 
@@ -69,9 +78,9 @@ public class TestMerge extends TestDataBase {
     public void mergeRelationshipThatDoesExist() throws UnsupportedEncodingException {
         graph.create(relationship12);
         assert graph.exists(relationship12);
-        final long oldEdgeNumber = graph.relationshipNumber();
+        final long oldEdgeNumber = graph.relationshipNumber(null);
         graph.merge(relationship12, "team", "teamName");
-        final long newEdgeNumber = graph.relationshipNumber();
+        final long newEdgeNumber = graph.relationshipNumber(null);
         assert oldEdgeNumber == newEdgeNumber;
     }
 
@@ -120,14 +129,14 @@ public class TestMerge extends TestDataBase {
         assert !graph.exists(vertexThird);
         graph.create(vertexOne);
         assert graph.exists(vertexOne);
-        final long oldVertexNumber = graph.vertexNumber();
+        final long oldVertexNumber = graph.vertexNumber(null);
         ArrayList<Vertex> vertices = new ArrayList<>();
         vertices.add(vertexOne);
         vertices.add(vertexTwo);
         vertices.add(vertexThird);
         Subgraph subgraph = new Subgraph(vertices);
         graph.merge(subgraph, "QKM2", "name");
-        long newVertexNumber = graph.vertexNumber();
+        long newVertexNumber = graph.vertexNumber(null);
         assert newVertexNumber == oldVertexNumber + 2;
     }
 
