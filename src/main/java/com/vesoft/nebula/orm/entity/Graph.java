@@ -15,7 +15,6 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.ngql.Encoding;
 import com.vesoft.nebula.orm.util.Util;
-
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -32,6 +31,10 @@ public class Graph {
     private final Session session;
     private static final String VERTICES_ = "vertices_";
     private static final String EDGES_ = "edges_";
+    private static final String NAME = "Name";
+    private static final String COUNT = "Count";
+    private static final String VERTICES = "vertices";
+    private static final String EDGES = "edges";
 
     protected Graph(String spaceName, Session session) {
         this.session = session;
@@ -56,7 +59,6 @@ public class Graph {
             throw new ExecuteException(e.getMessage());
         }
     }
-
 
     /**
      * create graphObject.
@@ -209,7 +211,7 @@ public class Graph {
         if (vertices.size() != 0) {
             if (schema[0] == null || schema[1] == null) {
                 throw new ExecuteException("tagName and attribute name is "
-                    + "a condition of merge,so cannot null");
+                    + "a condition of merge,so cannot be null");
             }
             ResultSet resultSet = run("DESC TAG " + schema[0]);
             if (resultSet.isSucceeded()) {
@@ -301,13 +303,16 @@ public class Graph {
         ArrayList<Relationship> relationships = new ArrayList<>();
         Util.judgeGraphObject(vertices, relationships, graphObject);
         if (vertices.size() != 0) {
+            HashMap<String, Vertex> idVertexMap = new HashMap<>();
             for (Vertex vertex : vertices) {
-                ResultSet resultSet = judgeExistVertex(vertex);
-                List<ValueWrapper> remoteVertex = resultSet.colValues(VERTICES_);
-                if (remoteVertex.size() == 0) {
-                    continue;
-                }
-                List<String> remoteTags = remoteVertex.get(0).asNode().labels();
+                idVertexMap.put(vertex.getVid().toString(), vertex);
+            }
+            ResultSet resultSet = judgeExistVertexes(vertices);
+            List<ValueWrapper> remoteVertex = resultSet.colValues(VERTICES_);
+            for (ValueWrapper value : remoteVertex) {
+                Node node = value.asNode();
+                Vertex vertex = idVertexMap.get(node.getId().asString());
+                List<String> remoteTags = node.labels();
                 Set<String> localTags = vertex.getPropMap().keySet();
                 //update and add tag
                 create(vertex);
@@ -321,32 +326,8 @@ public class Graph {
             for (Relationship relationship : relationships) {
                 ResultSet resultSet = judgeExistEdge(relationship);
                 List<ValueWrapper> remoteEdge = resultSet.colValues(EDGES_);
-                if (remoteEdge.size() == 0) {
-                    throw new ExecuteException("the relationship "
-                        + relationship
-                        + " is not found at remote database");
-                }
-                if (relationship.getPropMap() != null) {
-                    if (relationship.getPropMap() != null
-                        && relationship.getPropMap().size() != 0) {
-                        String updateEdgeValue = Encoding
-                            .updateSchemaValue(relationship.getPropMap());
-                        ResultSet updateRemote =
-                            run(String.format("UPSERT EDGE ON `%s` %s->%s@%d SET %s",
-                                relationship.getEdgeName(),
-                                relationship.getStartVid() instanceof String
-                                    ? "\"" + relationship.getStartVid()
-                                    + "\"" : relationship.getStartVid(),
-                                relationship.getEndVid() instanceof String
-                                    ? "\"" + relationship.getEndVid()
-                                    + "\"" : relationship.getEndVid(),
-                                relationship.getRank(), updateEdgeValue));
-                        if (!updateRemote.isSucceeded()) {
-                            throw new ExecuteException(updateRemote.getErrorMessage()
-                                + "\n the edge " + relationship.getEdgeName()
-                                + " corresponding to  " + relationship + " push fail");
-                        }
-                    }
+                if (remoteEdge.size() != 0) {
+                    create(relationship);
                 }
             }
         }
@@ -504,6 +485,7 @@ public class Graph {
      */
     public void createTag(Schema schema) {
         String tagJoin = "CREATE TAG IF NOT EXISTS " + Encoding.joinSchema(schema);
+        System.out.println(tagJoin);
         ResultSet resultSet = run(tagJoin);
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
@@ -581,6 +563,72 @@ public class Graph {
         dropEdgeList(edgeList);
     }
 
+    /**
+     * gets the number of vertexes of the specified tag by tagName,
+     * you should execute submit job stats before executing this method,
+     * if you pass in null means get all vertexes number
+     *
+     * @param tagName Specified tag name
+     * @return vertexNumber
+     * @throws UnsupportedEncodingException revert type is fail
+     */
+    public long vertexNumber(String tagName) throws UnsupportedEncodingException {
+        ResultSet showStats = run("SHOW STATS");
+        long flag = -1;
+        if (!showStats.isSucceeded()) {
+            throw new ExecuteException(showStats.getErrorMessage());
+        }
+        if (showStats.rowsSize() != 0) {
+            if (tagName == null) {
+                tagName = VERTICES;
+            }
+            for (int i = 0; i < showStats.rowsSize(); i++) {
+                ResultSet.Record valueWrappers = showStats.rowValues(i);
+                if (valueWrappers.get(NAME).asString().equals(tagName)) {
+                    flag = valueWrappers.get(COUNT).asLong();
+                    break;
+                }
+            }
+            if (flag == -1) {
+                throw new ExecuteException("the tag not exist");
+            }
+        }
+        return flag;
+    }
+
+
+    /**
+     * gets the number of edges of the specified edge by edgeName,
+     * you should execute submit job stats before executing this method,
+     * if you pass in null means get all edges number.
+     *
+     * @param edgeName specified edge name
+     * @return relationshipNumber
+     * @throws UnsupportedEncodingException revert type is fail
+     */
+    public long relationshipNumber(String edgeName) throws UnsupportedEncodingException {
+        ResultSet showStats = run("SHOW STATS");
+        long flag = -1;
+        if (!showStats.isSucceeded()) {
+            throw new ExecuteException(showStats.getErrorMessage());
+        }
+        if (showStats.rowsSize() != 0) {
+            if (edgeName == null) {
+                edgeName = EDGES;
+            }
+            for (int i = 0; i < showStats.rowsSize(); i++) {
+                ResultSet.Record valueWrappers = showStats.rowValues(i);
+                if (valueWrappers.get(NAME).asString().equals(edgeName)) {
+                    flag = valueWrappers.get(COUNT).asLong();
+                    break;
+                }
+            }
+            if (flag == -1) {
+                throw new ExecuteException("the edge not exist");
+            }
+        }
+        return flag;
+    }
 
     private ResultSet judgeExistVertexes(List<Vertex> vertices) {
         ArrayList<String> idList = new ArrayList<>();
@@ -597,14 +645,6 @@ public class Graph {
         return findRemote;
     }
 
-
-    private ResultSet judgeExistVertex(Vertex vertex) {
-        ArrayList<Vertex> vertices = new ArrayList<>();
-        vertices.add(vertex);
-        return judgeExistVertexes(vertices);
-    }
-
-
     private ResultSet judgeExistEdge(Relationship relationship) {
         ResultSet findRemote = run(String.format("FETCH PROP ON `%s` %s->%s@%d ",
             relationship.getEdgeName(), relationship.getStartVid() instanceof String
@@ -616,19 +656,5 @@ public class Graph {
             throw new ExecuteException(findRemote.getErrorMessage());
         }
         return findRemote;
-    }
-
-    private void updateVertex(Vertex vertex, String tagName) {
-        String updateTagValue =
-            Encoding.updateSchemaValue(vertex.getPropMap().get(tagName));
-        ResultSet result = run(String.format("UPSERT VERTEX ON `%s` %s SET %s",
-            tagName, vertex.getVid() instanceof String
-                ? "\"" + vertex.getVid()
-                + "\"" : vertex.getVid(), updateTagValue));
-        if (!result.isSucceeded()) {
-            throw new ExecuteException(result.getErrorMessage()
-                + "\n the tag " + tagName + " corresponding to "
-                + vertex + " update fail");
-        }
     }
 }

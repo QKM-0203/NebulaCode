@@ -109,10 +109,16 @@ public class Util {
             relationships.add((Relationship) graphObject);
         } else if (graphObject instanceof Subgraph) {
             vertices.addAll(((Subgraph) graphObject).getVertexes());
-            relationships.addAll(((Subgraph) graphObject).getRelationships());
+            if (((Subgraph) graphObject).getRelationships() != null
+                && ((Subgraph) graphObject).getRelationships().size() != 0) {
+                relationships.addAll(((Subgraph) graphObject).getRelationships());
+            }
         } else if (graphObject instanceof Path) {
             vertices.addAll(((Path) graphObject).getVertices());
-            relationships.addAll(((Path) graphObject).getRelationships());
+            if (((Path) graphObject).getRelationships() != null
+                && ((Path) graphObject).getRelationships().size() != 0) {
+                relationships.addAll(((Path) graphObject).getRelationships());
+            }
         } else {
             throw new ExecuteException(String.format("%s object is not support",
                 graphObject.getClass().getName()));

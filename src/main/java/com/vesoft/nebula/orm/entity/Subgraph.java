@@ -24,6 +24,10 @@ public class Subgraph {
         init(vertexList, relationshipsList);
     }
 
+    public Subgraph(List<Vertex> vertexList) {
+        init(vertexList, null);
+    }
+
     protected void init(List<Vertex> vertexList, List<Relationship> relationshipsList) {
         this.vertexList = vertexList;
         this.relationshipsList = relationshipsList;
