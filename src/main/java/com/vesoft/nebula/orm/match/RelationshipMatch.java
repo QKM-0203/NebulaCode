@@ -8,8 +8,9 @@ package com.vesoft.nebula.orm.match;
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.entity.Relationship;
-import com.vesoft.nebula.orm.entity.Vertex;
+import com.vesoft.nebula.orm.exception.ExecuteException;
+import com.vesoft.nebula.orm.ngql.Name;
+import com.vesoft.nebula.orm.ngql.Query;
 import com.vesoft.nebula.orm.operator.*;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,39 +18,47 @@ import java.util.List;
 
 public class RelationshipMatch {
     protected Graph graph;
-    private Vertex startVertex;
-    private Vertex endVertex;
+    private String startTagName;
+    private String endTagName;
     private List<String> edges;
     private List<String> filterString;
-    private long skip;
+    private long skip = 0;
     private long limit;
-    private HashMap<String, Sort> orderBy;
-    private String groupBy;
-    private Direction direction = Direction.OUT;
+    private HashMap<Name, Sort> orderBy;
+    private List<Name> groupBy;
+    private EdgeDirection edgeDirection = EdgeDirection.OUT;
     private HashMap<String, Filter> conMap;
-    private HashMap<String, Object> propMap;
+    private HashMap<String, Object> startTagMap;
+    private HashMap<String, Object> endTagMap;
+    private HashMap<String, Object> edgeMap;
+    private List<AggregateFunction> aggregateFunctions;
 
     protected RelationshipMatch(Graph graph) {
         this.graph = graph;
     }
 
     /**
-     * @param startVertex startVertex,can be null
-     * @param endVertex   endVertex,can be null
-     * @param direction   in edge or out edge
-     * @param propMap     if you create edge index,you can pass in ,eg:
-     *                    match (v)-[e:player{name: "qkm"}]-(v2)
-     * @param types       edgeName,can be multiple
+     * @param startTagName if tag of startVertex,you can pass in,can be null
+     * @param startTagMap  if startVertex has tag index you can pass in,can be null
+     * @param endTagName   if tag of endVertex,you can pass in,can be null
+     * @param endTagMap    if endVertex has tag index you can pass in,can be null
+     * @param edgeDirection    in edge or out edge
+     * @param edgeMap      if you create edge index,you can pass in ,eg:
+     *                     match (v)-[e:player{name: "qkm"}]-(v2)
+     * @param types        edgeName,can be multiple
      * @return RelationshipMatch
      */
-    public RelationshipMatch init(Vertex startVertex, Vertex endVertex,
-                                  Direction direction, HashMap<String, Object> propMap,
+    public RelationshipMatch init(String startTagName, HashMap<String, Object> startTagMap,
+                                  String endTagName, HashMap<String, Object> endTagMap,
+                                  EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
                                   String... types) {
-        this.startVertex = startVertex;
-        this.endVertex = endVertex;
-        this.propMap = propMap;
+        this.startTagName = startTagName;
+        this.endTagName = endTagName;
+        this.startTagMap = startTagMap;
+        this.endTagMap = endTagMap;
+        this.edgeMap = edgeMap;
         this.edges = Arrays.asList(types);
-        this.direction = direction;
+        this.edgeDirection = edgeDirection;
         return this;
     }
 
@@ -66,8 +75,8 @@ public class RelationshipMatch {
      * @param conMap       String is propName,Relational is {@link Filter}
      *                     include (Relational、Logical、UnaryOperate)
      * @param filterString filterString is alternative ,you can pass in
-     *                     "e.name == "qkm"" or "v.name == "qkm"",or front same to
-     *                     pass in <"name",Relational.EQ.setValue("qkm")> for conMap.
+     *                     "e.name == "qkm"" or "v.name == "qkm"" or "v1.name == "qkm"",
+     *                     or front same to pass in <"name",Relational.EQ.setValue("qkm")> for conMap.
      * @return RelationshipMatch
      */
     public RelationshipMatch where(HashMap<String, Filter> conMap, String... filterString) {
@@ -89,17 +98,21 @@ public class RelationshipMatch {
      * @param orderBy sort by one or multiple attribute,pass in eg: (e.name,Sort.ASC)
      * @return RelationshipMatch
      */
-    public RelationshipMatch orderBy(HashMap<String, Sort> orderBy) {
+    public RelationshipMatch orderBy(HashMap<Name, Sort> orderBy) {
         this.orderBy = orderBy;
         return this;
     }
 
     /**
-     * @param name pass in eg:e.name
+     * grouping using aggregate functions.
+     *
+     * @param groupBy            for grouping,{@link Name} Object is used to alias properties
+     * @param aggregateFunctions for calculation
      * @return RelationshipMatch
      */
-    public RelationshipMatch groupBy(String name) {
-        this.groupBy = name;
+    public RelationshipMatch groupBy(List<Name> groupBy, AggregateFunction... aggregateFunctions) {
+        this.groupBy = groupBy;
+        this.aggregateFunctions = Arrays.asList(aggregateFunctions);
         return this;
     }
 
@@ -116,8 +129,11 @@ public class RelationshipMatch {
     /**
      * @return from result get the first relationship
      */
-    public Relationship first() {
-        return all().get(0);
+    public ResultSet.Record first() {
+        if (all().rowsSize() != 0) {
+            return all().rowValues(0);
+        }
+        return null;
     }
 
     /**
@@ -126,16 +142,37 @@ public class RelationshipMatch {
      * @return sentence
      */
     private String connectQueryParameters() {
-        return "";
+        StringBuilder result = new StringBuilder();
+        if (edgeDirection.toString().equals("OUT")) {
+            result.append(String.format("MATCH (v%s)-[%s]->(v1%s) ",
+                Query.joinTag(startTagName, startTagMap), Query.joinEdge(edgeMap, edges),
+                Query.joinTag(endTagName, endTagMap)));
+        } else if (edgeDirection.toString().equals("IN")) {
+            result.append(String.format("MATCH (v%s)<-[%s]-(v1%s) ",
+                Query.joinTag(startTagName, startTagMap), Query.joinEdge(edgeMap, edges),
+                Query.joinTag(endTagName, endTagMap)));
+        } else {
+            result.append(String.format("MATCH (v%s)-[%s]-(v1%s) ",
+                Query.joinTag(startTagName, startTagMap), Query.joinEdge(edgeMap, edges),
+                Query.joinTag(endTagName, endTagMap)));
+        }
+        result.append(Query.judgeAndJoinWhere(conMap,filterString,1));
+        result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
+        result.append(Query.joinSkipAndLimit(skip,limit));
+        System.out.println(result);
+        return result.toString();
     }
 
     /**
      * @return all qualified relationships
      */
-    public List<Relationship> all() {
-        String s = connectQueryParameters();
-        ResultSet run = graph.run(s);
-        return null;
+    public ResultSet all() {
+        String matchRelationship = connectQueryParameters();
+        ResultSet resultSet = graph.run(matchRelationship);
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+        return resultSet;
     }
 
     /**
@@ -144,7 +181,7 @@ public class RelationshipMatch {
      * @return count
      */
     public long count() {
-        return all().size();
+        return all().rowsSize();
     }
 
     /**

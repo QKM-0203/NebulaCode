@@ -8,7 +8,10 @@ package com.vesoft.nebula.orm.match;
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.entity.Vertex;
+import com.vesoft.nebula.orm.exception.ExecuteException;
+import com.vesoft.nebula.orm.ngql.Name;
+import com.vesoft.nebula.orm.ngql.Query;
+import com.vesoft.nebula.orm.operator.AggregateFunction;
 import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Sort;
 import java.util.Arrays;
@@ -21,20 +24,21 @@ import java.util.List;
 public class VertexMatch {
     protected Graph graph;
     private String tagName;
-    private long skip;
+    private long skip = 0;
     private long limit;
-    private HashMap<String, Sort> orderBy;
-    private String groupBy;
+    private HashMap<Name, Sort> orderBy;
     private List<String> filterString;
     private HashMap<String, Filter> conMap;
     private HashMap<String, Object> propMap;
+    private List<Name> groupBy;
+    private List<AggregateFunction> aggregateFunctions;
 
     protected VertexMatch(Graph graph) {
         this.graph = graph;
     }
 
     /**
-     * @param tagName tagname
+     * @param tagName tagName
      * @param propMap if you create tag index,you can pass in propMap
      *                eg: match (v:player{name: "qkm"})
      * @return this
@@ -82,17 +86,21 @@ public class VertexMatch {
      * @param orderBy sort by one or multiple attribute,pass in eg: (v.name,Sort.ASC)
      * @return VertexMatch
      */
-    public VertexMatch orderBy(HashMap<String, Sort> orderBy) {
+    public VertexMatch orderBy(HashMap<Name, Sort> orderBy) {
         this.orderBy = orderBy;
         return this;
     }
 
     /**
-     * @param name pass in eg:v.name
+     * grouping using aggregate functions.
+     *
+     * @param groupBy            for grouping,{@link Name} Object is used to alias properties
+     * @param aggregateFunctions for calculation
      * @return VertexMatch
      */
-    public VertexMatch groupBy(String name) {
-        this.groupBy = name;
+    public VertexMatch groupBy(List<Name> groupBy, AggregateFunction... aggregateFunctions) {
+        this.groupBy = groupBy;
+        this.aggregateFunctions = Arrays.asList(aggregateFunctions);
         return this;
     }
 
@@ -109,26 +117,39 @@ public class VertexMatch {
     /**
      * @return from result get the first Vertex
      */
-    public Vertex first() {
-        return all().get(0);
+    public ResultSet.Record first() {
+        if (all().rowsSize() != 0) {
+            return all().rowValues(0);
+        }
+        return null;
     }
 
     /**
      * connect parameters
+     * match (v:%s)
      *
      * @return sentence
      */
     private String connectQueryParameters() {
-        return "";
+        StringBuilder result = new StringBuilder();
+        result.append(String.format("MATCH (v%s) ", Query.joinTag(tagName, propMap)));
+        result.append(Query.judgeAndJoinWhere(conMap, filterString, 0));
+        result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
+        result.append(Query.joinSkipAndLimit(skip,limit));
+        System.out.println(result);
+        return result.toString();
     }
 
     /**
-     * @return all qualified vertexes
+     * @return ResultSet
      */
-    public List<Vertex> all() {
-        String s = connectQueryParameters();
-        ResultSet run = graph.run(s);
-        return null;
+    public ResultSet all() {
+        String matchVertex = connectQueryParameters();
+        ResultSet resultSet = graph.run(matchVertex);
+        if (!resultSet.isSucceeded()) {
+            throw new ExecuteException(resultSet.getErrorMessage());
+        }
+        return resultSet;
     }
 
     /**
@@ -137,7 +158,7 @@ public class VertexMatch {
      * @return count
      */
     public long count() {
-        return all().size();
+        return all().rowsSize();
     }
 
     /**

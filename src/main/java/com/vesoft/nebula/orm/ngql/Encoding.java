@@ -42,7 +42,7 @@ public class Encoding {
                     throw new DataTypeException("attribute name cannot be null");
                 }
                 tagPartFormat.append(String.format(tagPart.toString(),
-                    useCommaSplitAddBackQuote(new ArrayList<>(propValueMap.keySet()))));
+                    useSymbolSplitAddBackQuote(new ArrayList<>(propValueMap.keySet()), ",")));
             } else {
                 tagPartFormat.append(String.format(tagPart.toString(), ""));
             }
@@ -128,6 +128,26 @@ public class Encoding {
             date.getDay());
     }
 
+    public static String encodeList(List<?> list) {
+        ArrayList<String> listString = new ArrayList<>();
+        for (Object o : list) {
+            listString.add(judgeDataType(o));
+        }
+        return listString.toString();
+    }
+
+    public static String encodeIdList(List<?> vidList) {
+        ArrayList<String> revertVid = new ArrayList<>();
+        for (Object id : vidList) {
+            if (id instanceof String) {
+                revertVid.add("\"" + id + "\"");
+            } else {
+                revertVid.add(id.toString());
+            }
+        }
+        return String.join(",", revertVid);
+    }
+
     /**
      * judge object what data type is it.
      *
@@ -152,6 +172,8 @@ public class Encoding {
             return String.format("date(\"%s\")", encodeDate((Date) object));
         } else if (object instanceof Boolean) {
             return String.format("%s", object);
+        } else if (object instanceof List) { // has question
+            return encodeList((List<?>) object);
         } else {
             throw new DataTypeException(String.format("nGql does not support type %s",
                 object.getClass().getName()));
@@ -164,12 +186,12 @@ public class Encoding {
      * @param nameList name List
      * @return (% s, % s, % s)
      */
-    public static String useCommaSplitAddBackQuote(List<String> nameList) {
+    public static String useSymbolSplitAddBackQuote(List<String> nameList, String symbol) {
         ArrayList<String> propNameAddBackQuote = new ArrayList<>();
         for (String name : nameList) {
             propNameAddBackQuote.add("`" + name + "`");
         }
-        return String.join(",", propNameAddBackQuote);
+        return String.join(symbol, propNameAddBackQuote);
     }
 
     /**
@@ -227,10 +249,10 @@ public class Encoding {
      * @param propMap attribute value of schema
      * @return eg: set name = "qkm",age = 10
      */
-    public static String updateSchemaValue(HashMap<String, Object> propMap) {
+    public static String connectProp(HashMap<String, Object> propMap) {
         ArrayList<String> keyValue = new ArrayList<>();
         for (String propName : propMap.keySet()) {
-            keyValue.add(String.format("%s = %s", propName, judgeDataType(propMap.get(propName))));
+            keyValue.add(String.format("%s: %s", propName, judgeDataType(propMap.get(propName))));
         }
         return String.join(",", keyValue);
     }

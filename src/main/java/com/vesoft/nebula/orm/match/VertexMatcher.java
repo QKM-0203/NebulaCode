@@ -6,9 +6,9 @@
 
 package com.vesoft.nebula.orm.match;
 
+import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.entity.Vertex;
-import java.util.ArrayList;
+import com.vesoft.nebula.orm.ngql.Encoding;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,8 +37,8 @@ public class VertexMatcher extends VertexMatch {
      * @param vid one vid
      * @return one vertex
      */
-    public Vertex getVertexByVid(Object vid) {
-        return match(null, null).where(null, "id(v) = " + (vid instanceof String
+    public ResultSet.Record getVertexByVid(Object vid) {
+        return match(null, null).where(null, "id(v) == " + (vid instanceof String
             ? "\"" + vid + "\"" : vid.toString())).first();
     }
 
@@ -48,15 +48,8 @@ public class VertexMatcher extends VertexMatch {
      * @param vidList vidList
      * @return vertexList
      */
-    public List<Vertex> getVertexByListVid(List<Object> vidList) {
-        ArrayList<String> revertVid = new ArrayList<>();
-        for (Object id : vidList) {
-            if (id instanceof String) {
-                revertVid.add("\"" + id + "\"");
-            } else {
-                revertVid.add(id.toString());
-            }
-        }
-        return match(null, null).where(null, "id(v) IN " + revertVid).all();
+    public ResultSet getVertexByListVid(List<?> vidList) {
+        return match(null, null)
+            .where(null, String.format("id(v) IN [%s]", Encoding.encodeIdList(vidList))).all();
     }
 }

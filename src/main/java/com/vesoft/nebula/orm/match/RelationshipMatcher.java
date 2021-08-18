@@ -7,8 +7,7 @@
 package com.vesoft.nebula.orm.match;
 
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.entity.Vertex;
-import com.vesoft.nebula.orm.operator.Direction;
+import com.vesoft.nebula.orm.operator.EdgeDirection;
 import java.util.HashMap;
 
 public class RelationshipMatcher extends RelationshipMatch {
@@ -18,16 +17,20 @@ public class RelationshipMatcher extends RelationshipMatch {
     }
 
     /**
-     * @param startVertex startVertex,can be null
-     * @param endVertex   endVertex,can be null
-     * @param direction   in edge or out edge
-     * @param propMap     if you create edge index,you can pass in eg: player{name: "qkm"}
-     * @param types       edgeName,can be Multiple
+     * @param startTagName if tag of startVertex,you can pass in,can be null
+     * @param startTagMap  if startVertex has tag index you can pass in,can be null
+     * @param endTagName   if tag of endVertex,you can pass in,can be null
+     * @param endTagMap    if endVertex has tag index you can pass in,can be null
+     * @param edgeDirection    in edge or out edge
+     * @param edgeMap      if you create edge index,you can pass in ,eg:
+     *                     match (v)-[e:player{name: "qkm"}]-(v2)
+     * @param types        edgeName,can be multiple
      * @return RelationshipMatch
      */
-    public RelationshipMatch match(Vertex startVertex, Vertex endVertex,
-                                   Direction direction, HashMap<String, Object> propMap,
+    public RelationshipMatch match(String startTagName, HashMap<String, Object> startTagMap,
+                                   String endTagName, HashMap<String, Object> endTagMap,
+                                   EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
                                    String... types) {
-        return init(startVertex, endVertex, direction, propMap, types);
+        return init(startTagName, startTagMap, endTagName, endTagMap, edgeDirection, edgeMap, types);
     }
 }
