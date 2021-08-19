@@ -10,7 +10,6 @@ import com.vesoft.nebula.orm.operator.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 /**
  * used to splice parameters into query statements
@@ -73,18 +72,10 @@ public class Query {
         }
     }
 
-    private static String joinOrderByAlice(HashMap<Name, Sort> orderBy) {
+    private static String joinOrderByAlias(HashMap<Name, Sort> orderBy) {
         ArrayList<String> orderByStrings = new ArrayList<>();
         for (Name name : orderBy.keySet()) {
             orderByStrings.add(name.getAlias() + " " + orderBy.get(name));
-        }
-        return String.join(",", orderByStrings);
-    }
-
-    private static String joinOrderByAtReturn(Set<Name> names) {
-        ArrayList<String> orderByStrings = new ArrayList<>();
-        for (Name name : names) {
-            orderByStrings.add(name.getPropName() + " AS " + name.getAlias());
         }
         return String.join(",", orderByStrings);
     }
@@ -120,17 +111,17 @@ public class Query {
                                         HashMap<Name, Sort> orderBy) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
-            result.append(String.format(" RETURN %s,%s ",joinGroupBy(groupBy),
+            result.append(String.format(" RETURN %s,%s ", joinReturnAlias(groupBy),
                 joinAggregateFunctions(aggregateFunctions)));
             if (orderBy != null && !orderBy.isEmpty()) {
-                result.append("ORDER BY ").append(joinOrderByAlice(orderBy));
+                result.append("ORDER BY ").append(joinOrderByAlias(orderBy));
             }
         } else {
             if (orderBy == null || orderBy.isEmpty()) {
                 result.append(" RETURN v ");
             } else {
-                result.append(" RETURN ").append(joinOrderByAtReturn(orderBy.keySet()));
-                result.append(" ORDER BY ").append(joinOrderByAlice(orderBy));
+                result.append(" RETURN ").append(joinReturnAlias((List<Name>)orderBy.keySet()));
+                result.append(" ORDER BY ").append(joinOrderByAlias(orderBy));
             }
         }
         return result.toString();
@@ -145,9 +136,9 @@ public class Query {
         return String.join(",",result);
     }
 
-    private static String joinGroupBy(List<Name> groupBy) {
+    private static String joinReturnAlias(List<Name> names) {
         ArrayList<String> result = new ArrayList<>();
-        for (Name name : groupBy) {
+        for (Name name : names) {
             result.add(name.getPropName() + " AS " + name.getAlias());
         }
         return String.join(",",result);
