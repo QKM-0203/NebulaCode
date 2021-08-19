@@ -11,7 +11,10 @@ import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.ngql.Name;
 import com.vesoft.nebula.orm.ngql.Query;
-import com.vesoft.nebula.orm.operator.*;
+import com.vesoft.nebula.orm.operator.AggregateFunction;
+import com.vesoft.nebula.orm.operator.EdgeDirection;
+import com.vesoft.nebula.orm.operator.Filter;
+import com.vesoft.nebula.orm.operator.Sort;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -46,9 +49,8 @@ public class RelationshipMatch {
      * @param edgeMap      if you create edge index,you can pass in ,eg:
      *                     match (v)-[e:player{name: "qkm"}]-(v2)
      * @param types        edgeName,can be multiple
-     * @return RelationshipMatch
      */
-    public RelationshipMatch init(String startTagName, HashMap<String, Object> startTagMap,
+    public void init(String startTagName, HashMap<String, Object> startTagMap,
                                   String endTagName, HashMap<String, Object> endTagMap,
                                   EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
                                   String... types) {
@@ -59,7 +61,6 @@ public class RelationshipMatch {
         this.edgeMap = edgeMap;
         this.edges = Arrays.asList(types);
         this.edgeDirection = edgeDirection;
-        return this;
     }
 
     /**
@@ -159,6 +160,7 @@ public class RelationshipMatch {
         result.append(Query.judgeAndJoinWhere(conMap,filterString,1));
         result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
         result.append(Query.joinSkipAndLimit(skip,limit));
+        System.out.println(result);
         return result.toString();
     }
 

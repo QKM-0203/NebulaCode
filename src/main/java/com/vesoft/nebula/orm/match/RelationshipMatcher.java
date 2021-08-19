@@ -31,6 +31,7 @@ public class RelationshipMatcher extends RelationshipMatch {
                                    String endTagName, HashMap<String, Object> endTagMap,
                                    EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
                                    String... types) {
-        return init(startTagName, startTagMap, endTagName, endTagMap, edgeDirection, edgeMap, types);
+        init(startTagName, startTagMap, endTagName, endTagMap, edgeDirection, edgeMap, types);
+        return this;
     }
 }

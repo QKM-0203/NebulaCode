@@ -41,12 +41,10 @@ public class VertexMatch {
      * @param tagName tagName
      * @param propMap if you create tag index,you can pass in propMap
      *                eg: match (v:player{name: "qkm"})
-     * @return this
      */
-    public VertexMatch init(String tagName, HashMap<String, Object> propMap) {
+    public void init(String tagName, HashMap<String, Object> propMap) {
         this.tagName = tagName;
         this.propMap = propMap;
-        return this;
     }
 
     /**
@@ -136,6 +134,7 @@ public class VertexMatch {
         result.append(Query.judgeAndJoinWhere(conMap, filterString, 0));
         result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
         result.append(Query.joinSkipAndLimit(skip,limit));
+        System.out.println(result);
         return result.toString();
     }
 

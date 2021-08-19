@@ -28,7 +28,8 @@ public class VertexMatcher extends VertexMatch {
      * @return VertexMatch
      */
     public VertexMatch match(String tagName, HashMap<String, Object> propMap) {
-        return init(tagName, propMap);
+        init(tagName, propMap);
+        return this;
     }
 
     /**
