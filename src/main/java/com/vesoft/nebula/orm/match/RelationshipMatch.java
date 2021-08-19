@@ -159,7 +159,6 @@ public class RelationshipMatch {
         result.append(Query.judgeAndJoinWhere(conMap,filterString,1));
         result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
         result.append(Query.joinSkipAndLimit(skip,limit));
-        System.out.println(result);
         return result.toString();
     }
 

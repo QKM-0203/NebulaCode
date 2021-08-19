@@ -21,7 +21,7 @@ public class Query {
         for (String propName : conMap.keySet()) {
             Filter filter = conMap.get(propName);
             if (filter instanceof Logical) {
-                whereStrings.add(joinLogical(propName, (Logical) filter,flag));
+                whereStrings.add(joinLogical(propName, (Logical) filter, flag));
             } else if (filter instanceof Relational) {
                 if (flag == 0) {
                     whereStrings.add(String.format("v.%s %s %s", propName,
@@ -52,7 +52,7 @@ public class Query {
         return result.toString();
     }
 
-    private static String joinLogical(String propName, Logical logical,int flag) {
+    private static String joinLogical(String propName, Logical logical, int flag) {
         Relational leftRelational = logical.getLeftRelational();
         Relational rightRelational = logical.getRightRelational();
         if (flag == 0) {
@@ -99,7 +99,7 @@ public class Query {
                     return String.format("e:`%s`{%s}", types.get(0), Encoding.connectProp(edgeMap));
                 }
             } else {
-                return String.format("e:%s", Encoding.useSymbolSplitAddBackQuote(types,"|:"));
+                return String.format("e:%s", Encoding.useSymbolSplitAddBackQuote(types, "|:"));
             }
         } else {
             return "e";
@@ -107,8 +107,8 @@ public class Query {
     }
 
     public static String joinGroupByAndOrderBy(List<Name> groupBy,
-                                        List<AggregateFunction> aggregateFunctions,
-                                        HashMap<Name, Sort> orderBy) {
+                                               List<AggregateFunction> aggregateFunctions,
+                                               HashMap<Name, Sort> orderBy) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
             result.append(String.format(" RETURN %s,%s ", joinReturnAlias(groupBy),
@@ -120,7 +120,7 @@ public class Query {
             if (orderBy == null || orderBy.isEmpty()) {
                 result.append(" RETURN v ");
             } else {
-                result.append(" RETURN ").append(joinReturnAlias((List<Name>)orderBy.keySet()));
+                result.append(" RETURN ").append(joinReturnAlias((List<Name>) orderBy.keySet()));
                 result.append(" ORDER BY ").append(joinOrderByAlias(orderBy));
             }
         }
@@ -131,20 +131,24 @@ public class Query {
     private static String joinAggregateFunctions(List<AggregateFunction> aggregateFunctions) {
         ArrayList<String> result = new ArrayList<>();
         for (AggregateFunction aggregateFunction : aggregateFunctions) {
-            result.add(String.format("%s(%s)",aggregateFunction.toString(),aggregateFunction.getValue()));
+            result.add(String.format("%s(%s)", aggregateFunction.toString(), aggregateFunction.getValue()));
         }
-        return String.join(",",result);
+        return String.join(",", result);
     }
 
-    private static String joinReturnAlias(List<Name> names) {
+    public static String joinReturnAlias(List<Name> names) {
         ArrayList<String> result = new ArrayList<>();
         for (Name name : names) {
-            result.add(name.getPropName() + " AS " + name.getAlias());
+            if (name.getAlias() != null) {
+                result.add(name.getPropName() + " AS " + name.getAlias());
+            } else {
+                result.add(name.getPropName());
+            }
         }
-        return String.join(",",result);
+        return String.join(",", result);
     }
 
-    public static String joinSkipAndLimit(long skip,long limit) {
+    public static String joinSkipAndLimit(long skip, long limit) {
         StringBuilder result = new StringBuilder();
         if (skip != 0) {
             result.append(" SKIP ").append(skip);

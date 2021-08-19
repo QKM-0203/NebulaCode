@@ -136,7 +136,6 @@ public class VertexMatch {
         result.append(Query.judgeAndJoinWhere(conMap, filterString, 0));
         result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
         result.append(Query.joinSkipAndLimit(skip,limit));
-        System.out.println(result);
         return result.toString();
     }
 
