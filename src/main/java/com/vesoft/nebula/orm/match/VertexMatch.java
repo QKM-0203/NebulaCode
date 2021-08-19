@@ -42,7 +42,7 @@ public class VertexMatch {
      * @param propMap if you create tag index,you can pass in propMap
      *                eg: match (v:player{name: "qkm"})
      */
-    public void init(String tagName, HashMap<String, Object> propMap) {
+    protected void init(String tagName, HashMap<String, Object> propMap) {
         this.tagName = tagName;
         this.propMap = propMap;
     }

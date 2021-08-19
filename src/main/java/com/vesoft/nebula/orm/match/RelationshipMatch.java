@@ -50,7 +50,7 @@ public class RelationshipMatch {
      *                     match (v)-[e:player{name: "qkm"}]-(v2)
      * @param types        edgeName,can be multiple
      */
-    public void init(String startTagName, HashMap<String, Object> startTagMap,
+    protected void init(String startTagName, HashMap<String, Object> startTagMap,
                                   String endTagName, HashMap<String, Object> endTagMap,
                                   EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
                                   String... types) {
