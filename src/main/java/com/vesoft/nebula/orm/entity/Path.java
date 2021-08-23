@@ -59,7 +59,6 @@ public class Path extends Walkable {
                         sequence.clear();
                         throw new ExecuteException(String.format("%s can not connect %s",
                             segment.getRelationship().getEndVid(), segment.getEndVertex()));
-
                     }
                 } else if (lastVertex.getVid().equals(segment.getRelationship().getEndVid())) {
                     sequence.add(segment.getRelationship());
@@ -73,12 +72,36 @@ public class Path extends Walkable {
                 } else {
                     sequence.clear();
                     throw new ExecuteException(String.format("%s can not connect %s",
-                        lastVertex, segment.getStartVertex()));
+                        lastVertex, segment.getRelationship()));
+                }
+            } else if (lastVertex.getVid().equals(segment.getEndVertex().getVid())) {
+                if (lastVertex.getVid().equals(segment.getRelationship().getStartVid())) {
+                    sequence.add(segment.getRelationship());
+                    if (segment.getStartVertex().getVid().equals(segment.getRelationship().getEndVid())) {
+                        sequence.add(segment.getStartVertex());
+                    } else {
+                        sequence.clear();
+                        throw new ExecuteException(String.format("%s can not connect %s",
+                            segment.getRelationship().getEndVid(), segment.getStartVertex()));
+                    }
+                } else if (lastVertex.getVid().equals(segment.getRelationship().getEndVid())) {
+                    sequence.add(segment.getRelationship());
+                    if (segment.getStartVertex().getVid().equals(segment.getRelationship().getStartVid())) {
+                        sequence.add(segment.getStartVertex());
+                    } else {
+                        sequence.clear();
+                        throw new ExecuteException(String.format("%s can not connect %s",
+                            segment.getRelationship().getStartVid(), segment.getStartVertex()));
+                    }
+                } else {
+                    sequence.clear();
+                    throw new ExecuteException(String.format("%s can not connect %s",
+                        lastVertex, segment.getRelationship()));
                 }
             } else {
                 sequence.clear();
                 throw new ExecuteException(String.format("%s can not connect %s",
-                    lastVertex, segment.getStartVertex()));
+                    lastVertex, segment));
             }
         }
         ArrayList<Vertex> vertices = new ArrayList<>();
