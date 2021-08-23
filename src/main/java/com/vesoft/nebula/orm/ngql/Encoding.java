@@ -101,7 +101,7 @@ public class Encoding {
      * use parameter to connect a attribute values of relationship.
      *
      * @param relationship a relationship object
-     * @return edgeValues eg:"1"->"2":("qkm",19)
+     * @return edgeValues eg:"1"->"2"[@1]:("qkm",19)
      * @throws DataTypeException the data type passed in does not match the given condition
      */
     public static String joinRelationshipValue(Relationship relationship) {
@@ -252,7 +252,7 @@ public class Encoding {
     public static String connectProp(HashMap<String, Object> propMap) {
         ArrayList<String> keyValue = new ArrayList<>();
         for (String propName : propMap.keySet()) {
-            keyValue.add(String.format("%s: %s", propName, judgeDataType(propMap.get(propName))));
+            keyValue.add(String.format("`%s`: %s", propName, judgeDataType(propMap.get(propName))));
         }
         return String.join(",", keyValue);
     }
