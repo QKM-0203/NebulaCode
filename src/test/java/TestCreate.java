@@ -33,11 +33,11 @@ public class TestCreate extends TestDataBase {
     @Test
     public void testCreateRelationship() {
         graph.create(relationship12);
-        graph.create(relationship23);
+        graph.create(relationship32);
         assert relationship12.getGraph() == graph;
-        assert relationship23.getGraph() == graph;
+        assert relationship32.getGraph() == graph;
         assert graph.exists(relationship12);
-        assert graph.exists(relationship23);
+        assert graph.exists(relationship32);
     }
 
     @Test
