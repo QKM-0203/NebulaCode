@@ -65,11 +65,11 @@ public class Relationship extends Entity {
         this.rank = rank;
     }
 
-    public void setStartVid(Vertex startVid) {
+    public void setStartVid(Object startVid) {
         this.startVid = startVid;
     }
 
-    public void setEndVid(Vertex endVid) {
+    public void setEndVid(Object endVid) {
         this.endVid = endVid;
     }
 
