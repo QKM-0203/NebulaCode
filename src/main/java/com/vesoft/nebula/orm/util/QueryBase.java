@@ -4,8 +4,10 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package com.vesoft.nebula.orm.ngql;
+package com.vesoft.nebula.orm.util;
 
+import com.vesoft.nebula.orm.ngql.Column;
+import com.vesoft.nebula.orm.ngql.Encoding;
 import com.vesoft.nebula.orm.operator.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,33 +16,41 @@ import java.util.List;
 /**
  * used to splice parameters into query statements
  */
-public class Query {
+public class QueryBase {
 
-    private static String joinWhere(HashMap<String, Filter> conMap, int flag) {
+    private static String joinWhere(HashMap<String, Filter> conMap, int isEdge) {
         ArrayList<String> whereStrings = new ArrayList<>();
         for (String propName : conMap.keySet()) {
             Filter filter = conMap.get(propName);
             if (filter instanceof Logical) {
-                whereStrings.add(joinLogical(propName, (Logical) filter, flag));
+                whereStrings.add(joinLogical(propName, (Logical) filter, isEdge));
             } else if (filter instanceof Relational) {
-                if (flag == 0) {
+                if (isEdge == 0) {
                     whereStrings.add(String.format("v.%s %s %s", propName,
                         ((Relational) filter).getSymbol(), Encoding.judgeDataType(((Relational) filter).getValue())));
                 } else {
                     whereStrings.add(String.format("e.%s %s %s", propName,
                         ((Relational) filter).getSymbol(), Encoding.judgeDataType(((Relational) filter).getValue())));
                 }
+            } else if (filter instanceof UnaryOperation) {
+                if (isEdge == 0) {
+                    whereStrings.add(String.format("v.%s %s", propName,
+                        ((UnaryOperation) filter).getSymbol()));
+                } else {
+                    whereStrings.add(String.format("e.%s %s", propName,
+                        ((UnaryOperation) filter).getSymbol()));
+                }
             }
         }
         return String.join(" AND ", whereStrings);
     }
 
-    public static String judgeAndJoinWhere(HashMap<String, Filter> conMap, List<String> filterString, int flag) {
+    public static String judgeAndJoinWhere(HashMap<String, Filter> conMap, List<String> filterString, int isEdge) {
         StringBuilder result = new StringBuilder();
         if ((conMap != null && !conMap.isEmpty()) || (filterString != null && !filterString.isEmpty())) {
             result.append("WHERE ");
             if (conMap != null && !conMap.isEmpty()) {
-                result.append(joinWhere(conMap, flag));
+                result.append(joinWhere(conMap, isEdge));
             }
             if (filterString != null && !filterString.isEmpty()) {
                 if (conMap != null && !conMap.isEmpty()) {
@@ -52,10 +62,10 @@ public class Query {
         return result.toString();
     }
 
-    private static String joinLogical(String propName, Logical logical, int flag) {
+    private static String joinLogical(String propName, Logical logical, int isEdge) {
         Relational leftRelational = logical.getLeftRelational();
         Relational rightRelational = logical.getRightRelational();
-        if (flag == 0) {
+        if (isEdge == 0) {
             return String.format("(%s %s %s)",
                 String.format("v.%s %s %s", propName,
                     leftRelational.getSymbol(), Encoding.judgeDataType(leftRelational.getValue())),
@@ -72,43 +82,17 @@ public class Query {
         }
     }
 
-    private static String joinOrderByAlias(HashMap<Name, Sort> orderBy) {
+    private static String joinOrderByAlias(HashMap<Column, Sort> orderBy) {
         ArrayList<String> orderByStrings = new ArrayList<>();
-        for (Name name : orderBy.keySet()) {
-            orderByStrings.add(name.getAlias() + " " + orderBy.get(name));
+        for (Column column : orderBy.keySet()) {
+            orderByStrings.add(column.getAlias() + " " + orderBy.get(column));
         }
         return String.join(",", orderByStrings);
     }
 
-    public static String joinTag(String tagName, HashMap<String, Object> tagMap) {
-        if (tagName == null) {
-            return "";
-        } else if (tagMap == null || tagMap.isEmpty()) {
-            return String.format(":`%s`", tagName);
-        } else {
-            return String.format(":`%s`{%s}", tagName, Encoding.connectProp(tagMap));
-        }
-    }
-
-    public static String joinEdge(HashMap<String, Object> edgeMap, List<String> types) {
-        if (types != null && !types.isEmpty()) {
-            if (types.size() == 1) {
-                if (edgeMap == null || edgeMap.isEmpty()) {
-                    return String.format("e:`%s`", types.get(0));
-                } else {
-                    return String.format("e:`%s`{%s}", types.get(0), Encoding.connectProp(edgeMap));
-                }
-            } else {
-                return String.format("e:%s", Encoding.useSymbolSplitAddBackQuote(types, "|:"));
-            }
-        } else {
-            return "e";
-        }
-    }
-
-    public static String joinGroupByAndOrderBy(List<Name> groupBy,
+    public static String joinGroupByAndOrderBy(List<Column> groupBy,
                                                List<AggregateFunction> aggregateFunctions,
-                                               HashMap<Name, Sort> orderBy) {
+                                               HashMap<Column, Sort> orderBy) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
             result.append(String.format(" RETURN %s,%s ", joinReturnAlias(groupBy),
@@ -120,7 +104,7 @@ public class Query {
             if (orderBy == null || orderBy.isEmpty()) {
                 result.append(" RETURN v ");
             } else {
-                result.append(" RETURN ").append(joinReturnAlias((List<Name>) orderBy.keySet()));
+                result.append(" RETURN ").append(joinReturnAlias((List<Column>) orderBy.keySet()));
                 result.append(" ORDER BY ").append(joinOrderByAlias(orderBy));
             }
         }
@@ -136,13 +120,13 @@ public class Query {
         return String.join(",", result);
     }
 
-    public static String joinReturnAlias(List<Name> names) {
+    public static String joinReturnAlias(List<Column> columns) {
         ArrayList<String> result = new ArrayList<>();
-        for (Name name : names) {
-            if (name.getAlias() != null) {
-                result.add(name.getPropName() + " AS " + name.getAlias());
+        for (Column column : columns) {
+            if (column.getAlias() != null) {
+                result.add(column.getPropName() + " AS " + column.getAlias());
             } else {
-                result.add(name.getPropName());
+                result.add(column.getPropName());
             }
         }
         return String.join(",", result);
@@ -158,5 +142,4 @@ public class Query {
         }
         return result.toString();
     }
-
 }

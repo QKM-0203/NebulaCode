@@ -9,8 +9,7 @@ package com.vesoft.nebula.orm.match;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
-import com.vesoft.nebula.orm.ngql.Name;
-import com.vesoft.nebula.orm.ngql.Query;
+import com.vesoft.nebula.orm.ngql.Column;
 import com.vesoft.nebula.orm.operator.AggregateFunction;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.operator.Filter;
@@ -27,8 +26,8 @@ public class RelationshipMatch {
     private List<String> filterString;
     private long skip = 0;
     private long limit;
-    private HashMap<Name, Sort> orderBy;
-    private List<Name> groupBy;
+    private HashMap<Column, Sort> orderBy;
+    private List<Column> groupBy;
     private EdgeDirection edgeDirection = EdgeDirection.OUT;
     private HashMap<String, Filter> conMap;
     private HashMap<String, Object> startTagMap;
@@ -41,19 +40,19 @@ public class RelationshipMatch {
     }
 
     /**
-     * @param startTagName if tag of startVertex,you can pass in,can be null
-     * @param startTagMap  if startVertex has tag index you can pass in,can be null
-     * @param endTagName   if tag of endVertex,you can pass in,can be null
-     * @param endTagMap    if endVertex has tag index you can pass in,can be null
-     * @param edgeDirection    in edge or out edge
-     * @param edgeMap      if you create edge index,you can pass in ,eg:
-     *                     match (v)-[e:player{name: "qkm"}]-(v2)
-     * @param types        edgeName,can be multiple
+     * @param startTagName  if tag of startVertex,you can pass in,can be null
+     * @param startTagMap   if startVertex has tag index you can pass in,can be null
+     * @param endTagName    if tag of endVertex,you can pass in,can be null
+     * @param endTagMap     if endVertex has tag index you can pass in,can be null
+     * @param edgeDirection in edge or out edge
+     * @param edgeMap       if you create edge index,you can pass in ,eg:
+     *                      match (v)-[e:player{name: "qkm"}]-(v2)
+     * @param types         edgeName,can be multiple
      */
     protected void init(String startTagName, HashMap<String, Object> startTagMap,
-                                  String endTagName, HashMap<String, Object> endTagMap,
-                                  EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
-                                  String... types) {
+                        String endTagName, HashMap<String, Object> endTagMap,
+                        EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
+                        String... types) {
         this.startTagName = startTagName;
         this.endTagName = endTagName;
         this.startTagMap = startTagMap;
@@ -77,7 +76,8 @@ public class RelationshipMatch {
      *                     include (Relational、Logical、UnaryOperate)
      * @param filterString filterString is alternative ,you can pass in
      *                     "e.name == "qkm"" or "v.name == "qkm"" or "v1.name == "qkm"",
-     *                     or front same to pass in <"name",Relational.EQ.setValue("qkm")> for conMap.
+     *                     or front same to pass in <"name",Relational.EQ.setValue("qkm")> for conMap,
+     *                                                                                 TODO check format.
      * @return RelationshipMatch
      */
     public RelationshipMatch where(HashMap<String, Filter> conMap, String... filterString) {
@@ -96,22 +96,30 @@ public class RelationshipMatch {
     }
 
     /**
-     * @param orderBy sort by one or multiple attribute,pass in eg: (e.name,Sort.ASC)
+     * <p>orderBy is used to sort,you can pass in eg:<(v.name,name),Sort.ASC>
+     * or <(MAX(v.age,age),Sort.DESC)>.</p>
+     * <p>the order by field you sent will be placed after return
+     *
+     * @param orderBy sort by one or multiple attribute.</p>
      * @return RelationshipMatch
      */
-    public RelationshipMatch orderBy(HashMap<Name, Sort> orderBy) {
+    public RelationshipMatch orderBy(HashMap<Column, Sort> orderBy) {
         this.orderBy = orderBy;
         return this;
     }
 
     /**
-     * grouping using aggregate functions.
+     * achieve group by use aggregateFunctions.eg:return v.name,max(v.age),
+     * at the same time, you can optionally pass in aliases.
      *
-     * @param groupBy            for grouping,{@link Name} Object is used to alias properties
+     * @param groupBy            for grouping,if you only want to implement aggregation,
+     *                           the alias in the column is optional,
+     *                           you can only pass the {@link Column}(name, null).
+     *                           If you use group by and order by, you must pass in alias.
      * @param aggregateFunctions for calculation
      * @return RelationshipMatch
      */
-    public RelationshipMatch groupBy(List<Name> groupBy, AggregateFunction... aggregateFunctions) {
+    public RelationshipMatch groupBy(List<Column> groupBy, AggregateFunction... aggregateFunctions) {
         this.groupBy = groupBy;
         this.aggregateFunctions = Arrays.asList(aggregateFunctions);
         return this;
@@ -146,21 +154,20 @@ public class RelationshipMatch {
         StringBuilder result = new StringBuilder();
         if (edgeDirection.toString().equals("OUT")) {
             result.append(String.format("MATCH (v%s)-[%s]->(v1%s) ",
-                Query.joinTag(startTagName, startTagMap), Query.joinEdge(edgeMap, edges),
-                Query.joinTag(endTagName, endTagMap)));
+                Match.joinTag(startTagName, startTagMap), Match.joinEdge(edgeMap, edges),
+                Match.joinTag(endTagName, endTagMap)));
         } else if (edgeDirection.toString().equals("IN")) {
             result.append(String.format("MATCH (v%s)<-[%s]-(v1%s) ",
-                Query.joinTag(startTagName, startTagMap), Query.joinEdge(edgeMap, edges),
-                Query.joinTag(endTagName, endTagMap)));
+                Match.joinTag(startTagName, startTagMap), Match.joinEdge(edgeMap, edges),
+                Match.joinTag(endTagName, endTagMap)));
         } else {
             result.append(String.format("MATCH (v%s)-[%s]-(v1%s) ",
-                Query.joinTag(startTagName, startTagMap), Query.joinEdge(edgeMap, edges),
-                Query.joinTag(endTagName, endTagMap)));
+                Match.joinTag(startTagName, startTagMap), Match.joinEdge(edgeMap, edges),
+                Match.joinTag(endTagName, endTagMap)));
         }
-        result.append(Query.judgeAndJoinWhere(conMap,filterString,1));
-        result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
-        result.append(Query.joinSkipAndLimit(skip,limit));
-        System.out.println(result);
+        result.append(Match.judgeAndJoinWhere(conMap, filterString, 1));
+        result.append(Match.joinGroupByAndOrderBy(groupBy, aggregateFunctions, orderBy));
+        result.append(Match.joinSkipAndLimit(skip, limit));
         return result.toString();
     }
 

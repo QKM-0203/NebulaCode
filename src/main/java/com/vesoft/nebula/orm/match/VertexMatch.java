@@ -9,8 +9,7 @@ package com.vesoft.nebula.orm.match;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
-import com.vesoft.nebula.orm.ngql.Name;
-import com.vesoft.nebula.orm.ngql.Query;
+import com.vesoft.nebula.orm.ngql.Column;
 import com.vesoft.nebula.orm.operator.AggregateFunction;
 import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Sort;
@@ -26,11 +25,11 @@ public class VertexMatch {
     private String tagName;
     private long skip = 0;
     private long limit;
-    private HashMap<Name, Sort> orderBy;
+    private HashMap<Column, Sort> orderBy;
     private List<String> filterString;
     private HashMap<String, Filter> conMap;
     private HashMap<String, Object> propMap;
-    private List<Name> groupBy;
+    private List<Column> groupBy;
     private List<AggregateFunction> aggregateFunctions;
 
     protected VertexMatch(Graph graph) {
@@ -62,7 +61,8 @@ public class VertexMatch {
      *                     include (Relational、Logical、UnaryOperate)
      * @param filterString filterString is alternative ,you can pass in
      *                     "v.name == "qkm"",it same to pass in
-     *                     <"name",Relational.EQ.setValue("qkm")> for conMap.
+     *                     <"name",Relational.EQ.setValue("qkm")> for conMap,
+     *                     TODO check format.
      * @return VertexMatch
      */
     public VertexMatch where(HashMap<String, Filter> conMap, String... filterString) {
@@ -84,19 +84,23 @@ public class VertexMatch {
      * @param orderBy sort by one or multiple attribute,pass in eg: (v.name,Sort.ASC)
      * @return VertexMatch
      */
-    public VertexMatch orderBy(HashMap<Name, Sort> orderBy) {
+    public VertexMatch orderBy(HashMap<Column, Sort> orderBy) {
         this.orderBy = orderBy;
         return this;
     }
 
     /**
-     * grouping using aggregate functions.
+     * achieve group by use aggregateFunctions.eg:return v.name,max(v.age),
+     * at the same time, you can optionally pass in aliases.
      *
-     * @param groupBy            for grouping,{@link Name} Object is used to alias properties
+     * @param groupBy            for grouping,if you only want to implement aggregation,
+     *                           the alias in the column is optional,
+     *                           you can only pass the {@link Column}(name, null).
+     *                           If you use group by and order by, you must pass in alias.
      * @param aggregateFunctions for calculation
      * @return VertexMatch
      */
-    public VertexMatch groupBy(List<Name> groupBy, AggregateFunction... aggregateFunctions) {
+    public VertexMatch groupBy(List<Column> groupBy, AggregateFunction... aggregateFunctions) {
         this.groupBy = groupBy;
         this.aggregateFunctions = Arrays.asList(aggregateFunctions);
         return this;
@@ -130,11 +134,10 @@ public class VertexMatch {
      */
     private String connectQueryParameters() {
         StringBuilder result = new StringBuilder();
-        result.append(String.format("MATCH (v%s) ", Query.joinTag(tagName, propMap)));
-        result.append(Query.judgeAndJoinWhere(conMap, filterString, 0));
-        result.append(Query.joinGroupByAndOrderBy(groupBy,aggregateFunctions,orderBy));
-        result.append(Query.joinSkipAndLimit(skip,limit));
-        System.out.println(result);
+        result.append(String.format("MATCH (v%s) ", Match.joinTag(tagName, propMap)));
+        result.append(Match.judgeAndJoinWhere(conMap, filterString, 0));
+        result.append(Match.joinGroupByAndOrderBy(groupBy, aggregateFunctions, orderBy));
+        result.append(Match.joinSkipAndLimit(skip, limit));
         return result.toString();
     }
 

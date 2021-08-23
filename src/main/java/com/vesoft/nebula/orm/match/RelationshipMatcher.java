@@ -17,14 +17,14 @@ public class RelationshipMatcher extends RelationshipMatch {
     }
 
     /**
-     * @param startTagName if tag of startVertex,you can pass in,can be null
-     * @param startTagMap  if startVertex has tag index you can pass in,can be null
-     * @param endTagName   if tag of endVertex,you can pass in,can be null
-     * @param endTagMap    if endVertex has tag index you can pass in,can be null
-     * @param edgeDirection    in edge or out edge
-     * @param edgeMap      if you create edge index,you can pass in ,eg:
-     *                     match (v)-[e:player{name: "qkm"}]-(v2)
-     * @param types        edgeName,can be multiple
+     * @param startTagName  if tag of startVertex,you can pass in,can be null
+     * @param startTagMap   if startVertex has tag index you can pass in,can be null
+     * @param endTagName    if tag of endVertex,you can pass in,can be null
+     * @param endTagMap     if endVertex has tag index you can pass in,can be null
+     * @param edgeDirection in edge or out edge
+     * @param edgeMap       if you create edge index,you can pass in ,eg:
+     *                      match (v)-[e:player{name: "qkm"}]-(v2)
+     * @param types         edgeName,can be multiple
      * @return RelationshipMatch
      */
     public RelationshipMatch match(String startTagName, HashMap<String, Object> startTagMap,
