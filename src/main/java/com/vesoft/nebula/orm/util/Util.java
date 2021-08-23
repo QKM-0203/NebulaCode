@@ -157,8 +157,8 @@ public class Util {
                 propMap.put(propName, valueWrapperMap.get(propName).asDouble());
             } else if (valueWrapperMap.get(propName).isLong()) {
                 propMap.put(propName, valueWrapperMap.get(propName).asLong());
-            } else {
-                propMap.put(propName, valueWrapperMap.get(propName).asNull());
+            } else if (valueWrapperMap.get(propName).isNull() || valueWrapperMap.get(propName).isEmpty()) {
+                propMap.put(propName, null);
             }
         }
     }

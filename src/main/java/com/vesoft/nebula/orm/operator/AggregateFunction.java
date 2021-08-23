@@ -16,7 +16,11 @@ public enum AggregateFunction {
     COUNT,
     MAX,
     STD,
-    SUM;
+    SUM,
+    BIT_AND,
+    BIT_OR,
+    BIT_XOR,
+    COLLECT_SET;
 
     private String value;
 

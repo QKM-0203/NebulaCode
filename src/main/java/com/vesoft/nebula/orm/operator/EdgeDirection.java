@@ -12,5 +12,5 @@ package com.vesoft.nebula.orm.operator;
 public enum EdgeDirection {
     OUT,
     IN,
-    ALL
+    BOTH
 }

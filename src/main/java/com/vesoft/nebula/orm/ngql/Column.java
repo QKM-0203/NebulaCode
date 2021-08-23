@@ -9,11 +9,11 @@ package com.vesoft.nebula.orm.ngql;
 /**
  * alias properties
  */
-public class Name {
+public class Column {
     private String propName;
     private String alias;
 
-    public Name(String propName, String alias) {
+    public Column(String propName, String alias) {
         this.propName = propName;
         this.alias = alias;
     }
