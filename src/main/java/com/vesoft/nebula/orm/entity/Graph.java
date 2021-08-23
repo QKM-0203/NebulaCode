@@ -15,6 +15,7 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.ngql.Encoding;
 import com.vesoft.nebula.orm.util.Util;
+
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -209,7 +210,7 @@ public class Graph {
             }
         }
         if (vertices.size() != 0) {
-            if (schema[0] == null || schema[1] == null) {
+            if (schema == null || schema.length == 0) {
                 throw new ExecuteException("tagName and attribute name is "
                     + "a condition of merge,so cannot be null");
             }
@@ -261,7 +262,12 @@ public class Graph {
                 List<ValueWrapper> remoteVertices = vertexResultSet.colValues(VERTICES_);
                 for (ValueWrapper remoteVertex : remoteVertices) {
                     Node node = remoteVertex.asNode();
-                    Vertex vertex = idVertexMap.get(node.getId().asString());
+                    Vertex vertex;
+                    if (node.getId().isString()) {
+                        vertex = idVertexMap.get(node.getId().asString());
+                    } else {
+                        vertex = idVertexMap.get(node.getId().toString());
+                    }
                     HashMap<String, HashMap<String, Object>> propMap = new HashMap<>();
                     for (String tagName : node.tagNames()) {
                         HashMap<String, ValueWrapper> properties = node.properties(tagName);
@@ -291,7 +297,7 @@ public class Graph {
     }
 
     /**
-     * push local data to remote database.
+     * push local data to remote database,full coverage.
      *
      * <p>remoteTags is first from remote pull,
      * so in most scenarios, what can be guaranteed is the latest</p>
@@ -311,7 +317,12 @@ public class Graph {
             List<ValueWrapper> remoteVertex = resultSet.colValues(VERTICES_);
             for (ValueWrapper value : remoteVertex) {
                 Node node = value.asNode();
-                Vertex vertex = idVertexMap.get(node.getId().asString());
+                Vertex vertex;
+                if (node.getId().isString()) {
+                    vertex = idVertexMap.get(node.getId().asString());
+                } else {
+                    vertex = idVertexMap.get(node.getId().toString());
+                }
                 List<String> remoteTags = node.labels();
                 Set<String> localTags = vertex.getPropMap().keySet();
                 //update and add tag
