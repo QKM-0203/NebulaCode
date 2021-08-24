@@ -13,7 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * match vertex
+ * the user gets the {@link VertexMatcher} object by passing the {@link Graph} object,
+ * and user can use {@link #match(String, HashMap)} method by pass in about tag,use
+ * {@link #getVertexByVid(Object)} method by pass in vid get Vertex and use
+ * {@link #getVertexByListVid(List)} method by pass in vidList get Vertexes.
  */
 public class VertexMatcher extends VertexMatch {
 
@@ -22,9 +25,11 @@ public class VertexMatcher extends VertexMatch {
     }
 
     /**
-     * @param tagName tagName
-     * @param propMap eg: query match (v:player{name: "qkm"}),if you create index on tag,
-     *                you can pass in propMap
+     * @param tagName if vertex has tag index,you can pass in,eg:
+     *                match (v:player),can be null eg: match (v).
+     * @param propMap if you create tag prop index,you can pass in propMap
+     *                eg: match (v:player{name: "qkm"}),can be null eg:
+     *                match (v:player).
      * @return VertexMatch
      */
     public VertexMatch match(String tagName, HashMap<String, Object> propMap) {
@@ -33,7 +38,7 @@ public class VertexMatcher extends VertexMatch {
     }
 
     /**
-     * getVertex by vid
+     * getVertex by vid eg:match (v) where id(v) == vid.
      *
      * @param vid one vid
      * @return one vertex
@@ -44,7 +49,7 @@ public class VertexMatcher extends VertexMatch {
     }
 
     /**
-     * getVertex by vidList
+     * getVertex by vidList eg:match (v) where id(v) IN [vid1,vid2,vid3].
      *
      * @param vidList vidList
      * @return vertexList

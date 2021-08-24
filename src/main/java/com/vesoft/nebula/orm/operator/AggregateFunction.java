@@ -10,7 +10,7 @@ package com.vesoft.nebula.orm.operator;
  * aggregate function
  */
 public enum AggregateFunction {
-    COLLETC,
+    COLLECT,
     AVG,
     MIN,
     COUNT,

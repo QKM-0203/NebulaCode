@@ -9,11 +9,12 @@ package com.vesoft.nebula.orm.ngql;
 /**
  * alias properties
  */
-public class Column {
+public class AttributeColumn {
     private String propName;
     private String alias;
 
-    public Column(String propName, String alias) {
+
+    public AttributeColumn(String propName, String alias) {
         this.propName = propName;
         this.alias = alias;
     }
@@ -25,4 +26,5 @@ public class Column {
     public String getAlias() {
         return alias;
     }
+
 }

@@ -6,8 +6,9 @@
 
 package com.vesoft.nebula.orm.util;
 
-import com.vesoft.nebula.orm.ngql.Column;
+import com.vesoft.nebula.orm.ngql.AttributeColumn;
 import com.vesoft.nebula.orm.ngql.Encoding;
+import com.vesoft.nebula.orm.ngql.FunctionColumn;
 import com.vesoft.nebula.orm.operator.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,26 +19,33 @@ import java.util.List;
  */
 public class QueryBase {
 
-    private static String joinWhere(HashMap<String, Filter> conMap, int isEdge) {
+    private static String joinWhere(HashMap<String, Filter> conMap, int isEdgeOrNode) {
         ArrayList<String> whereStrings = new ArrayList<>();
         for (String propName : conMap.keySet()) {
             Filter filter = conMap.get(propName);
             if (filter instanceof Logical) {
-                whereStrings.add(joinLogical(propName, (Logical) filter, isEdge));
+                whereStrings.add(joinLogical(propName, (Logical) filter, isEdgeOrNode));
             } else if (filter instanceof Relational) {
-                if (isEdge == 0) {
+                if (isEdgeOrNode == 0) {
                     whereStrings.add(String.format("v.%s %s %s", propName,
                         ((Relational) filter).getSymbol(), Encoding.judgeDataType(((Relational) filter).getValue())));
-                } else {
+                } else if (isEdgeOrNode == 1) {
                     whereStrings.add(String.format("e.%s %s %s", propName,
                         ((Relational) filter).getSymbol(), Encoding.judgeDataType(((Relational) filter).getValue())));
+                } else {
+                    whereStrings.add(String.format("%s %s %s", propName,
+                        ((Relational) filter).getSymbol(), Encoding.judgeDataType(((Relational) filter).getValue())));
+
                 }
             } else if (filter instanceof UnaryOperation) {
-                if (isEdge == 0) {
+                if (isEdgeOrNode == 0) {
                     whereStrings.add(String.format("v.%s %s", propName,
                         ((UnaryOperation) filter).getSymbol()));
-                } else {
+                } else if (isEdgeOrNode == 1) {
                     whereStrings.add(String.format("e.%s %s", propName,
+                        ((UnaryOperation) filter).getSymbol()));
+                } else {
+                    whereStrings.add(String.format("%s %s", propName,
                         ((UnaryOperation) filter).getSymbol()));
                 }
             }
@@ -45,12 +53,12 @@ public class QueryBase {
         return String.join(" AND ", whereStrings);
     }
 
-    public static String judgeAndJoinWhere(HashMap<String, Filter> conMap, List<String> filterString, int isEdge) {
+    public static String judgeAndJoinWhere(HashMap<String, Filter> conMap, List<String> filterString, int isEdgeOrNode) {
         StringBuilder result = new StringBuilder();
         if ((conMap != null && !conMap.isEmpty()) || (filterString != null && !filterString.isEmpty())) {
             result.append("WHERE ");
             if (conMap != null && !conMap.isEmpty()) {
-                result.append(joinWhere(conMap, isEdge));
+                result.append(joinWhere(conMap, isEdgeOrNode));
             }
             if (filterString != null && !filterString.isEmpty()) {
                 if (conMap != null && !conMap.isEmpty()) {
@@ -62,84 +70,64 @@ public class QueryBase {
         return result.toString();
     }
 
-    private static String joinLogical(String propName, Logical logical, int isEdge) {
+    private static String joinLogical(String propName, Logical logical, int isEdgeOrNode) {
         Relational leftRelational = logical.getLeftRelational();
         Relational rightRelational = logical.getRightRelational();
-        if (isEdge == 0) {
+        if (isEdgeOrNode == 0) {
             return String.format("(%s %s %s)",
                 String.format("v.%s %s %s", propName,
                     leftRelational.getSymbol(), Encoding.judgeDataType(leftRelational.getValue())),
                 logical.getSymbol(),
                 String.format("v.%s %s %s", propName,
                     rightRelational.getSymbol(), Encoding.judgeDataType(rightRelational.getValue())));
-        } else {
+        } else if (isEdgeOrNode == 1) {
             return String.format("(%s %s %s)",
                 String.format("e.%s %s %s", propName,
                     leftRelational.getSymbol(), Encoding.judgeDataType(leftRelational.getValue())),
                 logical.getSymbol(),
                 String.format("e.%s %s %s", propName,
                     rightRelational.getSymbol(), Encoding.judgeDataType(rightRelational.getValue())));
-        }
-    }
-
-    private static String joinOrderByAlias(HashMap<Column, Sort> orderBy) {
-        ArrayList<String> orderByStrings = new ArrayList<>();
-        for (Column column : orderBy.keySet()) {
-            orderByStrings.add(column.getAlias() + " " + orderBy.get(column));
-        }
-        return String.join(",", orderByStrings);
-    }
-
-    public static String joinGroupByAndOrderBy(List<Column> groupBy,
-                                               List<AggregateFunction> aggregateFunctions,
-                                               HashMap<Column, Sort> orderBy) {
-        StringBuilder result = new StringBuilder();
-        if (groupBy != null && !groupBy.isEmpty()) {
-            result.append(String.format(" RETURN %s,%s ", joinReturnAlias(groupBy),
-                joinAggregateFunctions(aggregateFunctions)));
-            if (orderBy != null && !orderBy.isEmpty()) {
-                result.append("ORDER BY ").append(joinOrderByAlias(orderBy));
-            }
         } else {
-            if (orderBy == null || orderBy.isEmpty()) {
-                result.append(" RETURN v ");
-            } else {
-                result.append(" RETURN ").append(joinReturnAlias((List<Column>) orderBy.keySet()));
-                result.append(" ORDER BY ").append(joinOrderByAlias(orderBy));
-            }
+            return String.format("(%s %s %s)",
+                String.format("%s %s %s", propName,
+                    leftRelational.getSymbol(), Encoding.judgeDataType(leftRelational.getValue())),
+                logical.getSymbol(),
+                String.format("%s %s %s", propName,
+                    rightRelational.getSymbol(), Encoding.judgeDataType(rightRelational.getValue())));
         }
-        return result.toString();
     }
 
-
-    private static String joinAggregateFunctions(List<AggregateFunction> aggregateFunctions) {
+    public static String joinAttributeAlias(List<AttributeColumn> attributeColumns) {
         ArrayList<String> result = new ArrayList<>();
-        for (AggregateFunction aggregateFunction : aggregateFunctions) {
-            result.add(String.format("%s(%s)", aggregateFunction.toString(), aggregateFunction.getValue()));
-        }
-        return String.join(",", result);
-    }
-
-    public static String joinReturnAlias(List<Column> columns) {
-        ArrayList<String> result = new ArrayList<>();
-        for (Column column : columns) {
-            if (column.getAlias() != null) {
-                result.add(column.getPropName() + " AS " + column.getAlias());
+        for (AttributeColumn attributeColumn : attributeColumns) {
+            if (attributeColumn.getAlias() != null) {
+                result.add(attributeColumn.getPropName() + " AS " + attributeColumn.getAlias());
             } else {
-                result.add(column.getPropName());
+                result.add(attributeColumn.getPropName());
             }
         }
         return String.join(",", result);
     }
 
-    public static String joinSkipAndLimit(long skip, long limit) {
-        StringBuilder result = new StringBuilder();
-        if (skip != 0) {
-            result.append(" SKIP ").append(skip);
+    public static String joinAttribute(List<AttributeColumn> attributeColumns) {
+        ArrayList<String> result = new ArrayList<>();
+        for (AttributeColumn attributeColumn : attributeColumns) {
+            result.add(attributeColumn.getPropName());
         }
-        if (limit != 0) {
-            result.append(" LIMIT ").append(limit);
+        return String.join(",", result);
+    }
+
+    protected static String joinAggregateFunctionsAlias(List<FunctionColumn> aggregateFunctions) {
+        ArrayList<String> result = new ArrayList<>();
+        for (FunctionColumn aggregateFunction : aggregateFunctions) {
+            if (aggregateFunction.getAlias() == null) {
+                result.add(String.format("%s(%s)", aggregateFunction.getAggregateFunction().toString(),
+                    aggregateFunction.getAggregateFunction().getValue()));
+            } else {
+                result.add(String.format("%s(%s) AS %s", aggregateFunction.getAggregateFunction().toString(),
+                    aggregateFunction.getAggregateFunction().getValue(), aggregateFunction.getAlias()));
+            }
         }
-        return result.toString();
+        return String.join(",", result);
     }
 }
