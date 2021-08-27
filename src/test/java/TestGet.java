@@ -4,7 +4,6 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-
 import java.util.List;
 import org.junit.Test;
 

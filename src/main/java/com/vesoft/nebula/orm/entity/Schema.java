@@ -23,7 +23,7 @@ public class Schema {
     private String ttlCol;
 
     /**
-     * create an Tag or EdgeType of include property.
+     * create a Tag or EdgeType of include property.
      *
      * @param name         tag name or edgeName
      * @param propertyList Property List

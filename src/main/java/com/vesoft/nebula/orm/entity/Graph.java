@@ -13,8 +13,8 @@ import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
-import com.vesoft.nebula.orm.ngql.Encoding;
-import com.vesoft.nebula.orm.util.Util;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
+import com.vesoft.nebula.orm.query.util.Util;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -209,7 +209,7 @@ public class Graph {
             }
         }
         if (vertices.size() != 0) {
-            if (schema[0] == null || schema[1] == null) {
+            if (schema == null || schema.length == 0) {
                 throw new ExecuteException("tagName and attribute name is "
                     + "a condition of merge,so cannot be null");
             }
@@ -261,7 +261,12 @@ public class Graph {
                 List<ValueWrapper> remoteVertices = vertexResultSet.colValues(VERTICES_);
                 for (ValueWrapper remoteVertex : remoteVertices) {
                     Node node = remoteVertex.asNode();
-                    Vertex vertex = idVertexMap.get(node.getId().asString());
+                    Vertex vertex;
+                    if (node.getId().isString()) {
+                        vertex = idVertexMap.get(node.getId().asString());
+                    } else {
+                        vertex = idVertexMap.get(node.getId().toString());
+                    }
                     HashMap<String, HashMap<String, Object>> propMap = new HashMap<>();
                     for (String tagName : node.tagNames()) {
                         HashMap<String, ValueWrapper> properties = node.properties(tagName);
@@ -291,7 +296,7 @@ public class Graph {
     }
 
     /**
-     * push local data to remote database.
+     * push local data to remote database,full coverage.
      *
      * <p>remoteTags is first from remote pull,
      * so in most scenarios, what can be guaranteed is the latest</p>
@@ -311,7 +316,12 @@ public class Graph {
             List<ValueWrapper> remoteVertex = resultSet.colValues(VERTICES_);
             for (ValueWrapper value : remoteVertex) {
                 Node node = value.asNode();
-                Vertex vertex = idVertexMap.get(node.getId().asString());
+                Vertex vertex;
+                if (node.getId().isString()) {
+                    vertex = idVertexMap.get(node.getId().asString());
+                } else {
+                    vertex = idVertexMap.get(node.getId().toString());
+                }
                 List<String> remoteTags = node.labels();
                 Set<String> localTags = vertex.getPropMap().keySet();
                 //update and add tag
@@ -574,7 +584,6 @@ public class Graph {
      */
     public long vertexNumber(String tagName) throws UnsupportedEncodingException {
         ResultSet showStats = run("SHOW STATS");
-        long flag = -1;
         if (!showStats.isSucceeded()) {
             throw new ExecuteException(showStats.getErrorMessage());
         }
@@ -585,15 +594,11 @@ public class Graph {
             for (int i = 0; i < showStats.rowsSize(); i++) {
                 ResultSet.Record valueWrappers = showStats.rowValues(i);
                 if (valueWrappers.get(NAME).asString().equals(tagName)) {
-                    flag = valueWrappers.get(COUNT).asLong();
-                    break;
+                    return valueWrappers.get(COUNT).asLong();
                 }
             }
-            if (flag == -1) {
-                throw new ExecuteException("the tag not exist");
-            }
         }
-        return flag;
+        return 0;
     }
 
 
@@ -608,7 +613,6 @@ public class Graph {
      */
     public long relationshipNumber(String edgeName) throws UnsupportedEncodingException {
         ResultSet showStats = run("SHOW STATS");
-        long flag = -1;
         if (!showStats.isSucceeded()) {
             throw new ExecuteException(showStats.getErrorMessage());
         }
@@ -619,15 +623,11 @@ public class Graph {
             for (int i = 0; i < showStats.rowsSize(); i++) {
                 ResultSet.Record valueWrappers = showStats.rowValues(i);
                 if (valueWrappers.get(NAME).asString().equals(edgeName)) {
-                    flag = valueWrappers.get(COUNT).asLong();
-                    break;
+                    return valueWrappers.get(COUNT).asLong();
                 }
             }
-            if (flag == -1) {
-                throw new ExecuteException("the edge not exist");
-            }
         }
-        return flag;
+        return 0;
     }
 
     private ResultSet judgeExistVertexes(List<Vertex> vertices) {

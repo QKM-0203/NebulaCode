@@ -6,14 +6,17 @@
 
 package com.vesoft.nebula.orm.match;
 
+import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.entity.Vertex;
-import java.util.ArrayList;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * match vertex
+ * the user gets the {@link VertexMatcher} object by passing the {@link Graph} object,
+ * and user can use {@link #match(String, HashMap)} method by pass in about tag,use
+ * {@link #getVertexByVid(Object)} method by pass in vid get Vertex and use
+ * {@link #getVertexByListVid(List)} method by pass in vidList get Vertexes.
  */
 public class VertexMatcher extends VertexMatch {
 
@@ -22,41 +25,37 @@ public class VertexMatcher extends VertexMatch {
     }
 
     /**
-     * @param tagName tagName
-     * @param propMap eg: query match (v:player{name: "qkm"}),if you create index on tag,
-     *                you can pass in propMap
+     * @param tagName if vertex has tag index,you can pass in,eg:
+     *                match (v:player),can be null eg: match (v).
+     * @param propMap if you create tag prop index,you can pass in propMap
+     *                eg: match (v:player{name: "qkm"}),can be null eg:
+     *                match (v:player).
      * @return VertexMatch
      */
     public VertexMatch match(String tagName, HashMap<String, Object> propMap) {
-        return init(tagName, propMap);
+        init(tagName, propMap);
+        return this;
     }
 
     /**
-     * getVertex by vid
+     * getVertex by vid eg:match (v) where id(v) == vid.
      *
      * @param vid one vid
      * @return one vertex
      */
-    public Vertex getVertexByVid(Object vid) {
-        return match(null, null).where(null, "id(v) = " + (vid instanceof String
+    public ResultSet.Record getVertexByVid(Object vid) {
+        return match(null, null).where(null, "id(v) == " + (vid instanceof String
             ? "\"" + vid + "\"" : vid.toString())).first();
     }
 
     /**
-     * getVertex by vidList
+     * getVertex by vidList eg:match (v) where id(v) IN [vid1,vid2,vid3].
      *
      * @param vidList vidList
      * @return vertexList
      */
-    public List<Vertex> getVertexByListVid(List<Object> vidList) {
-        ArrayList<String> revertVid = new ArrayList<>();
-        for (Object id : vidList) {
-            if (id instanceof String) {
-                revertVid.add("\"" + id + "\"");
-            } else {
-                revertVid.add(id.toString());
-            }
-        }
-        return match(null, null).where(null, "id(v) IN " + revertVid).all();
+    public ResultSet getVertexByListVid(List<?> vidList) {
+        return match(null, null)
+            .where(null, String.format("id(v) IN [%s]", Encoding.encodeIdList(vidList))).all();
     }
 }
