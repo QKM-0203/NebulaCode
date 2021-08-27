@@ -13,8 +13,8 @@ import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
-import com.vesoft.nebula.orm.ngql.Encoding;
-import com.vesoft.nebula.orm.util.Util;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
+import com.vesoft.nebula.orm.query.util.Util;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 

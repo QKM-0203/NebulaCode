@@ -4,11 +4,11 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package com.vesoft.nebula.orm.ngql;
+package com.vesoft.nebula.orm.query.ngql;
 
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.util.QueryBase;
+import com.vesoft.nebula.orm.query.cypher.QueryBase;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +41,7 @@ public class NGqlQuery extends QueryBase {
         return String.join(",", orderByStrings);
     }
 
-    public static String joinGroupBy(List<AttributeColumn> groupBy, List<FunctionColumn> aggregateFunctions) {
+    public static String joinGroupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
             result.append(String.format("| GROUP BY %s ", joinAttribute(groupBy)));

@@ -9,11 +9,11 @@ package com.vesoft.nebula.orm.match;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
-import com.vesoft.nebula.orm.ngql.AttributeColumn;
-import com.vesoft.nebula.orm.ngql.FunctionColumn;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Sort;
+import com.vesoft.nebula.orm.query.ngql.Column;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,14 +35,14 @@ public class RelationshipMatch {
     private List<String> filterString;
     private long skip = 0;
     private long limit = -1;
-    private HashMap<AttributeColumn, Sort> orderBy;
-    private List<AttributeColumn> groupBy;
+    private HashMap<Column, Sort> orderBy;
+    private List<Column> groupBy;
     private EdgeDirection edgeDirection = EdgeDirection.OUT;
     private HashMap<String, Filter> conMap;
     private HashMap<String, Object> startTagMap;
     private HashMap<String, Object> endTagMap;
     private HashMap<String, Object> edgeMap;
-    private List<FunctionColumn> aggregateFunctions;
+    private List<Column> aggregateFunctions;
 
     protected RelationshipMatch(Graph graph) {
         this.graph = graph;
@@ -118,10 +118,10 @@ public class RelationshipMatch {
      * <p>if order by and group by are used together,the field of orderBy passed must be
      * included in {@link #groupBy(List, List)}groupBy and aggregateFunctions,
      * this function will sort directly using the passed alias,you can pass in
-     * <{@link AttributeColumn}(null,alias),{@link Sort}>.</p>
+     * <{@link Column}(null,alias),{@link Sort}>.</p>
      * <p>if you only use order by,this function puts the orderBy field you passed in
      * after the return field as output,and then sorts the aliases,you must pass in
-     * <{@link AttributeColumn}("propName",alias),{@link Sort}>.</p>
+     * <{@link Column}("propName",alias),{@link Sort}>.</p>
      * <p>if you do not use order by, return e.</p>
      * <p>order by uses an alias to sort, so you must pass in an alias,
      * if the sort you passed is null,default is ASC.</p>
@@ -129,7 +129,7 @@ public class RelationshipMatch {
      * @param orderBy sort by one or multiple attribute.</p>
      * @return RelationshipMatch
      */
-    public RelationshipMatch orderBy(HashMap<AttributeColumn, Sort> orderBy) {
+    public RelationshipMatch orderBy(HashMap<Column, Sort> orderBy) {
         this.orderBy = orderBy;
         return this;
     }
@@ -138,17 +138,17 @@ public class RelationshipMatch {
      * achieve group by use aggregateFunctions.eg:return v.name [as name],max(v.age) [as max].
      *
      * <p>if group by and order by are used together,for the field you need order by,
-     * you must pass in alias.eg:{@link AttributeColumn}(propName,alias) or
-     * {@link FunctionColumn}(AggregateFunction,alias).</p>
+     * you must pass in alias.eg:{@link Column}(propName,alias) or
+     * {@link Column}(AggregateFunction,alias).</p>
      * <p>if you only use group by,the alias in the column is optional,
-     * you can only pass the {@link AttributeColumn}(propName, null) or
-     * {@link FunctionColumn}(AggregateFunction,null).</p>
+     * you can only pass the {@link Column}(propName, null) or
+     * {@link Column}(AggregateFunction,null).</p>
      *
      * @param groupBy            for grouping
      * @param aggregateFunctions for calculatio
      * @return RelationshipMatch
      */
-    public RelationshipMatch groupBy(List<AttributeColumn> groupBy, List<FunctionColumn> aggregateFunctions) {
+    public RelationshipMatch groupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
         this.groupBy = groupBy;
         this.aggregateFunctions = aggregateFunctions;
         return this;

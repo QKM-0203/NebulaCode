@@ -6,11 +6,10 @@
 
 package com.vesoft.nebula.orm.match;
 
-import com.vesoft.nebula.orm.ngql.AttributeColumn;
-import com.vesoft.nebula.orm.ngql.Encoding;
-import com.vesoft.nebula.orm.ngql.FunctionColumn;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
+import com.vesoft.nebula.orm.query.ngql.Column;
 import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.util.QueryBase;
+import com.vesoft.nebula.orm.query.cypher.QueryBase;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,21 +44,21 @@ public class Match extends QueryBase {
         }
     }
 
-    private static String joinOrderByAlias(HashMap<AttributeColumn, Sort> orderBy) {
+    private static String joinOrderByAlias(HashMap<Column, Sort> orderBy) {
         ArrayList<String> orderByStrings = new ArrayList<>();
-        for (AttributeColumn attributeColumn : orderBy.keySet()) {
-            if (orderBy.get(attributeColumn) != null) {
-                orderByStrings.add(attributeColumn.getAlias() + " " + orderBy.get(attributeColumn));
+        for (Column column : orderBy.keySet()) {
+            if (orderBy.get(column) != null) {
+                orderByStrings.add(column.getAlias() + " " + orderBy.get(column));
             } else {
-                orderByStrings.add(attributeColumn.getAlias());
+                orderByStrings.add(column.getAlias());
             }
         }
         return String.join(",", orderByStrings);
     }
 
-    public static String joinGroupByAndOrderBy(List<AttributeColumn> groupBy,
-                                               List<FunctionColumn> aggregateFunctions,
-                                               HashMap<AttributeColumn, Sort> orderBy, int isEdgeOrNode) {
+    public static String joinGroupByAndOrderBy(List<Column> groupBy,
+                                               List<Column> aggregateFunctions,
+                                               HashMap<Column, Sort> orderBy, int isEdgeOrNode) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
             result.append(String.format(" RETURN %s,%s ", joinAttributeAlias(groupBy),
@@ -75,7 +74,7 @@ public class Match extends QueryBase {
                     result.append(" RETURN e ");
                 }
             } else {
-                result.append(" RETURN ").append(joinAttributeAlias((List<AttributeColumn>) orderBy.keySet()));
+                result.append(" RETURN ").append(joinAttributeAlias((List<Column>) orderBy.keySet()));
                 result.append(" ORDER BY ").append(joinOrderByAlias(orderBy));
             }
         }

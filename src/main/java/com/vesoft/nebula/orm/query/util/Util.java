@@ -4,7 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package com.vesoft.nebula.orm.util;
+package com.vesoft.nebula.orm.query.util;
 
 import com.vesoft.nebula.client.graph.data.DateTimeWrapper;
 import com.vesoft.nebula.client.graph.data.TimeWrapper;
@@ -13,7 +13,7 @@ import com.vesoft.nebula.orm.datatype.DateTime;
 import com.vesoft.nebula.orm.datatype.Time;
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.exception.ExecuteException;
-import com.vesoft.nebula.orm.ngql.Encoding;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

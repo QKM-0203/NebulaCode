@@ -12,7 +12,7 @@ import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.entity.GraphService;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Vertex;
-import com.vesoft.nebula.orm.ngql.Encoding;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;

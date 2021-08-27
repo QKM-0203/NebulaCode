@@ -4,7 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package com.vesoft.nebula.orm.ngql;
+package com.vesoft.nebula.orm.query.cypher;
 
 import com.vesoft.nebula.Date;
 import com.vesoft.nebula.orm.datatype.DateTime;

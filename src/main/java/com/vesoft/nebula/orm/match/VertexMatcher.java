@@ -8,7 +8,7 @@ package com.vesoft.nebula.orm.match;
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.ngql.Encoding;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
 import java.util.HashMap;
 import java.util.List;
 

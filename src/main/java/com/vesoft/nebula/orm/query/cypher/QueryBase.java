@@ -4,11 +4,9 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package com.vesoft.nebula.orm.util;
+package com.vesoft.nebula.orm.query.cypher;
 
-import com.vesoft.nebula.orm.ngql.AttributeColumn;
-import com.vesoft.nebula.orm.ngql.Encoding;
-import com.vesoft.nebula.orm.ngql.FunctionColumn;
+import com.vesoft.nebula.orm.query.ngql.Column;
 import com.vesoft.nebula.orm.operator.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,17 +17,17 @@ import java.util.List;
  */
 public class QueryBase {
 
-    private static String joinWhere(HashMap<String, Filter> conMap, int isEdgeOrNode) {
+    private static String joinWhere(HashMap<String, Filter> conMap, int isEdge) {
         ArrayList<String> whereStrings = new ArrayList<>();
         for (String propName : conMap.keySet()) {
             Filter filter = conMap.get(propName);
             if (filter instanceof Logical) {
-                whereStrings.add(joinLogical(propName, (Logical) filter, isEdgeOrNode));
+                whereStrings.add(joinLogical(propName, (Logical) filter, isEdge));
             } else if (filter instanceof Relational) {
-                if (isEdgeOrNode == 0) {
+                if (isEdge == 0) {
                     whereStrings.add(String.format("v.%s %s %s", propName,
                         ((Relational) filter).getSymbol(), Encoding.judgeDataType(((Relational) filter).getValue())));
-                } else if (isEdgeOrNode == 1) {
+                } else if (isEdge == 1) {
                     whereStrings.add(String.format("e.%s %s %s", propName,
                         ((Relational) filter).getSymbol(), Encoding.judgeDataType(((Relational) filter).getValue())));
                 } else {
@@ -38,10 +36,10 @@ public class QueryBase {
 
                 }
             } else if (filter instanceof UnaryOperation) {
-                if (isEdgeOrNode == 0) {
+                if (isEdge == 0) {
                     whereStrings.add(String.format("v.%s %s", propName,
                         ((UnaryOperation) filter).getSymbol()));
-                } else if (isEdgeOrNode == 1) {
+                } else if (isEdge == 1) {
                     whereStrings.add(String.format("e.%s %s", propName,
                         ((UnaryOperation) filter).getSymbol()));
                 } else {
@@ -53,12 +51,12 @@ public class QueryBase {
         return String.join(" AND ", whereStrings);
     }
 
-    public static String judgeAndJoinWhere(HashMap<String, Filter> conMap, List<String> filterString, int isEdgeOrNode) {
+    public static String judgeAndJoinWhere(HashMap<String, Filter> conMap, List<String> filterString, int isEdge) {
         StringBuilder result = new StringBuilder();
         if ((conMap != null && !conMap.isEmpty()) || (filterString != null && !filterString.isEmpty())) {
             result.append("WHERE ");
             if (conMap != null && !conMap.isEmpty()) {
-                result.append(joinWhere(conMap, isEdgeOrNode));
+                result.append(joinWhere(conMap, isEdge));
             }
             if (filterString != null && !filterString.isEmpty()) {
                 if (conMap != null && !conMap.isEmpty()) {
@@ -70,17 +68,17 @@ public class QueryBase {
         return result.toString();
     }
 
-    private static String joinLogical(String propName, Logical logical, int isEdgeOrNode) {
+    private static String joinLogical(String propName, Logical logical, int isEdge) {
         Relational leftRelational = logical.getLeftRelational();
         Relational rightRelational = logical.getRightRelational();
-        if (isEdgeOrNode == 0) {
+        if (isEdge == 0) {
             return String.format("(%s %s %s)",
                 String.format("v.%s %s %s", propName,
                     leftRelational.getSymbol(), Encoding.judgeDataType(leftRelational.getValue())),
                 logical.getSymbol(),
                 String.format("v.%s %s %s", propName,
                     rightRelational.getSymbol(), Encoding.judgeDataType(rightRelational.getValue())));
-        } else if (isEdgeOrNode == 1) {
+        } else if (isEdge == 1) {
             return String.format("(%s %s %s)",
                 String.format("e.%s %s %s", propName,
                     leftRelational.getSymbol(), Encoding.judgeDataType(leftRelational.getValue())),
@@ -97,29 +95,29 @@ public class QueryBase {
         }
     }
 
-    public static String joinAttributeAlias(List<AttributeColumn> attributeColumns) {
+    public static String joinAttributeAlias(List<Column> columns) {
         ArrayList<String> result = new ArrayList<>();
-        for (AttributeColumn attributeColumn : attributeColumns) {
-            if (attributeColumn.getAlias() != null) {
-                result.add(attributeColumn.getPropName() + " AS " + attributeColumn.getAlias());
+        for (Column column : columns) {
+            if (column.getAlias() != null) {
+                result.add(column.getPropName() + " AS " + column.getAlias());
             } else {
-                result.add(attributeColumn.getPropName());
+                result.add(column.getPropName());
             }
         }
         return String.join(",", result);
     }
 
-    public static String joinAttribute(List<AttributeColumn> attributeColumns) {
+    public static String joinAttribute(List<Column> columns) {
         ArrayList<String> result = new ArrayList<>();
-        for (AttributeColumn attributeColumn : attributeColumns) {
-            result.add(attributeColumn.getPropName());
+        for (Column column : columns) {
+            result.add(column.getPropName());
         }
         return String.join(",", result);
     }
 
-    protected static String joinAggregateFunctionsAlias(List<FunctionColumn> aggregateFunctions) {
+    protected static String joinAggregateFunctionsAlias(List<Column> aggregateFunctions) {
         ArrayList<String> result = new ArrayList<>();
-        for (FunctionColumn aggregateFunction : aggregateFunctions) {
+        for (Column aggregateFunction : aggregateFunctions) {
             if (aggregateFunction.getAlias() == null) {
                 result.add(String.format("%s(%s)", aggregateFunction.getAggregateFunction().toString(),
                     aggregateFunction.getAggregateFunction().getValue()));

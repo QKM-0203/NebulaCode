@@ -4,13 +4,15 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package com.vesoft.nebula.orm.ngql;
+package com.vesoft.nebula.orm.query.ngql;
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.*;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -130,7 +132,7 @@ public class Go {
      * @param aggregateFunctions for calculation
      * @return RelationshipMatch
      */
-    public Go groupBy(List<AttributeColumn> groupBy, List<FunctionColumn> aggregateFunctions) {
+    public Go groupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
         condition.append(NGqlQuery.joinGroupBy(groupBy, aggregateFunctions)).append(" ");
         return this;
     }
