@@ -22,8 +22,8 @@ public enum Relational implements Filter {
     IN("IN"),
     CONTAINS("CONTAINS");
 
-    String symbol;
-    Object value;
+    private final String symbol;
+    private Object value;
     Relational(String symbol) {
         this.symbol = symbol;
     }

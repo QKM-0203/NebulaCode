@@ -14,12 +14,16 @@ public enum Logical implements Filter {
     XOR("XOR"),
     OR("OR");
 
-    String symbol;
-    Relational leftRelational;
-    Relational rightRelational;
+    private final String symbol;
+    private Relational leftRelational;
+    private Relational rightRelational;
 
     Logical(String symbol) {
         this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 
     /**

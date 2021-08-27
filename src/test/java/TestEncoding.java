@@ -12,7 +12,7 @@ import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.entity.GraphService;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Vertex;
-import com.vesoft.nebula.orm.ngql.Encoding;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -27,7 +27,7 @@ public class TestEncoding {
     HashMap<String, HashMap<String, Object>> propMap = new HashMap<>();
     HashMap<String, Object> propValueOne = new HashMap<>();
     HashMap<String, Object> propValueTwo = new HashMap<>();
-    HashMap<String, Object> propValueThird= new HashMap<>();
+    HashMap<String, Object> propValueThird = new HashMap<>();
     short year = 2021;
     byte month = 7;
     byte day = 29;
@@ -51,7 +51,7 @@ public class TestEncoding {
         propValueOne.put("etime", time);
         propValueTwo.put("bool", true);
         propValueTwo.put("null", null);
-        propValueThird.put("birth",date);
+        propValueThird.put("birth", date);
         propMap.put("QKM2", propValueOne);
         propMap.put("QKM3", propValueTwo);
         propMap.put("demo9", propValueThird);

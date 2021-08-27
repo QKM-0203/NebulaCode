@@ -9,8 +9,8 @@ package com.vesoft.nebula.orm.operator;
 /**
  * used to judge edge is out or in
  */
-public enum Direction {
+public enum EdgeDirection {
     OUT,
     IN,
-    ALL
+    BOTH
 }
