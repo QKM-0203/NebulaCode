@@ -12,24 +12,27 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.*;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-
+import com.vesoft.nebula.orm.query.cypher.Lexer;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * <p>you can use {@link #where(HashMap, String...)} for conditional filtering,
+ * <p>you can use {@link #where(Map, String...)} for conditional filtering,
  * use {@link #limit(long, long)}、{@link #groupBy(List, List)}}
- * and {@link #orderBy(HashMap)} to operate the output results,
- * call {@link #yield(List)}} as finally result.</p>
+ * and {@link #orderBy(Map)} to operate the output results,
+ * call {@link #yield(String...)}} as finally result.</p>
  * <p>the user does need to consider the calling order,for where and final yield
  * user can not need to consider.</p>
+ * <p>the simple sentence of query is similar to 'GO FROM "player102" OVER serve'.</p>
+ *
+ * @author Qi Kai Meng
  */
 public class Go {
     private List<Object> srcIds;
     private List<String> edges;
     private List<String> yield;
-    private HashMap<String, Filter> conMap;
+    private Map<String, Filter> conMap;
     private List<String> filterString;
     private long leftSteps = 0;
     private long rightSteps = 1;
@@ -41,9 +44,10 @@ public class Go {
         this.graph = graph;
     }
 
-    protected void init(List<?> srcIds, List<String> edges) {
+    protected Go init(List<?> srcIds, List<String> edges) {
         this.srcIds = (List<Object>) srcIds;
         this.edges = edges;
+        return this;
     }
 
     /**
@@ -78,33 +82,35 @@ public class Go {
     /**
      * filter condition,finally, conMap and filterString do logical sum operations.
      *
-     * <p>For conMap,if you represents a relationship ,you can pass in
-     * <"name",Relational.EQ.setValue("qkm")>it means name == "qkm".</p>
+     * <p>For conMap,you can pass in <"player.name",Relational.EQ.setValue("qkm")>
+     * it means player.name == "qkm".</p>
      * <p>if you represents a logic relationship you can pass in
-     * <"name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
-     * it means name == "qkm" or name == "SC";</p>
+     * <"player.name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
+     * it means player.name == "qkm" or player.name == "SC";</p>
      * <p>all map elements represents an and logical relationship</p>
      *
      * @param conMap       String is propName,Relational is {@link Filter}
      *                     include (Relational、Logical、UnaryOperate)
      * @param filterString filterString is alternative ,you can pass in
-     *                     "name == "qkm"".TODO check format.
+     *                     "player.name == "qkm"".TODO check format.
      * @return Go
      */
-    public Go where(HashMap<String, Filter> conMap, String... filterString) {
+    public Go where(Map<String, Filter> conMap, String... filterString) {
         this.conMap = conMap;
         this.filterString = Arrays.asList(filterString);
         return this;
     }
 
     /**
-     * what the user wants to output.
+     * what the user wants to output,if yield is not set,the format returned is destination ID.
      *
-     * @param yield pass in eg:$$.team.name, if you alias output,pass in eg:$$.team.name as name.
+     * @param yield pass in eg:$$.team.name, if you alias output,pass in eg:$$.team.name as name,
+     *              if you want to Distinct you can add DISTINCT key,
+     *              eg: DISTINCT $$.team.name as name,first string add is ok.
      * @return Go
      */
-    public Go yield(List<String> yield) {
-        this.yield = yield;
+    public Go yield(String... yield) {
+        this.yield = Arrays.asList(yield);
         return this;
     }
 
@@ -116,8 +122,8 @@ public class Go {
      * @param orderBy sort by one or multiple attribute.String is alias at after yield field
      * @return Go
      */
-    public Go orderBy(HashMap<String, Sort> orderBy) {
-        condition.append("| ORDER BY ").append(NGqlQuery.joinOrderBy(orderBy)).append(" ");
+    public Go orderBy(Map<String, Sort> orderBy) {
+        condition.append(Lexer.PIPE).append(Lexer.ORDER_BY).append(NGqlQuery.joinOrderBy(orderBy));
         return this;
     }
 
@@ -133,7 +139,7 @@ public class Go {
      * @return RelationshipMatch
      */
     public Go groupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
-        condition.append(NGqlQuery.joinGroupBy(groupBy, aggregateFunctions)).append(" ");
+        condition.append(NGqlQuery.joinGroupBy(groupBy, aggregateFunctions));
         return this;
     }
 
@@ -147,7 +153,7 @@ public class Go {
      */
     public Go limit(long offsetValue, long numberRows) {
         if (offsetValue >= 0) {
-            condition.append("| LIMIT ").append(offsetValue);
+            condition.append(Lexer.PIPE).append(Lexer.LIMIT).append(offsetValue);
             if (numberRows >= 0) {
                 condition.append(",").append(numberRows).append(" ");
             }
@@ -159,8 +165,9 @@ public class Go {
      * @return from result get the first
      */
     public ResultSet.Record first() {
-        if (all().rowsSize() != 0) {
-            return all().rowValues(0);
+        ResultSet all = all();
+        if (!all.isEmpty()) {
+            return all.rowValues(0);
         }
         return null;
     }
@@ -172,24 +179,27 @@ public class Go {
      */
     private String connectParameters() {
         StringBuilder result = new StringBuilder();
-        result.append("GO ").append(leftSteps).append(" TO ").append(rightSteps).append(" STEPS");
+        result.append(Lexer.GO).append(leftSteps).append(Lexer.TO).append(rightSteps).append(Lexer.STEPS);
         if (srcIds == null || srcIds.isEmpty()) {
             throw new InitException("srcIds can not be null");
         }
-        result.append(" FROM ").append(Encoding.encodeIdList(srcIds));
+        result.append(" ").append(Lexer.FROM).append(Encoding.encodeIdList(srcIds));
         if (edges == null || edges.isEmpty()) {
-            throw new InitException("edges can not be null");
+            result.append(" ").append(Lexer.OVER).append(Lexer.ALL);
+        } else {
+            result.append(" ").append(Lexer.OVER).append(String.join(",", edges));
         }
-        result.append(" OVER ").append(String.join(",", edges)).append(" ");
         if (pathDirection != null) {
-            result.append(pathDirection).append(" ");
+            result.append(" ").append(pathDirection);
         }
         result.append(NGqlQuery.judgeAndJoinWhere(conMap, filterString, -1));
-        result.append(" YIELD ").append(String.join(",", yield));
-        if (condition != null) {
-            result.append(" ").append(condition);
+        if (yield != null && !yield.isEmpty()) {
+            result.append(Lexer.YIELD).append(" ").append(String.join(",", yield));
         }
-        return result.toString();
+        if (condition != null) {
+            result.append(condition);
+        }
+        return result.toString().trim();
     }
 
     /**
@@ -198,6 +208,7 @@ public class Go {
     public ResultSet all() {
         String query = connectParameters();
         ResultSet resultSet = graph.run(query);
+        System.out.println(query.trim());
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
         }
@@ -210,7 +221,11 @@ public class Go {
      * @return count
      */
     public long count() {
-        return all().rowsSize();
+        ResultSet all = all();
+        if (!all.isEmpty()) {
+            return all.rowsSize();
+        }
+        return 0;
     }
 
     /**
@@ -219,6 +234,6 @@ public class Go {
      * @return true or false
      */
     public boolean exist() {
-        return count() > 0;
+        return !all().isEmpty();
     }
 }

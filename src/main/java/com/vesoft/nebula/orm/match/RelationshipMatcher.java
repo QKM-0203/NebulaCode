@@ -8,17 +8,20 @@ package com.vesoft.nebula.orm.match;
 
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * the user gets the {@link RelationshipMatcher} object by passing the {@link Graph} object,
- * and then calls the {@link #match(String, HashMap, String, HashMap, EdgeDirection, HashMap, String...)}
+ * and then calls the {@link #match(String, Map, String, Map, EdgeDirection, Map, String...)}
  * method to pass the parameters.
+ *
+ * @author Qi Kai Meng
  */
-public class RelationshipMatcher extends RelationshipMatch {
+public class RelationshipMatcher {
+    private final RelationshipMatch relationshipMatch;
 
     public RelationshipMatcher(Graph graph) {
-        super(graph);
+        this.relationshipMatch = new RelationshipMatch(graph);
     }
 
     /**
@@ -39,11 +42,10 @@ public class RelationshipMatcher extends RelationshipMatch {
      *                      if you pass in multiple edges,we will only use edge instead of edgeMap.
      *                      eg: [e:player|:team|:work].
      */
-    public RelationshipMatch match(String startTagName, HashMap<String, Object> startTagMap,
-                                   String endTagName, HashMap<String, Object> endTagMap,
-                                   EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
+    public RelationshipMatch match(String startTagName, Map<String, Object> startTagMap,
+                                   String endTagName, Map<String, Object> endTagMap,
+                                   EdgeDirection edgeDirection, Map<String, Object> edgeMap,
                                    String... types) {
-        init(startTagName, startTagMap, endTagName, endTagMap, edgeDirection, edgeMap, types);
-        return this;
+        return relationshipMatch.init(startTagName, startTagMap, endTagName, endTagMap, edgeDirection, edgeMap, types);
     }
 }

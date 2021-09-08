@@ -12,20 +12,22 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Sort;
+import com.vesoft.nebula.orm.query.cypher.Lexer;
 import com.vesoft.nebula.orm.query.ngql.Column;
-
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * match Relationship
- * <p>you can use {@link #where(HashMap, String...)} for conditional filtering,
+ * <p>you can use {@link #where(Map, String...)} for conditional filtering,
  * and use {@link #skip(long)}, {@link #limit(long)}, {@link #groupBy(List, List)}}
- * and {@link #orderBy(HashMap)} to operate the output results.</p>
+ * and {@link #orderBy(Map)} to operate the output results.</p>
  * <p>the user does not need to consider the calling order,
  * when the user calls the {@link #all()}、{@link #first()} etc method,
  * the parameter connection will be made.</p>
+ * <p>note: make sure that at least one index is available for the match statement.</p>
+ *
+ * @author Qi Kai Meng
  */
 public class RelationshipMatch {
     protected Graph graph;
@@ -35,13 +37,13 @@ public class RelationshipMatch {
     private List<String> filterString;
     private long skip = 0;
     private long limit = -1;
-    private HashMap<Column, Sort> orderBy;
+    private Map<Column, Sort> orderBy;
     private List<Column> groupBy;
     private EdgeDirection edgeDirection = EdgeDirection.OUT;
-    private HashMap<String, Filter> conMap;
-    private HashMap<String, Object> startTagMap;
-    private HashMap<String, Object> endTagMap;
-    private HashMap<String, Object> edgeMap;
+    private Map<String, Filter> conMap;
+    private Map<String, Object> startTagMap;
+    private Map<String, Object> endTagMap;
+    private Map<String, Object> edgeMap;
     private List<Column> aggregateFunctions;
 
     protected RelationshipMatch(Graph graph) {
@@ -66,10 +68,10 @@ public class RelationshipMatch {
      *                      if you pass in multiple edges,we will only use edge instead of edgeMap.
      *                      eg: [e:player|:team|:work].
      */
-    protected void init(String startTagName, HashMap<String, Object> startTagMap,
-                        String endTagName, HashMap<String, Object> endTagMap,
-                        EdgeDirection edgeDirection, HashMap<String, Object> edgeMap,
-                        String... types) {
+    protected RelationshipMatch init(String startTagName, Map<String, Object> startTagMap,
+                                     String endTagName, Map<String, Object> endTagMap,
+                                     EdgeDirection edgeDirection, Map<String, Object> edgeMap,
+                                     String... types) {
         this.startTagName = startTagName;
         this.endTagName = endTagName;
         this.startTagMap = startTagMap;
@@ -77,16 +79,17 @@ public class RelationshipMatch {
         this.edgeMap = edgeMap;
         this.edges = Arrays.asList(types);
         this.edgeDirection = edgeDirection;
+        return this;
     }
 
     /**
-     * filter condition.
+     * filter condition,finally, conMap and filterString do logical sum operations.
      *
      * <p>for conMap,if you represents a relationship,you can pass in
-     * <"name",Relational.EQ.setValue("qkm")>it means v.name == "qkm".</p>
+     * <"name",Relational.EQ.setValue("qkm")>it means e.name == "qkm".</p>
      * <p>if you represents a logic relationship you can pass in
      * <"name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
-     * it means v.name == "qkm" or v.name == "SC".</p>
+     * it means e.name == "qkm" or e.name == "SC".</p>
      * <p>all map elements represents an and logical relationship.</p>
      *
      * @param conMap       String is propName,Relational is {@link Filter}
@@ -97,7 +100,7 @@ public class RelationshipMatch {
      *                     for conMap TODO check format
      * @return RelationshipMatch
      */
-    public RelationshipMatch where(HashMap<String, Filter> conMap, String... filterString) {
+    public RelationshipMatch where(Map<String, Filter> conMap, String... filterString) {
         this.conMap = conMap;
         this.filterString = Arrays.asList(filterString);
         return this;
@@ -129,7 +132,7 @@ public class RelationshipMatch {
      * @param orderBy sort by one or multiple attribute.</p>
      * @return RelationshipMatch
      */
-    public RelationshipMatch orderBy(HashMap<Column, Sort> orderBy) {
+    public RelationshipMatch orderBy(Map<Column, Sort> orderBy) {
         this.orderBy = orderBy;
         return this;
     }
@@ -167,16 +170,6 @@ public class RelationshipMatch {
     }
 
     /**
-     * @return from result get the first relationship
-     */
-    public ResultSet.Record first() {
-        if (all().rowsSize() != 0) {
-            return all().rowValues(0);
-        }
-        return null;
-    }
-
-    /**
      * connect parameters.
      *
      * @return sentence
@@ -184,22 +177,33 @@ public class RelationshipMatch {
     private String connectParameters() {
         StringBuilder result = new StringBuilder();
         if (edgeDirection.toString().equals("OUT")) {
-            result.append(String.format("MATCH (v%s)-[%s]->(v1%s) ",
+            result.append(String.format(Lexer.MATCH + "(v%s)-[%s]->(v1%s)",
                 Match.joinTag(startTagName, startTagMap), Match.joinEdge(edgeMap, edges),
                 Match.joinTag(endTagName, endTagMap)));
         } else if (edgeDirection.toString().equals("IN")) {
-            result.append(String.format("MATCH (v%s)<-[%s]-(v1%s) ",
+            result.append(String.format(Lexer.MATCH + "(v%s)<-[%s]-(v1%s)",
                 Match.joinTag(startTagName, startTagMap), Match.joinEdge(edgeMap, edges),
                 Match.joinTag(endTagName, endTagMap)));
         } else {
-            result.append(String.format("MATCH (v%s)-[%s]-(v1%s) ",
+            result.append(String.format(Lexer.MATCH + "(v%s)-[%s]-(v1%s)",
                 Match.joinTag(startTagName, startTagMap), Match.joinEdge(edgeMap, edges),
                 Match.joinTag(endTagName, endTagMap)));
         }
         result.append(Match.judgeAndJoinWhere(conMap, filterString, 1));
         result.append(Match.joinGroupByAndOrderBy(groupBy, aggregateFunctions, orderBy, 1));
         result.append(Match.joinSkipAndLimit(skip, limit));
-        return result.toString();
+        return result.toString().trim();
+    }
+
+    /**
+     * @return from result get the first
+     */
+    public ResultSet.Record first() {
+        ResultSet all = all();
+        if (!all.isEmpty()) {
+            return all.rowValues(0);
+        }
+        return null;
     }
 
     /**
@@ -220,7 +224,11 @@ public class RelationshipMatch {
      * @return count
      */
     public long count() {
-        return all().rowsSize();
+        ResultSet all = all();
+        if (!all.isEmpty()) {
+            return all.rowsSize();
+        }
+        return 0;
     }
 
     /**
@@ -229,6 +237,6 @@ public class RelationshipMatch {
      * @return true or false
      */
     public boolean exist() {
-        return count() > 0;
+        return !all().isEmpty();
     }
 }

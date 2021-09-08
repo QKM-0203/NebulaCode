@@ -11,17 +11,18 @@ import java.util.List;
 
 /**
  * the user gets the {@link Goer} object by passing the {@link Graph} object,
- * and then calls the {@link #go(List, List)}
- * method to pass the parameters.
+ * and then calls the {@link #go(List, List)} method to pass the parameters.
+ *
+ * @author Qi Kai Meng
  */
-public class Goer extends Go {
+public class Goer {
+    private final Go go;
 
     public Goer(Graph graph) {
-        super(graph);
+        this.go = new Go(graph);
     }
 
     public Go go(List<?> srcIds, List<String> edges) {
-        init(srcIds, edges);
-        return this;
+        return go.init(srcIds, edges);
     }
 }

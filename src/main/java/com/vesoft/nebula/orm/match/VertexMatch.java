@@ -9,31 +9,34 @@ package com.vesoft.nebula.orm.match;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
-import com.vesoft.nebula.orm.query.ngql.Column;
 import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Sort;
+import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.ngql.Column;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * match Vertex
- * <p>you can use {@link #where(HashMap, String...)} for conditional filtering,
+ * <p>you can use {@link #where(Map, String...)} for conditional filtering,
  * and use {@link #skip(long)}, {@link #limit(long)}, {@link #groupBy(List, List)}}
- * and {@link #orderBy(HashMap)} to operate the output results.</p>
+ * and {@link #orderBy(Map)} to operate the output results.</p>
  * <p>the user does not need to consider the calling order,
  * when the user calls the {@link #all()}、{@link #first()} etc method,
  * the parameter connection will be made.</p>
+ * <p>note: make sure that at least one index is available for the match statement.</p>
+ *
+ * @author Qi Kai Meng
  */
 public class VertexMatch {
     protected Graph graph;
     private String tagName;
     private long skip = 0;
     private long limit = -1;
-    private HashMap<Column, Sort> orderBy;
+    private Map<Column, Sort> orderBy;
     private List<String> filterString;
-    private HashMap<String, Filter> conMap;
-    private HashMap<String, Object> propMap;
+    private Map<String, Filter> conMap;
+    private Map<String, Object> propMap;
     private List<Column> groupBy;
     private List<Column> aggregateFunctions;
 
@@ -50,15 +53,16 @@ public class VertexMatch {
      *                eg: match (v:player{name: "qkm"}),can be null eg:
      *                match (v:player).
      */
-    protected void init(String tagName, HashMap<String, Object> propMap) {
+    protected VertexMatch init(String tagName, Map<String, Object> propMap) {
         this.tagName = tagName;
         this.propMap = propMap;
+        return this;
     }
 
     /**
-     * filter condition.
+     * filter condition,finally, conMap and filterString do logical sum operations.
      *
-     * <p>for conMap,if you represents a relationship ,you can pass in
+     * <p>for conMap,if you represents a Vertex ,you can pass in
      * <"name",Relational.EQ.setValue("qkm")>it means v.name == "qkm".</p>
      * <p>if you represents a logic relationship you can pass in
      * <"name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
@@ -72,7 +76,7 @@ public class VertexMatch {
      *                     <"name",Relational.EQ.setValue("qkm")> for conMap TODO check format
      * @return VertexMatch
      */
-    public VertexMatch where(HashMap<String, Filter> conMap, String... filterString) {
+    public VertexMatch where(Map<String, Filter> conMap, String... filterString) {
         this.conMap = conMap;
         this.filterString = Arrays.asList(filterString);
         return this;
@@ -104,7 +108,7 @@ public class VertexMatch {
      * @param orderBy sort by one or multiple attribute
      * @return VertexMatch
      */
-    public VertexMatch orderBy(HashMap<Column, Sort> orderBy) {
+    public VertexMatch orderBy(Map<Column, Sort> orderBy) {
         this.orderBy = orderBy;
         return this;
     }
@@ -142,28 +146,28 @@ public class VertexMatch {
     }
 
     /**
-     * @return from result get the first Vertex
-     */
-    public ResultSet.Record first() {
-        if (all().rowsSize() != 0) {
-            return all().rowValues(0);
-        }
-        return null;
-    }
-
-    /**
      * connect parameters.
      *
      * @return sentence
      */
     private String connectParameters() {
         StringBuilder result = new StringBuilder();
-        result.append(String.format("MATCH (v%s) ", Match.joinTag(tagName, propMap)));
+        result.append(String.format(Lexer.MATCH + "(v%s)", Match.joinTag(tagName, propMap)));
         result.append(Match.judgeAndJoinWhere(conMap, filterString, 0));
         result.append(Match.joinGroupByAndOrderBy(groupBy, aggregateFunctions, orderBy, 0));
         result.append(Match.joinSkipAndLimit(skip, limit));
-        System.out.println(result);
-        return result.toString();
+        return result.toString().trim();
+    }
+
+    /**
+     * @return from result get the first
+     */
+    public ResultSet.Record first() {
+        ResultSet all = all();
+        if (!all.isEmpty()) {
+            return all.rowValues(0);
+        }
+        return null;
     }
 
     /**
@@ -184,7 +188,11 @@ public class VertexMatch {
      * @return count
      */
     public long count() {
-        return all().rowsSize();
+        ResultSet all = all();
+        if (!all.isEmpty()) {
+            return all.rowsSize();
+        }
+        return 0;
     }
 
     /**
@@ -193,6 +201,6 @@ public class VertexMatch {
      * @return true or false
      */
     public boolean exist() {
-        return count() > 0;
+        return !all().isEmpty();
     }
 }
