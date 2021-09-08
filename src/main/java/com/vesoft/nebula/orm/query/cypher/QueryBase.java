@@ -6,18 +6,20 @@
 
 package com.vesoft.nebula.orm.query.cypher;
 
-import com.vesoft.nebula.orm.query.ngql.Column;
 import com.vesoft.nebula.orm.operator.*;
+import com.vesoft.nebula.orm.query.ngql.Column;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * used to splice parameters into query statements
+ * used to splice parameters into query statements.
+ *
+ * @author Qi Kai Meng
  */
 public class QueryBase {
 
-    private static String joinWhere(HashMap<String, Filter> conMap, int isEdge) {
+    private static String joinWhere(Map<String, Filter> conMap, int isEdge) {
         ArrayList<String> whereStrings = new ArrayList<>();
         for (String propName : conMap.keySet()) {
             Filter filter = conMap.get(propName);
@@ -48,21 +50,21 @@ public class QueryBase {
                 }
             }
         }
-        return String.join(" AND ", whereStrings);
+        return String.join(Lexer.AND, whereStrings);
     }
 
-    public static String judgeAndJoinWhere(HashMap<String, Filter> conMap, List<String> filterString, int isEdge) {
+    public static String judgeAndJoinWhere(Map<String, Filter> conMap, List<String> filterString, int isEdge) {
         StringBuilder result = new StringBuilder();
         if ((conMap != null && !conMap.isEmpty()) || (filterString != null && !filterString.isEmpty())) {
-            result.append("WHERE ");
+            result.append(Lexer.WHERE);
             if (conMap != null && !conMap.isEmpty()) {
                 result.append(joinWhere(conMap, isEdge));
             }
             if (filterString != null && !filterString.isEmpty()) {
                 if (conMap != null && !conMap.isEmpty()) {
-                    result.append(" AND ");
+                    result.append(Lexer.AND);
                 }
-                result.append(String.join(" AND ", filterString));
+                result.append(String.join(Lexer.AND, filterString));
             }
         }
         return result.toString();
@@ -99,7 +101,7 @@ public class QueryBase {
         ArrayList<String> result = new ArrayList<>();
         for (Column column : columns) {
             if (column.getAlias() != null) {
-                result.add(column.getPropName() + " AS " + column.getAlias());
+                result.add(column.getPropName() + Lexer.AS + column.getAlias());
             } else {
                 result.add(column.getPropName());
             }
@@ -122,7 +124,7 @@ public class QueryBase {
                 result.add(String.format("%s(%s)", aggregateFunction.getAggregateFunction().toString(),
                     aggregateFunction.getAggregateFunction().getValue()));
             } else {
-                result.add(String.format("%s(%s) AS %s", aggregateFunction.getAggregateFunction().toString(),
+                result.add(String.format("%s(%s)" + Lexer.AS + "%s", aggregateFunction.getAggregateFunction().toString(),
                     aggregateFunction.getAggregateFunction().getValue(), aggregateFunction.getAlias()));
             }
         }

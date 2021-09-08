@@ -6,19 +6,22 @@
 
 package com.vesoft.nebula.orm.match;
 
-import com.vesoft.nebula.orm.query.cypher.Encoding;
-import com.vesoft.nebula.orm.query.ngql.Column;
 import com.vesoft.nebula.orm.operator.Sort;
+import com.vesoft.nebula.orm.query.cypher.Encoding;
+import com.vesoft.nebula.orm.query.cypher.Lexer;
 import com.vesoft.nebula.orm.query.cypher.QueryBase;
+import com.vesoft.nebula.orm.query.ngql.Column;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * fields used to join match queries.
+ *
+ * @author Qi Kai Meng
  */
 public class Match extends QueryBase {
-    public static String joinTag(String tagName, HashMap<String, Object> tagMap) {
+    public static String joinTag(String tagName, Map<String, Object> tagMap) {
         if (tagName == null) {
             return "";
         } else if (tagMap == null || tagMap.isEmpty()) {
@@ -28,7 +31,7 @@ public class Match extends QueryBase {
         }
     }
 
-    public static String joinEdge(HashMap<String, Object> edgeMap, List<String> types) {
+    public static String joinEdge(Map<String, Object> edgeMap, List<String> types) {
         if (types != null && !types.isEmpty()) {
             if (types.size() == 1) {
                 if (edgeMap == null || edgeMap.isEmpty()) {
@@ -44,7 +47,7 @@ public class Match extends QueryBase {
         }
     }
 
-    private static String joinOrderByAlias(HashMap<Column, Sort> orderBy) {
+    private static String joinOrderByAlias(Map<Column, Sort> orderBy) {
         ArrayList<String> orderByStrings = new ArrayList<>();
         for (Column column : orderBy.keySet()) {
             if (orderBy.get(column) != null) {
@@ -58,24 +61,25 @@ public class Match extends QueryBase {
 
     public static String joinGroupByAndOrderBy(List<Column> groupBy,
                                                List<Column> aggregateFunctions,
-                                               HashMap<Column, Sort> orderBy, int isEdgeOrNode) {
+                                               Map<Column, Sort> orderBy, int isEdgeOrNode) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
-            result.append(String.format(" RETURN %s,%s ", joinAttributeAlias(groupBy),
+            result.append(String.format(Lexer.RETURN + "%s,%s", joinAttributeAlias(groupBy),
                 joinAggregateFunctionsAlias(aggregateFunctions)));
             if (orderBy != null && !orderBy.isEmpty()) {
-                result.append("ORDER BY ").append(joinOrderByAlias(orderBy));
+                result.append(Lexer.ORDER_BY).append(joinOrderByAlias(orderBy));
             }
         } else {
             if (orderBy == null || orderBy.isEmpty()) {
                 if (isEdgeOrNode == 0) {
-                    result.append(" RETURN v ");
+                    result.append(Lexer.RETURN).append("v ");
                 } else {
-                    result.append(" RETURN e ");
+                    result.append(Lexer.RETURN).append("e ");
                 }
             } else {
-                result.append(" RETURN ").append(joinAttributeAlias((List<Column>) orderBy.keySet()));
-                result.append(" ORDER BY ").append(joinOrderByAlias(orderBy));
+                ArrayList<Column> columns = new ArrayList<>(orderBy.keySet());
+                result.append(Lexer.RETURN).append(joinAttributeAlias(columns));
+                result.append(Lexer.ORDER_BY).append(joinOrderByAlias(orderBy));
             }
         }
         return result.toString();
@@ -83,11 +87,11 @@ public class Match extends QueryBase {
 
     public static String joinSkipAndLimit(long skip, long limit) {
         StringBuilder result = new StringBuilder();
-        if (skip > 0) {
-            result.append(" SKIP ").append(skip);
+        if (skip >= 1) {
+            result.append(Lexer.SKIP).append(skip);
         }
         if (limit >= 0) {
-            result.append(" LIMIT ").append(limit);
+            result.append(Lexer.LIMIT).append(limit);
         }
         return result.toString();
     }
