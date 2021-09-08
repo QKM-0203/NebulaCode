@@ -12,11 +12,21 @@ import java.util.HashMap;
 import org.junit.Test;
 
 /**
- * test merge
+ * because the schema creation and index creation steps are implemented asynchronously,
+ * the Nepal graph cannot be created until the next heartbeat cycle,
+ * so you can wait and execute the method again.
  */
 public class TestMerge extends TestDataBase {
+
+    {
+        graph.createTag(qkm1);
+        graph.createTag(qkm2);
+        graph.createEdge(team);
+        graph.createEdge(work);
+    }
+
     @Test
-    public void mergeVertexThatDoesNotExist() throws UnsupportedEncodingException {
+    public void mergeVertexThatDoesNotExistTagHasProp() throws UnsupportedEncodingException {
         graph.delete(vertexOne);
         assert !graph.exists(vertexOne);
         graph.merge(vertexOne, "QKM2", "name");
@@ -24,15 +34,21 @@ public class TestMerge extends TestDataBase {
     }
 
     @Test
-    public void mergeVertexThatDoesExist() throws UnsupportedEncodingException, InterruptedException {
+    public void mergeVertexThatDoesNotExistTagNotHasProp() throws UnsupportedEncodingException {
+        graph.delete(vertexOne);
+        assert !graph.exists(vertexOne);
+        graph.merge(vertexOne, "QKM1");
+        graph.exists(vertexOne);
+    }
+
+    @Test
+    public void mergeVertexThatDoesExist() throws UnsupportedEncodingException {
         graph.create(vertexOne);
         assert graph.exists(vertexOne);
         graph.run("submit job stats");
-        Thread.sleep(1000);
         final long oldVertexNumber = graph.vertexNumber(null);
         graph.merge(vertexOne, "QKM2", "name");
         graph.run("submit job stats");
-        Thread.sleep(1000);
         final long newVertexNumber = graph.vertexNumber(null);
         assert newVertexNumber == oldVertexNumber;
     }
@@ -79,15 +95,11 @@ public class TestMerge extends TestDataBase {
 
 
     @Test
-    public void mergeRelationshipThatDoesExist() throws UnsupportedEncodingException, InterruptedException {
+    public void mergeRelationshipThatDoesExist() throws UnsupportedEncodingException {
         graph.create(relationship12);
         assert graph.exists(relationship12);
-        graph.run("submit job stats");
-        Thread.sleep(1000);
         final long oldEdgeNumber = graph.relationshipNumber(null);
         graph.merge(relationship12, "team", "teamName");
-        graph.run("submit job stats");
-        Thread.sleep(1000);
         final long newEdgeNumber = graph.relationshipNumber(null);
         assert oldEdgeNumber == newEdgeNumber;
     }
@@ -96,7 +108,7 @@ public class TestMerge extends TestDataBase {
     public void mergeRelationshipThatUpdatePropValue() throws UnsupportedEncodingException {
         graph.create(relationship12);
         assert graph.exists(relationship12);
-        relationshipValueOne.put("teamName", "China");
+        relationshipValueOne.put("teacherName", "China");
         graph.merge(relationship12);
         assertEdgePropValue(relationship12);
     }
@@ -109,7 +121,7 @@ public class TestMerge extends TestDataBase {
                 ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
             relationship.getRank()));
         assert resultSet.colValues("edges_")
-            .get(0).asRelationship().properties().get("teamName").asString().equals("China");
+            .get(0).asRelationship().properties().get("teacherName").asString().equals("China");
 
     }
 
@@ -159,7 +171,7 @@ public class TestMerge extends TestDataBase {
         try {
             graph.merge(vertexOne, null, null);
         } catch (Exception e) {
-            assert e.getMessage().equals("tagName and attribute name is"
+            assert e.getMessage().equals("tagName is"
                 + " a condition of merge,so cannot be null");
         }
     }
