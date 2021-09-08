@@ -9,7 +9,9 @@ package com.vesoft.nebula.orm.query.ngql;
 import com.vesoft.nebula.orm.operator.AggregateFunction;
 
 /**
- * alias properties
+ * alias properties.
+ *
+ * @author Qi Kai Meng
  */
 public class Column {
     private String propName;
@@ -39,4 +41,15 @@ public class Column {
         return alias;
     }
 
+    public void setPropName(String propName) {
+        this.propName = propName;
+    }
+
+    public void setAggregateFunction(AggregateFunction aggregateFunction) {
+        this.aggregateFunction = aggregateFunction;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 }

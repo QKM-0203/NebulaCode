@@ -10,14 +10,17 @@ import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.TimeWrapper;
 import com.vesoft.nebula.orm.entity.GraphService;
 import com.vesoft.nebula.orm.exception.ExecuteException;
+import java.util.Objects;
 
 /**
  * this class is a Time class.
  *
  * <p>users can pass in time strings like this "12:23:45:123",
- * it should be noted that users must call setSession to pass in Session Object,
- * in order to convert the time string into TimeWrapper, users can obtain
- * hour / minute / second of local and UTC.</p>
+ * it should be noted that users must call {@link #setGraphService(GraphService)}
+ * to pass in {@link GraphService} Object,in order to convert the time string into TimeWrapper,
+ * users can obtain hour / minute / second of local and UTC.</p>
+ *
+ * @author Qi Kai Meng
  */
 public class Time {
     private String timeString;
@@ -86,12 +89,25 @@ public class Time {
         }
     }
 
-    public String getTimeString() {
+    @Override
+    public String toString() {
         return timeString;
     }
 
     @Override
-    public String toString() {
-        return timeString;
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Time time = (Time) o;
+        return Objects.equals(timeString, time.timeString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(timeString);
     }
 }

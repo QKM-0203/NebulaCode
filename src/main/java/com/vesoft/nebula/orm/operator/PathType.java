@@ -7,12 +7,14 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * used to judge edge is out or in.
+ * {@code PathType} is used to show pathType,
+ * SHORTEST、ALL、NOLOOP represents the shortest path, find all paths
+ * and find acyclic paths respectively.
  *
  * @author Qi Kai Meng
  */
-public enum EdgeDirection {
-    OUT,
-    IN,
-    BOTH
+public enum PathType {
+    SHORTEST,
+    ALL,
+    NOLOOP
 }

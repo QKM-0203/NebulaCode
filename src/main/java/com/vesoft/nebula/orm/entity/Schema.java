@@ -34,7 +34,7 @@ public class Schema {
     }
 
     /**
-     * create an Tag or EdgeType of include property and property time setting.
+     * create a Tag or EdgeType of include property and property time setting.
      *
      * @param name         Tag name or EdgeType name
      * @param propertyList property List

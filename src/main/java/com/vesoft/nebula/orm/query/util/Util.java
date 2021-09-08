@@ -7,20 +7,24 @@
 package com.vesoft.nebula.orm.query.util;
 
 import com.vesoft.nebula.client.graph.data.DateTimeWrapper;
+import com.vesoft.nebula.client.graph.data.DateWrapper;
 import com.vesoft.nebula.client.graph.data.TimeWrapper;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
+import com.vesoft.nebula.orm.datatype.Date;
 import com.vesoft.nebula.orm.datatype.DateTime;
 import com.vesoft.nebula.orm.datatype.Time;
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.exception.ExecuteException;
+import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * this class is a tool class
+ * this class is a tool class.
  *
  * @author Qi Kai Meng
  */
@@ -31,8 +35,8 @@ public class Util {
      * @param vertexList many vertexes
      * @return classify
      */
-    public static HashMap<String, List<Vertex>> joinSameTagVertices(List<Vertex> vertexList) {
-        HashMap<String, List<Vertex>> classifyVertex = new HashMap<>();
+    public static Map<String, List<Vertex>> joinSameTagVertices(List<Vertex> vertexList) {
+        Map<String, List<Vertex>> classifyVertex = new HashMap<>();
         for (Vertex vertex : vertexList) {
             String tagJoin = Encoding.joinTag(vertex.getPropMap());
             if (classifyVertex.get(tagJoin) == null) {
@@ -80,6 +84,9 @@ public class Util {
         } else {
             for (Relationship relationship : relationshipList) {
                 String edgeName = relationship.getEdgeName();
+                if (edgeName == null) {
+                    throw new InitException("edgeName of " + relationship + " is null");
+                }
                 if (classifyEdge.get(edgeName) == null) {
                     ArrayList<Relationship> relationships = new ArrayList<>();
                     relationships.add(relationship);
@@ -140,7 +147,9 @@ public class Util {
             if (valueWrapperMap.get(propName).isString()) {
                 propMap.put(propName, valueWrapperMap.get(propName).asString());
             } else if (valueWrapperMap.get(propName).isDate()) {
-                propMap.put(propName, valueWrapperMap.get(propName).asDate());
+                DateWrapper dateWrapper = valueWrapperMap.get(propName).asDate();
+                Date date = new Date(dateWrapper.toString());
+                propMap.put(propName, date);
             } else if (valueWrapperMap.get(propName).isBoolean()) {
                 propMap.put(propName, valueWrapperMap.get(propName).asBoolean());
             } else if (valueWrapperMap.get(propName).isDateTime()) {

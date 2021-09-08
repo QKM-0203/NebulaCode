@@ -9,7 +9,7 @@ package com.vesoft.nebula.orm.operator;
 /**
  * the data type used to represent data.
  *
- * <p>users pass in data types by enumerating instances</p>
+ * <p>users pass in data types by enumerating instances.</p>
  *
  * @author Qi Kai Meng
  */
@@ -20,11 +20,12 @@ public enum DataType {
     FLOAT(4),
     INT8(5),
     INT16(6),
-    INT32(7),
+    INT(7),
     FIXED_STRING(8),
     INT64(9),
     STRING(10),
     TIME(11),
+    //pass in long
     TIMESTAMP(12),
     BOOL(13);
 

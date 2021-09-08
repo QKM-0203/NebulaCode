@@ -7,7 +7,7 @@
 package com.vesoft.nebula.orm.entity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -18,7 +18,7 @@ import java.util.Objects;
  * the name of the edge type ({@link #edgeName}), rank ({@link #rank}) (the default value is 0,
  * rank value can be used to distinguish edges with the same edge type,
  * starting point and destination point)
- * and the attributes of the edge ({@link #propMap})</p>
+ * and the attributes of the edge ({@link #propMap}).</p>
  *
  * @author Qi Kai Meng
  */
@@ -27,7 +27,7 @@ public class Relationship extends Entity {
     private Object endVid;
     private String edgeName;
     private int rank = 0;
-    private HashMap<String, Object> propMap = null;
+    private Map<String, Object> propMap = null;
 
     /**
      * user pass in parameter creates a directional edge.
@@ -39,12 +39,28 @@ public class Relationship extends Entity {
      * @param rank     distinguish edges with the same edge type, starting point and destination point.
      */
     public Relationship(Object startVid, Object endVid, String edgeName,
-                        HashMap<String, Object> propMap, int rank) {
+                        Map<String, Object> propMap, int rank) {
         this.startVid = startVid;
         this.endVid = endVid;
         this.edgeName = edgeName;
         this.propMap = propMap;
         this.rank = rank;
+    }
+
+    /**
+     * user pass in parameter creates a directional edge,rank use default value.
+     *
+     * @param startVid startVid
+     * @param endVid   endVid
+     * @param edgeName edgeName
+     * @param propMap  attribute Map
+     */
+    public Relationship(Object startVid, Object endVid, String edgeName,
+                        Map<String, Object> propMap) {
+        this.startVid = startVid;
+        this.endVid = endVid;
+        this.edgeName = edgeName;
+        this.propMap = propMap;
     }
 
     /**
@@ -55,6 +71,15 @@ public class Relationship extends Entity {
         this.endVid = endVid;
         this.edgeName = edgeName;
         this.rank = rank;
+    }
+
+    /**
+     * create relationship and edgeType propertyList is null,rank use default value.
+     */
+    public Relationship(Object startVid, Object endVid, String edgeName) {
+        this.startVid = startVid;
+        this.endVid = endVid;
+        this.edgeName = edgeName;
     }
 
     public String getEdgeName() {
@@ -77,7 +102,7 @@ public class Relationship extends Entity {
         this.edgeName = edgeName;
     }
 
-    public void setPropMap(HashMap<String, Object> propMap) {
+    public void setPropMap(Map<String, Object> propMap) {
         this.propMap = propMap;
     }
 
@@ -101,11 +126,11 @@ public class Relationship extends Entity {
         return Objects.hash(startVid, endVid, edgeName, rank, propMap);
     }
 
-    public HashMap<String, Object> properties() {
+    public Map<String, Object> properties() {
         return propMap;
     }
 
-    public HashMap<String, Object> getPropMap() {
+    public Map<String, Object> getPropMap() {
         return propMap;
     }
 

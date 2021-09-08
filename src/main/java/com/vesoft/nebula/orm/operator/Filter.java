@@ -7,7 +7,9 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * abstract logical relations and relations
+ * abstract logical relations and relations.
+ *
+ * @author Qi Kai Meng
  */
 public interface Filter {
 }

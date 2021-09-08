@@ -7,12 +7,11 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * used to judge edge is out or in.
+ * path direction.
  *
  * @author Qi Kai Meng
  */
-public enum EdgeDirection {
-    OUT,
-    IN,
-    BOTH
+public enum PathDirection {
+    REVERSELY,
+    BIDIRET
 }

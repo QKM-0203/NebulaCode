@@ -7,10 +7,7 @@
 package com.vesoft.nebula.orm.entity;
 
 import com.vesoft.nebula.orm.exception.InitException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * vertex object with ID and attribute.
@@ -20,7 +17,7 @@ import java.util.Objects;
  * according to the graph object.</p>
  *
  * <p>judge whether the tag exists({@link #hasTag(String)}),
- * add a new tag({@link #addTag(String, HashMap)}), etc</p>
+ * add a new tag({@link #addTag(String, HashMap)}), etc.</p>
  *
  * @author Qi Kai Meng
  */
@@ -75,7 +72,7 @@ public class Vertex extends Entity {
      * @param tagName tagName
      * @return specify the properties of the tag
      */
-    public HashMap<String, Object> getTag(String tagName) {
+    public Map<String, Object> getTag(String tagName) {
         return this.getPropMap().get(tagName);
     }
 
@@ -128,7 +125,7 @@ public class Vertex extends Entity {
         String result = (vid instanceof String) ? "(\"%s\"%s)" : "(%s%s)";
         StringBuilder part = new StringBuilder();
         for (String tagName : propMap.keySet()) {
-            HashMap<String, Object> propValueMap = propMap.get(tagName);
+            Map<String, Object> propValueMap = propMap.get(tagName);
             part.append(String.format(" :%s{", tagName));
             if (propValueMap == null || propValueMap.isEmpty()) {
                 part.append("}");
