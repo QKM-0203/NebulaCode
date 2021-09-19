@@ -302,7 +302,8 @@ public class TestFindPath extends TestDataBase {
     }
 
     @Test
-    public void testFindNoloopReverselyDirectionPathAddOrderBy() throws UnsupportedEncodingException {
+    public void testFindNoloopReverselyDirectionPathAddOrderBy()
+        throws UnsupportedEncodingException {
         ArrayList<Integer> srcIds = new ArrayList<>();
         srcIds.add(2);
         ArrayList<Integer> dstIds = new ArrayList<>();
@@ -326,13 +327,13 @@ public class TestFindPath extends TestDataBase {
 
     @Test
     public void testFindPathSrcIdException() {
-        ArrayList<Integer> srcIds = new ArrayList<>();
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
         edgeNames.add("team");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
+        ArrayList<Integer> srcIds = new ArrayList<>();
         FindPath findPath = finderPath.find(PathType.NOLOOP, srcIds, dstIds, edgeNames);
         try {
             ResultSet all = findPath.orderBy(true).pathDirection(PathDirection.REVERSELY).all();

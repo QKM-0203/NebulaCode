@@ -84,7 +84,7 @@ public class TestFetchVertex extends TestDataBase {
     public void testFetchAddYield() throws UnsupportedEncodingException {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
         FetchVertex fetchVertex = fetcherVertex.fetchOne(1);
-        ResultSet all = fetchVertex.on("QKM2").yield("DISTINCT QKM2.name as name", "QKM2.age as age").all();
+        ResultSet all = fetchVertex.on("QKM2").yield("QKM2.name as name", "QKM2.age as age").all();
         assert all.rowsSize() == 1;
         assert fetchVertex.exist();
         List<ValueWrapper> vid = all.colValues("VertexID");
@@ -100,7 +100,8 @@ public class TestFetchVertex extends TestDataBase {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
         FetchVertex fetchVertex = fetcherVertex.fetch(null);
         try {
-            ResultSet all = fetchVertex.on("QKM2").yield("DISTINCT QKM2.name as name", "QKM2.age as age").all();
+            ResultSet all = fetchVertex.on("QKM2")
+                .yield("QKM2.name as name", "QKM2.age as age").all();
         } catch (Exception e) {
             assert e.getMessage().equals("vidList can not be null");
         }

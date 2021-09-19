@@ -5,12 +5,12 @@
  */
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
-import com.vesoft.nebula.orm.datatype.DateTime;
 import com.vesoft.nebula.orm.entity.Property;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Schema;
 import com.vesoft.nebula.orm.entity.Vertex;
 import com.vesoft.nebula.orm.operator.DataType;
+import com.vesoft.nebula.orm.timetype.DateTime;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +66,8 @@ public class TestPush extends TestDataBase {
         try {
             graph.push(relationship34);
         } catch (Exception e) {
-            assert e.getMessage().equals("the edge (2)-[:QKM9@0{year: 2002-02-03T12:30:12.000000}]->(3) not exist");
+            assert e.getMessage().equals("the edge "
+                + "(2)-[:QKM9@0{year: 2002-02-03T12:30:12.000000}]->(3) not exist");
         }
     }
 
@@ -88,7 +89,8 @@ public class TestPush extends TestDataBase {
         relationship34.setRank(relationship23.getRank());
         graph.push(relationship34);
         graph.pull(relationship23);
-        assert relationship23.properties().get("year").equals(relationship34.properties().get("year"));
+        assert relationship23.properties().get("year")
+            .equals(relationship34.properties().get("year"));
         try {
             graph.push(relationship34);
         } catch (Exception e) {
@@ -116,7 +118,8 @@ public class TestPush extends TestDataBase {
         assert relationship12.properties().get("teacherName").equals("SC");
     }
 
-    public void assertEdgePropValue(Relationship relationship, String propName, String value) throws UnsupportedEncodingException {
+    public void assertEdgePropValue(Relationship relationship, String propName, String value)
+        throws UnsupportedEncodingException {
         ResultSet resultSet = graph.run(String.format("FETCH PROP ON `%s` %s->%s@%d",
             relationship.getEdgeName(), relationship.getStartVid() instanceof String
                 ? "\"" + relationship.getStartVid() + "\"" : relationship.getStartVid(),
@@ -128,7 +131,8 @@ public class TestPush extends TestDataBase {
 
     }
 
-    public void assertTagPropValue(String tagName, String vid, String propName, String value) throws UnsupportedEncodingException {
+    public void assertTagPropValue(String tagName, String vid, String propName, String value)
+        throws UnsupportedEncodingException {
 
         ResultSet resultSet = graph.run("FETCH PROP ON * " + vid);
         assert resultSet.colValues("vertices_")

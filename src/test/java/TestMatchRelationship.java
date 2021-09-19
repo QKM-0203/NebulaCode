@@ -71,7 +71,6 @@ public class TestMatchRelationship extends TestDataBase {
         ResultSet work = work1.all();
         List<ValueWrapper> edges = work.colValues("e");
         assert work1.exist();
-        System.out.println(work1.count());
         assert work1.count() == 6;
         assert edges.get(0).asRelationship().srcId().asLong() == 1
             && edges.get(0).asRelationship().dstId().asLong() == 3;
@@ -130,11 +129,13 @@ public class TestMatchRelationship extends TestDataBase {
             && edges.get(0).asRelationship().properties().get("object").asString().equals("math");
         assert edges.get(1).asRelationship().srcId().asLong() == 2
             && edges.get(1).asRelationship().dstId().asLong() == 4
-            && edges.get(1).asRelationship().properties().get("object").asString().equals("chinese");
+            && edges.get(1).asRelationship().properties()
+            .get("object").asString().equals("chinese");
     }
 
     @Test
-    public void testMatchByEdgeNameAddSrcTagAddWhere() throws UnsupportedEncodingException {
+    public void testMatchByEdgeNameAddSrcTagAddWhere()
+        throws UnsupportedEncodingException {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         HashMap<String, Object> tag = new HashMap<>();
         tag.put("name", "qkm");
@@ -150,7 +151,8 @@ public class TestMatchRelationship extends TestDataBase {
     }
 
     @Test
-    public void testMatchByEdgeNameAddSrcTagNameAddDstTagNameAddWhere() throws UnsupportedEncodingException {
+    public void testMatchByEdgeNameAddSrcTagNameAddDstTagNameAddWhere()
+        throws UnsupportedEncodingException {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         RelationshipMatch match = relationshipMatcher.match("QKM2", null, "QKM1", null,
             EdgeDirection.OUT, null, "team");
@@ -210,7 +212,8 @@ public class TestMatchRelationship extends TestDataBase {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         RelationshipMatch match = relationshipMatcher.match("QKM1", null, null, null,
             EdgeDirection.OUT, null, "team");
-        ResultSet work = match.where(null).orderBy(orderBy).groupBy(groupBy, aggregateFunctions).all();
+        ResultSet work = match.where(null).orderBy(orderBy)
+            .groupBy(groupBy, aggregateFunctions).all();
         assert match.exist();
         assert match.count() == 2;
         List<ValueWrapper> outPut = work.colValues("name");

@@ -80,11 +80,11 @@ public class TestGetSubgraph extends TestDataBase {
         ResultSet all = getSubgraph.edges(EdgeDirection.OUT, "team", "work").steps(2).all();
         assert getSubgraph.exist();
         List<ValueWrapper> vertices = all.colValues("_vertices");
-        List<ValueWrapper> edges = all.colValues("_edges");
         assert vertices.get(0).asList().get(0).asNode().getId().asLong() == 1;
         assert vertices.get(1).asList().get(0).asNode().getId().asLong() == 3
             && vertices.get(1).asList().get(1).asNode().getId().asLong() == 2;
         assert vertices.get(2).asList().get(0).asNode().getId().asLong() == 4;
+        List<ValueWrapper> edges = all.colValues("_edges");
         assert edges.get(0).asList().get(0).asRelationship().srcId().asLong() == 1
             && edges.get(0).asList().get(0).asRelationship().dstId().asLong() == 3
             && edges.get(0).asList().get(0).asRelationship().ranking() == 0

@@ -112,15 +112,15 @@ public class TestLookUp extends TestDataBase {
         ResultSet qkm2 = team.where(filter).all();
         assert team.exist();
         assert team.count() == 2;
-        List<ValueWrapper> SrcVID = qkm2.colValues("SrcVID");
-        List<ValueWrapper> DstVID = qkm2.colValues("DstVID");
-        List<ValueWrapper> Ranking = qkm2.colValues("Ranking");
-        assert SrcVID.get(0).asLong() == 1;
-        assert DstVID.get(0).asLong() == 2;
-        assert Ranking.get(0).asLong() == 1;
-        assert SrcVID.get(1).asLong() == 2;
-        assert DstVID.get(1).asLong() == 3;
-        assert Ranking.get(1).asLong() == 0;
+        List<ValueWrapper> srcVid = qkm2.colValues("SrcVID");
+        List<ValueWrapper> dstVid = qkm2.colValues("DstVID");
+        List<ValueWrapper> ranking = qkm2.colValues("Ranking");
+        assert srcVid.get(0).asLong() == 1;
+        assert dstVid.get(0).asLong() == 2;
+        assert ranking.get(0).asLong() == 1;
+        assert srcVid.get(1).asLong() == 2;
+        assert dstVid.get(1).asLong() == 3;
+        assert ranking.get(1).asLong() == 0;
     }
 
     @Test

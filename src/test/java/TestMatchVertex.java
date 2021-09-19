@@ -327,10 +327,10 @@ public class TestMatchVertex extends TestDataBase {
         ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20").orderBy(orderBy)
             .groupBy(groupBy, aggregateFunctions).all();
         List<ValueWrapper> outPut = matchByTagQKM1.colValues("age");
-        List<ValueWrapper> outPut1 = matchByTagQKM1.colValues("count");
         assert qkm2.exist();
         assert qkm2.count() == 2;
         assert outPut.get(0).asLong() == 20;
+        List<ValueWrapper> outPut1 = matchByTagQKM1.colValues("count");
         assert outPut1.get(0).asLong() == 1;
         assert outPut.get(1).asLong() == 19;
         assert outPut1.get(1).asLong() == 2;

@@ -181,6 +181,43 @@ public class TestGo extends TestDataBase {
     }
 
     @Test
+    public void testGoYield() throws UnsupportedEncodingException {
+        ArrayList<String> edges = new ArrayList<>();
+        edges.add("team");
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ids.add(2);
+        ids.add(3);
+        Goer goer = new Goer(graph);
+        Go go = goer.go(ids, edges);
+        ResultSet all = go.yield("team.object as object").all();
+        assert go.exist();
+        assert go.count() == 3;
+        List<ValueWrapper> object = all.colValues("object");
+        assert object.get(0).asString().equals("math")
+            && object.get(1).asString().equals("chinese")
+            && object.get(2).asString().equals("math");
+    }
+
+    @Test
+    public void testGoYieldAddDistinct() throws UnsupportedEncodingException {
+        ArrayList<String> edges = new ArrayList<>();
+        edges.add("team");
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ids.add(2);
+        ids.add(3);
+        Goer goer = new Goer(graph);
+        Go go = goer.go(ids, edges);
+        ResultSet all = go.yieldWithDistinct("team.object as object").all();
+        assert go.exist();
+        assert go.count() == 2;
+        List<ValueWrapper> object = all.colValues("object");
+        assert object.get(0).asString().equals("math")
+            && object.get(1).asString().equals("chinese");
+    }
+
+    @Test
     public void testGoGetDstIDAddWhereYieldAddOrderBy() throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
         edges.add("team");
@@ -202,7 +239,8 @@ public class TestGo extends TestDataBase {
     }
 
     @Test
-    public void testGoGetDstIDAddWhereYieldAddLimitAddOrderBy() throws UnsupportedEncodingException {
+    public void testGoGetDstIDAddWhereYieldAddLimitAddOrderBy()
+        throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
         edges.add("team");
         ArrayList<Integer> ids = new ArrayList<>();
@@ -222,7 +260,8 @@ public class TestGo extends TestDataBase {
     }
 
     @Test
-    public void testGoGetDstIDAddWhereYieldAddIllegalLimitAddOrderBy() throws UnsupportedEncodingException {
+    public void testGoGetDstIDAddWhereYieldAddIllegalLimitAddOrderBy()
+        throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
         edges.add("team");
         ArrayList<Integer> ids = new ArrayList<>();
@@ -250,7 +289,6 @@ public class TestGo extends TestDataBase {
         ids.add(1);
         ids.add(2);
         ids.add(3);
-        Goer goer = new Goer(graph);
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("object", null);
         List<Column> groupBy = new ArrayList<>();
@@ -259,6 +297,7 @@ public class TestGo extends TestDataBase {
         groupBy.add(column);
         Column aggregateColumn = new Column(AggregateFunction.COUNT.setValue("*"), "count");
         aggregateFunctions.add(aggregateColumn);
+        Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
         ResultSet all = go.yield("team.object as object").orderBy(orderBy)
             .groupBy(groupBy, aggregateFunctions).all();
@@ -273,12 +312,12 @@ public class TestGo extends TestDataBase {
     }
 
     @Test
-    public void testGoGetDstIDYieldAddOrderByAddGroupByAddOrderBy() throws UnsupportedEncodingException {
+    public void testGoGetDstIDYieldAddOrderByAddGroupByAddOrderBy()
+        throws UnsupportedEncodingException {
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
         ids.add(3);
-        Goer goer = new Goer(graph);
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("object", null);
         List<Column> groupBy = new ArrayList<>();
@@ -287,7 +326,11 @@ public class TestGo extends TestDataBase {
         groupBy.add(column);
         Column aggregateColumn = new Column(AggregateFunction.COUNT.setValue("*"), "count");
         aggregateFunctions.add(aggregateColumn);
-        Go go = goer.go(ids, null);
+        ArrayList<String> edges = new ArrayList<>();
+        edges.add("team");
+        edges.add("work");
+        Goer goer = new Goer(graph);
+        Go go = goer.go(ids, edges);
         ResultSet all = go.yield("team.object as object").orderBy(orderBy)
             .groupBy(groupBy, aggregateFunctions).orderBy(orderBy).all();
         assert go.exist();

@@ -5,9 +5,9 @@
  */
 
 import com.vesoft.nebula.client.graph.data.HostAddress;
-import com.vesoft.nebula.orm.datatype.DateTime;
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.operator.DataType;
+import com.vesoft.nebula.orm.timetype.DateTime;
 import java.util.*;
 
 public class TestDataBase {

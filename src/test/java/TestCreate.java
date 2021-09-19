@@ -4,11 +4,11 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-import com.vesoft.nebula.orm.datatype.Date;
-import com.vesoft.nebula.orm.datatype.DateTime;
-import com.vesoft.nebula.orm.datatype.Time;
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.operator.DataType;
+import com.vesoft.nebula.orm.timetype.Date;
+import com.vesoft.nebula.orm.timetype.DateTime;
+import com.vesoft.nebula.orm.timetype.Time;
 import java.util.HashMap;
 import org.junit.Test;
 
