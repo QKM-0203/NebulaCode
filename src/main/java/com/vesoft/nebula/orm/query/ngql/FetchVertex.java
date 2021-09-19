@@ -11,7 +11,7 @@ import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,10 +26,9 @@ import java.util.List;
  *
  * @author Qi Kai Meng
  */
-public class FetchVertex {
+public class FetchVertex extends NGqlQuery<FetchVertex> {
     private List<String> tagNames;
     private List<Object> vidList;
-    private List<String> yield;
     private final Graph graph;
 
     protected FetchVertex(Graph graph) {
@@ -46,23 +45,9 @@ public class FetchVertex {
         return this;
     }
 
-    protected FetchVertex initOne(Object id) {
+    protected FetchVertex init(Object id) {
         this.vidList = new ArrayList<>();
         this.vidList.add(id);
-        return this;
-    }
-
-    /**
-     * what the user wants to output,if yield is not set,the format returned is similar to
-     * * ("player100" :player{age: 42, name: "Tim Duncan"}).
-     *
-     * @param yield pass in eg:player.name, if you alias output,pass in eg:player.name as name,
-     *              if you want to Distinct you can add DISTINCT key,
-     *              eg: DISTINCT player.name as name,first string add is ok.
-     * @return FetchVertex
-     */
-    public FetchVertex yield(String... yield) {
-        this.yield = Arrays.asList(yield);
         return this;
     }
 
@@ -71,15 +56,15 @@ public class FetchVertex {
             throw new InitException("vidList can not be null");
         }
         StringBuilder result = new StringBuilder();
-        result.append(Lexer.FETCH_PROP_ON);
+        result.append(KeyWord.FETCH_PROP_ON).append(" ");
         if (tagNames == null || tagNames.isEmpty()) {
-            result.append(Lexer.ALL);
+            result.append(KeyWord.ALL).append(" ");
         } else {
             result.append(String.join(",", tagNames)).append(" ");
         }
         result.append(String.join(",", Encoding.encodeIdList(vidList)));
-        if (yield != null && !yield.isEmpty()) {
-            result.append(Lexer.YIELD).append(String.join(",", yield));
+        if (yields != null && !yields.isEmpty()) {
+            result.append(" ").append(KeyWord.YIELD).append(" ").append(String.join(",", yields));
         }
         return result.toString().trim();
     }

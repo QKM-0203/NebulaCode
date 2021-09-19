@@ -12,7 +12,7 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.*;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +28,9 @@ import java.util.Map;
  *
  * @author Qi Kai Meng
  */
-public class Go {
+public class Go extends NGqlQuery<Go> {
     private List<Object> srcIds;
     private List<String> edges;
-    private List<String> yield;
     private Map<String, Filter> conMap;
     private List<String> filterString;
     private long leftSteps = 0;
@@ -85,8 +84,8 @@ public class Go {
      * <p>For conMap,you can pass in <"player.name",Relational.EQ.setValue("qkm")>
      * it means player.name == "qkm".</p>
      * <p>if you represents a logic relationship you can pass in
-     * <"player.name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
-     * it means player.name == "qkm" or player.name == "SC";</p>
+     * <"player.name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),
+     * Relational.EQ.setValue("SC"))> it means player.name == "qkm" or player.name == "SC";</p>
      * <p>all map elements represents an and logical relationship</p>
      *
      * @param conMap       String is propName,Relational is {@link Filter}
@@ -102,20 +101,6 @@ public class Go {
     }
 
     /**
-     * what the user wants to output,if yield is not set,the format returned is destination ID.
-     *
-     * @param yield pass in eg:$$.team.name, if you alias output,pass in eg:$$.team.name as name,
-     *              if you want to Distinct you can add DISTINCT key,
-     *              eg: DISTINCT $$.team.name as name,first string add is ok.
-     * @return Go
-     */
-    public Go yield(String... yield) {
-        this.yield = Arrays.asList(yield);
-        return this;
-    }
-
-
-    /**
      * <p>orderBy is used to sort,you can pass in eg: (alias,{@link Sort}),
      * Sort</p>
      *
@@ -123,7 +108,8 @@ public class Go {
      * @return Go
      */
     public Go orderBy(Map<String, Sort> orderBy) {
-        condition.append(Lexer.PIPE).append(Lexer.ORDER_BY).append(NGqlQuery.joinOrderBy(orderBy));
+        condition.append(" ").append(KeyWord.PIPE).append(" ")
+            .append(KeyWord.ORDER_BY).append(" ").append(joinOrderBy(orderBy));
         return this;
     }
 
@@ -132,14 +118,14 @@ public class Go {
      * yield $$-.name [as name],max(v.age) [as maxAge].
      *
      * <p>groupBy field is used to grouping,this is put on group by.
-     * pass in groupBy and aggregateFunctions are put on yield,alias is optional</>
+     * pass in groupBy and aggregateFunctions are put on yield,alias is optional</p>
      *
      * @param groupBy            for grouping
      * @param aggregateFunctions for calculation
      * @return RelationshipMatch
      */
     public Go groupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
-        condition.append(NGqlQuery.joinGroupBy(groupBy, aggregateFunctions));
+        condition.append(joinGroupBy(groupBy, aggregateFunctions));
         return this;
     }
 
@@ -153,7 +139,8 @@ public class Go {
      */
     public Go limit(long offsetValue, long numberRows) {
         if (offsetValue >= 0) {
-            condition.append(Lexer.PIPE).append(Lexer.LIMIT).append(offsetValue);
+            condition.append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(offsetValue);
             if (numberRows >= 0) {
                 condition.append(",").append(numberRows).append(" ");
             }
@@ -179,22 +166,24 @@ public class Go {
      */
     private String connectParameters() {
         StringBuilder result = new StringBuilder();
-        result.append(Lexer.GO).append(leftSteps).append(Lexer.TO).append(rightSteps).append(Lexer.STEPS);
+        result.append(KeyWord.GO).append(" ").append(leftSteps)
+            .append(" ").append(KeyWord.TO).append(" ")
+            .append(rightSteps).append(" ").append(KeyWord.STEPS);
         if (srcIds == null || srcIds.isEmpty()) {
             throw new InitException("srcIds can not be null");
         }
-        result.append(" ").append(Lexer.FROM).append(Encoding.encodeIdList(srcIds));
+        result.append(" ").append(KeyWord.FROM).append(" ").append(Encoding.encodeIdList(srcIds));
         if (edges == null || edges.isEmpty()) {
-            result.append(" ").append(Lexer.OVER).append(Lexer.ALL);
+            result.append(" ").append(KeyWord.OVER).append(" ").append(KeyWord.ALL);
         } else {
-            result.append(" ").append(Lexer.OVER).append(String.join(",", edges));
+            result.append(" ").append(KeyWord.OVER).append(" ").append(String.join(",", edges));
         }
         if (pathDirection != null) {
             result.append(" ").append(pathDirection);
         }
-        result.append(NGqlQuery.judgeAndJoinWhere(conMap, filterString, -1));
-        if (yield != null && !yield.isEmpty()) {
-            result.append(Lexer.YIELD).append(" ").append(String.join(",", yield));
+        result.append(judgeAndJoinWhere(conMap, filterString, -1));
+        if (yields != null && !yields.isEmpty()) {
+            result.append(" ").append(KeyWord.YIELD).append(" ").append(String.join(",", yields));
         }
         if (condition != null) {
             result.append(condition);
@@ -208,7 +197,6 @@ public class Go {
     public ResultSet all() {
         String query = connectParameters();
         ResultSet resultSet = graph.run(query);
-        System.out.println(query.trim());
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
         }

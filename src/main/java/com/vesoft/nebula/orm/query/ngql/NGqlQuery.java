@@ -8,21 +8,20 @@ package com.vesoft.nebula.orm.query.ngql;
 
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
-import com.vesoft.nebula.orm.query.cypher.QueryBase;
+import com.vesoft.nebula.orm.query.QueryBase;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import com.vesoft.nebula.orm.query.util.Util;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * fields used to join NGql queries.
  *
  * @author Qi Kai Meng
  */
-public class NGqlQuery extends QueryBase {
-    public static String joinRelationshipNoHasValue(List<Relationship> relationships) {
+public class NGqlQuery<E> extends QueryBase {
+    public List<String> yields;
+
+    private String joinRelationshipNoHasValue(List<Relationship> relationships) {
         ArrayList<String> result = new ArrayList<>();
         for (Relationship relationship : relationships) {
             result.add(String.format(" %s->%s@%s", relationship.getStartVid() instanceof String
@@ -34,7 +33,7 @@ public class NGqlQuery extends QueryBase {
         return String.join(",", result);
     }
 
-    public static String joinOrderBy(Map<String, Sort> orderBy) {
+    public String joinOrderBy(Map<String, Sort> orderBy) {
         ArrayList<String> orderByStrings = new ArrayList<>();
         for (String propName : orderBy.keySet()) {
             if (orderBy.get(propName) != null) {
@@ -46,29 +45,55 @@ public class NGqlQuery extends QueryBase {
         return String.join(",", orderByStrings);
     }
 
-    public static String joinGroupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
+    public String joinGroupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
-            result.append(String.format(Lexer.PIPE + Lexer.GROUP_BY + "%s", joinAttribute(groupBy)));
-            result.append(String.format(Lexer.YIELD + " %s,%s ", joinAttributeAlias(groupBy),
+            result.append(String.format(" " + KeyWord.PIPE + " "
+                + KeyWord.GROUP_BY + " " + "%s", joinAttribute(groupBy)));
+            result.append(String.format(" " + KeyWord.YIELD
+                    + " %s,%s ", joinAttributeAlias(groupBy),
                 joinAggregateFunctionsAlias(aggregateFunctions)));
         }
         return result.toString();
     }
 
-    public static List<String> joinFetch(List<Relationship> relationships, List<String> yield) {
+    public List<String> joinFetch(List<Relationship> relationships) {
         HashMap<String, List<Relationship>> joinSameEdgeRelationships =
             Util.joinSameEdgeRelationships(relationships, 1);
         ArrayList<String> fetchStrings = new ArrayList<>();
         for (String edgeName : joinSameEdgeRelationships.keySet()) {
             StringBuilder fetch = new StringBuilder();
-            fetch.append(Lexer.FETCH_PROP_ON).append(edgeName);
+            fetch.append(KeyWord.FETCH_PROP_ON).append(" ").append(edgeName);
             fetch.append(joinRelationshipNoHasValue(joinSameEdgeRelationships.get(edgeName)));
-            if (yield != null && !yield.isEmpty()) {
-                fetch.append(Lexer.YIELD).append(String.join(",", yield));
+            if (yields != null && !yields.isEmpty()) {
+                fetch.append(" ").append(KeyWord.YIELD).append(" ")
+                    .append(String.join(",", yields));
             }
             fetchStrings.add(fetch.toString());
         }
         return fetchStrings;
     }
+
+    /**
+     * what the user wants to output.
+     *
+     * @param yield pass in eg:player.name, if you alias output,pass in eg:player.name as name.
+     */
+    public E yield(String... yield) {
+        this.yields = Arrays.asList(yield);
+        return (E) this;
+    }
+
+    /**
+     * what the user wants to output.
+     *
+     * @param yield pass in eg:player.name, if you alias output,pass in eg:player.name as name,
+     *              finally, give the first yield add DISTINCT.
+     */
+    public E yieldWithDistinct(String... yield) {
+        yield[0] = "DISTINCT " + yield[0];
+        this.yields = Arrays.asList(yield);
+        return (E) this;
+    }
+
 }

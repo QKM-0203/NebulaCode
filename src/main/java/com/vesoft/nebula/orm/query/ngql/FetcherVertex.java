@@ -27,6 +27,6 @@ public class FetcherVertex {
     }
 
     public FetchVertex fetchOne(Object id) {
-        return fetchVertex.initOne(id);
+        return fetchVertex.init(id);
     }
 }

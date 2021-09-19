@@ -12,7 +12,7 @@ import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Qi Kai Meng
  */
-public class GetSubgraph {
+public class GetSubgraph extends NGqlQuery<GetSubgraph> {
     private long steps = 1;
     private List<Object> srcIds;
     private EdgeDirection edgeDirection = EdgeDirection.BOTH;
@@ -68,11 +68,11 @@ public class GetSubgraph {
             throw new InitException("srcIds can not be null");
         }
         StringBuilder result = new StringBuilder();
-        result.append(Lexer.GET_SUBGRAPH);
+        result.append(KeyWord.GET_SUBGRAPH).append(" ");
         if (steps >= 0) {
-            result.append(steps).append(Lexer.STEPS).append(" ");
+            result.append(steps).append(" ").append(KeyWord.STEPS).append(" ");
         }
-        result.append(String.format(Lexer.FROM + "%s ", Encoding.encodeIdList(srcIds)));
+        result.append(String.format(KeyWord.FROM + " %s ", Encoding.encodeIdList(srcIds)));
         if (edges != null && !edges.isEmpty()) {
             result.append(edgeDirection.toString()).append(" ").append(String.join(",", edges));
         }

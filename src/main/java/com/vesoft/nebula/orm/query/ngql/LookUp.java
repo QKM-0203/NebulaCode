@@ -11,7 +11,8 @@ import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.Filter;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.QueryBase;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +26,10 @@ import java.util.Map;
  *
  * @author Qi Kai Meng
  */
-public class LookUp {
+public class LookUp extends NGqlQuery<LookUp> {
     private String schema;
     private List<String> filterString;
     private Map<String, Filter> conMap;
-    private List<String> yield;
     private Graph graph;
 
     public LookUp(Graph graph) {
@@ -47,8 +47,8 @@ public class LookUp {
      * <p>for conMap,you can pass in
      * <"player.name",Relational.EQ.setValue("qkm")>it means player.name == "qkm".</p>
      * <p>if you represents a logic relationship you can pass in
-     * <"player.name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),Relational.EQ.setValue("SC"))>
-     * it means player.name == "qkm" or player.name == "SC".</p>
+     * <"player.name",Logical.OR.setRelational(Relational.EQ.setValue("qkm"),
+     * Relational.EQ.setValue("SC"))> it means player.name == "qkm" or player.name == "SC".</p>
      * <p>all map elements represents an and logical relationship.</p>
      *
      * @param conMap       String is propName,Relational is {@link Filter}
@@ -63,29 +63,15 @@ public class LookUp {
         return this;
     }
 
-    /**
-     * what the user wants to output,if you don't pass in yield,for vertex: print all point IDs,
-     * for edge: print the start id, destination id,and rank of all edges.
-     *
-     * @param yield pass in eg: player.name, if you alias output,pass in eg: player.name as name,
-     *              if you want to Distinct you can add DISTINCT key,
-     *              eg: DISTINCT player.name as name,first string add is ok.
-     * @return LookUp
-     */
-    public LookUp yield(String... yield) {
-        this.yield = Arrays.asList(yield);
-        return this;
-    }
-
     private String connectParameters() {
         if (schema == null) {
             throw new InitException("schema can not be null");
         }
         StringBuilder result = new StringBuilder();
-        result.append(Lexer.LOOKUP).append(schema);
-        result.append(NGqlQuery.judgeAndJoinWhere(conMap, filterString, -1));
-        if (yield != null && !yield.isEmpty()) {
-            result.append(Lexer.YIELD).append(" ").append(String.join(",", yield));
+        result.append(KeyWord.LOOKUP).append(" ").append(schema);
+        result.append(judgeAndJoinWhere(conMap, filterString, -1));
+        if (yields != null && !yields.isEmpty()) {
+            result.append(" ").append(KeyWord.YIELD).append(" ").append(String.join(",", yields));
         }
         return result.toString().trim();
     }

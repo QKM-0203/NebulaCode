@@ -16,7 +16,7 @@ import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.operator.DataType;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,16 +103,16 @@ public class GraphService {
         Session session = getSession();
         String createSpace;
         if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
-            createSpace = String.format(Lexer.CREATE + Lexer.SPACE + Lexer.IF_NOT_EXISTS + "`%s`"
-                    + "(" + Lexer.PARTITION_NUM + "= %d," + Lexer.REPLICA_FACTOR + "= %d,"
-                + Lexer.VID_TYPE + "= %s)",
+            createSpace = String.format(KeyWord.CREATE + " " + KeyWord.SPACE + " "
+                    + KeyWord.IF_NOT_EXISTS + "`%s`" + " (" + KeyWord.PARTITION_NUM
+                    + " = %d," + KeyWord.REPLICA_FACTOR + " = %d," + KeyWord.VID_TYPE + " = %s)",
                 space.getSpaceName(), space.getPartitionNumber(),
                 space.getReplicaFactor(), String.format("%s(%d" + ")",
                     space.getVidDataType(), space.getVidDataType().getLength()));
         } else {
-            createSpace = String.format(Lexer.CREATE + Lexer.SPACE + Lexer.IF_NOT_EXISTS + "`%s`"
-                    + "(" + Lexer.PARTITION_NUM + "= %d," + Lexer.REPLICA_FACTOR + "= %d,"
-                    + Lexer.VID_TYPE + "= %s)",
+            createSpace = String.format(KeyWord.CREATE + " " + KeyWord.SPACE + " "
+                    + KeyWord.IF_NOT_EXISTS + "`%s`" + " (" + KeyWord.PARTITION_NUM
+                    + " = %d," + KeyWord.REPLICA_FACTOR + " = %d," + KeyWord.VID_TYPE + " = %s)",
                 space.getSpaceName(), space.getPartitionNumber(),
                 space.getReplicaFactor(), space.getVidDataType());
         }
@@ -150,8 +150,9 @@ public class GraphService {
         if (spaceNameList != null && !spaceNameList.isEmpty()) {
             ArrayList<String> spaceSentences = new ArrayList<>();
             for (String spaceName : spaceNameList) {
-                spaceSentences.add(String.format(Lexer.DROP + Lexer.SPACE + Lexer.IF_EXISTS
-                    + "`%s`", spaceName));
+                spaceSentences.add(String.format(KeyWord.DROP + " "
+                    + KeyWord.SPACE + " " + KeyWord.IF_EXISTS
+                    + " `%s`", spaceName));
             }
             ResultSet resultSet = run(String.join(";", spaceSentences));
             if (!resultSet.isSucceeded()) {
@@ -166,7 +167,7 @@ public class GraphService {
      * @return users information
      */
     public ResultSet showUser() {
-        return run(Lexer.SHOW + Lexer.USERS);
+        return run(KeyWord.SHOW + " " + KeyWord.USERS);
     }
 
     /**
@@ -175,7 +176,7 @@ public class GraphService {
      * @return cluster information
      */
     public ResultSet showHosts() {
-        return run(Lexer.SHOW + Lexer.HOSTS);
+        return run(KeyWord.SHOW + " " + KeyWord.HOSTS);
     }
 
     /**
@@ -184,7 +185,7 @@ public class GraphService {
      * @return configs information
      */
     public ResultSet getSnapshot() {
-        return run(Lexer.SHOW + Lexer.SNAPSHOTS);
+        return run(KeyWord.SHOW + " " + KeyWord.SNAPSHOTS);
     }
 
     /**
@@ -193,6 +194,6 @@ public class GraphService {
      * @return space part information
      */
     public ResultSet getParts() {
-        return run(Lexer.SHOW + Lexer.PARTS);
+        return run(KeyWord.SHOW + " " + KeyWord.PARTS);
     }
 }

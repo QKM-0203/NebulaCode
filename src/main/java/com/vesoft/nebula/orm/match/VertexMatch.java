@@ -11,8 +11,8 @@ import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
 import com.vesoft.nebula.orm.query.ngql.Column;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author Qi Kai Meng
  */
-public class VertexMatch {
+public class VertexMatch extends Match {
     protected Graph graph;
     private String tagName;
     private long skip = 0;
@@ -152,10 +152,10 @@ public class VertexMatch {
      */
     private String connectParameters() {
         StringBuilder result = new StringBuilder();
-        result.append(String.format(Lexer.MATCH + "(v%s)", Match.joinTag(tagName, propMap)));
-        result.append(Match.judgeAndJoinWhere(conMap, filterString, 0));
-        result.append(Match.joinGroupByAndOrderBy(groupBy, aggregateFunctions, orderBy, 0));
-        result.append(Match.joinSkipAndLimit(skip, limit));
+        result.append(String.format(KeyWord.MATCH + " (v%s)", joinTag(tagName, propMap)));
+        result.append(judgeAndJoinWhere(conMap, filterString, 0));
+        result.append(joinGroupByAndOrderBy(groupBy, aggregateFunctions, orderBy, 0));
+        result.append(joinSkipAndLimit(skip, limit));
         return result.toString().trim();
     }
 

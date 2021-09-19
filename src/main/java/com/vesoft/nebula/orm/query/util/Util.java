@@ -10,13 +10,13 @@ import com.vesoft.nebula.client.graph.data.DateTimeWrapper;
 import com.vesoft.nebula.client.graph.data.DateWrapper;
 import com.vesoft.nebula.client.graph.data.TimeWrapper;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
-import com.vesoft.nebula.orm.datatype.Date;
-import com.vesoft.nebula.orm.datatype.DateTime;
-import com.vesoft.nebula.orm.datatype.Time;
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
+import com.vesoft.nebula.orm.timetype.Date;
+import com.vesoft.nebula.orm.timetype.DateTime;
+import com.vesoft.nebula.orm.timetype.Time;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -166,7 +166,8 @@ public class Util {
                 propMap.put(propName, valueWrapperMap.get(propName).asDouble());
             } else if (valueWrapperMap.get(propName).isLong()) {
                 propMap.put(propName, valueWrapperMap.get(propName).asLong());
-            } else if (valueWrapperMap.get(propName).isNull() || valueWrapperMap.get(propName).isEmpty()) {
+            } else if (valueWrapperMap.get(propName).isNull()
+                || valueWrapperMap.get(propName).isEmpty()) {
                 propMap.put(propName, null);
             }
         }

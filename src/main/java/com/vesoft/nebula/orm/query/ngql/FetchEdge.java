@@ -11,7 +11,6 @@ import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,8 +25,7 @@ import java.util.List;
  *
  * @author Qi Kai Meng
  */
-public class FetchEdge {
-    private List<String> yield;
+public class FetchEdge extends NGqlQuery<FetchEdge> {
     private List<Relationship> relationships;
     private final Graph graph;
 
@@ -40,25 +38,12 @@ public class FetchEdge {
         return this;
     }
 
-    protected FetchEdge initOne(Relationship relationship) {
+    protected FetchEdge init(Relationship relationship) {
         this.relationships = new ArrayList<>();
         this.relationships.add(relationship);
         return this;
     }
 
-    /**
-     * what the user wants to output,if yield is not set,the format returned is similar to
-     * * [:serve "player100"->"team204" @0 {end_year: 2016, start_year: 1997}].
-     *
-     * @param yield pass in eg:player.name, if you alias output,pass in eg:player.name as name,
-     *              if you want to Distinct you can add DISTINCT key,
-     *              eg: DISTINCT player.name as name,first string add is ok.
-     * @return FetchEdge
-     */
-    public FetchEdge yield(String... yield) {
-        this.yield = Arrays.asList(yield);
-        return this;
-    }
 
     /**
      * classify the relationships with the same edgeName together,
@@ -69,7 +54,7 @@ public class FetchEdge {
      * @return fetchStrings
      */
     public List<String> connectParameters() {
-        return NGqlQuery.joinFetch(relationships, yield);
+        return joinFetch(relationships);
     }
 
     /**

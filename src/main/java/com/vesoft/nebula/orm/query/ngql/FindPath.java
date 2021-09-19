@@ -13,7 +13,7 @@ import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.PathDirection;
 import com.vesoft.nebula.orm.operator.PathType;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.List;
 
 /**
@@ -25,8 +25,8 @@ import java.util.List;
  *
  * @author Qi Kai Meng
  */
-public class FindPath {
-    private long steps = 5;
+public class FindPath extends NGqlQuery<FindPath> {
+    private int steps = 5;
     private PathType pathType;
     private List<Object> srcIds;
     private List<Object> dstIds;
@@ -71,7 +71,7 @@ public class FindPath {
      * @param steps relationship number,default value is five
      * @return FindPath
      */
-    public FindPath steps(long steps) {
+    public FindPath steps(int steps) {
         this.steps = steps;
         return this;
     }
@@ -110,25 +110,27 @@ public class FindPath {
             throw new InitException("pathType can not be null");
         }
         StringBuilder result = new StringBuilder();
-        result.append(Lexer.FIND).append(pathType).append(Lexer.PATH);
-        result.append(String.format(Lexer.FROM + "%s", Encoding.encodeIdList(srcIds)));
-        result.append(String.format(Lexer.TO + "%s ", Encoding.encodeIdList(dstIds)));
+        result.append(KeyWord.FIND).append(" ").append(pathType).append(KeyWord.PATH).append(" ");
+        result.append(String.format(KeyWord.FROM + " %s", Encoding.encodeIdList(srcIds)));
+        result.append(String.format(" " + KeyWord.TO + " " + "%s ", Encoding.encodeIdList(dstIds)));
         if (edges == null || edges.isEmpty()) {
-            result.append(Lexer.OVER).append(Lexer.ALL);
+            result.append(KeyWord.OVER).append(" ").append(KeyWord.ALL).append(" ");
         } else {
-            result.append(String.format(Lexer.OVER + "%s ", String.join(",", edges)));
+            result.append(String.format(KeyWord.OVER + " %s ", String.join(",", edges)));
         }
         if (pathDirection != null) {
             result.append(pathDirection).append(" ");
         }
         if (steps >= 0) {
-            result.append(Lexer.UPTO).append(steps).append(Lexer.STEPS);
+            result.append(KeyWord.UPTO).append(" ").append(steps).append(" ").append(KeyWord.STEPS);
         }
         if (isSort) {
-            result.append(Lexer.PIPE).append(Lexer.ORDER_BY).append(Lexer.$_PATH);
+            result.append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.ORDER_BY).append(" ").append(KeyWord.$_PATH);
         }
         if (limit >= 0) {
-            result.append(Lexer.PIPE).append(Lexer.LIMIT).append(limit);
+            result.append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(limit);
         }
         return result.toString().trim();
     }

@@ -14,7 +14,7 @@ import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import com.vesoft.nebula.orm.query.util.Util;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -41,7 +41,7 @@ public class Graph {
     protected Graph(String spaceName, Session session) {
         this.session = session;
         ResultSet result;
-        String useSpace = Lexer.USE + "`" + spaceName + "`";
+        String useSpace = KeyWord.USE + " `" + spaceName + "`";
         result = run(useSpace);
         if (!result.isSucceeded()) {
             throw new ExecuteException(result.getErrorMessage());
@@ -95,8 +95,8 @@ public class Graph {
                 for (Vertex vertex : vertexList) {
                     vertexValues.add(Encoding.joinVertexValue(vertex));
                 }
-                ResultSet resultSet = run(String.format(Lexer.INSERT + Lexer.VERTEX
-                        + "%s" + Lexer.VALUES + "%s",
+                ResultSet resultSet = run(String.format(KeyWord.INSERT + " " + KeyWord.VERTEX
+                        + " %s " + KeyWord.VALUES + " %s",
                     tagJoin, String.join(",", vertexValues)));
                 vertexValues.clear();
                 if (!resultSet.isSucceeded()) {
@@ -119,8 +119,8 @@ public class Graph {
                 for (Relationship relationship : relationshipList) {
                     edgeValues.add(Encoding.joinRelationshipValue(relationship));
                 }
-                ResultSet resultSet = run(String.format(Lexer.INSERT + Lexer.EDGE
-                        + "%s" + Lexer.VALUES + "%s",
+                ResultSet resultSet = run(String.format(KeyWord.INSERT + " " + KeyWord.EDGE
+                        + " %s " + KeyWord.VALUES + " %s",
                     edgeJoin, String.join(",", edgeValues)));
                 edgeValues.clear();
                 if (!resultSet.isSucceeded()) {
@@ -147,7 +147,8 @@ public class Graph {
         if (vertices.size() != 0) {
             ArrayList<Object> delSuccess = new ArrayList<>();
             for (Vertex vertex : vertices) {
-                ResultSet resultSet = run(String.format(Lexer.DELETE + Lexer.VERTEX + "%s",
+                ResultSet resultSet = run(String.format(KeyWord.DELETE + " "
+                        + KeyWord.VERTEX + " %s",
                     vertex.getVid() instanceof String
                         ? "\"" + vertex.getVid() + "\"" : vertex.getVid().toString()));
                 if (!resultSet.isSucceeded()) {
@@ -174,7 +175,8 @@ public class Graph {
                                 ? "\"" + relationship.getEndVid() + "\"" : relationship.getEndVid(),
                             relationship.getRank()));
                 }
-                ResultSet resultSet = run(String.format(Lexer.DELETE + Lexer.EDGE + "`" + edgeName + "` %s",
+                ResultSet resultSet = run(String.format(KeyWord.DELETE + " " + KeyWord.EDGE
+                        + " `" + edgeName + "` %s",
                     String.join(",", relationshipString)));
                 if (!resultSet.isSucceeded()) {
                     throw new ExecuteException(resultSet.getErrorMessage()
@@ -218,7 +220,8 @@ public class Graph {
                 throw new ExecuteException("tagName is "
                     + "a condition of merge,so cannot be null");
             }
-            ResultSet resultSet = run(Lexer.DESC + Lexer.TAG + schema[0]);
+            ResultSet resultSet = run(KeyWord.DESC + " " + KeyWord.TAG
+                + " " + schema[0]);
             if (resultSet.isSucceeded() && !resultSet.isEmpty()) {
                 List<ValueWrapper> field = resultSet.colValues(FIELD);
                 ArrayList<String> filedString = new ArrayList<>();
@@ -372,8 +375,9 @@ public class Graph {
      */
     public void createTagIndex(String tagName, String indexName,
                                Map<String, Integer> propList) {
-        ResultSet resultSet = run(String.format(Lexer.CREATE + Lexer.TAG + Lexer.INDEX
-                + Lexer.IF_NOT_EXISTS + "%s" + Lexer.ON + "%s(%s)",
+        ResultSet resultSet = run(String.format(KeyWord.CREATE + " " + KeyWord.TAG
+                + " " + KeyWord.INDEX + " "
+                + KeyWord.IF_NOT_EXISTS + " %s " + KeyWord.ON + " %s(%s)",
             indexName, tagName, (Encoding.joinIndexProp(propList)) == null
                 ? "" : Encoding.joinIndexProp(propList)));
         if (!resultSet.isSucceeded()) {
@@ -393,8 +397,8 @@ public class Graph {
      */
     public void createEdgeIndex(String edgeName, String indexName,
                                 Map<String, Integer> propList) {
-        ResultSet resultSet = run(String.format(Lexer.CREATE + Lexer.EDGE + Lexer.INDEX
-                + Lexer.IF_NOT_EXISTS + "%s" + Lexer.ON + "%s(%s)",
+        ResultSet resultSet = run(String.format(KeyWord.CREATE + " " + KeyWord.EDGE + " "
+                + KeyWord.INDEX + " " + KeyWord.IF_NOT_EXISTS + " %s " + KeyWord.ON + " %s(%s)",
             indexName, edgeName, (Encoding.joinIndexProp(propList)) == null
                 ? "" : Encoding.joinIndexProp(propList)));
         if (!resultSet.isSucceeded()) {
@@ -409,7 +413,7 @@ public class Graph {
      */
     public List<String> getTags() {
         ArrayList<String> tagNames = new ArrayList<>();
-        run(Lexer.SHOW + Lexer.TAGS).colValues(NAME)
+        run(KeyWord.SHOW + " " + KeyWord.TAGS).colValues(NAME)
             .forEach(tagName -> {
                 try {
                     tagNames.add(tagName.asString());
@@ -428,7 +432,7 @@ public class Graph {
      */
     public List<String> getEdges() {
         ArrayList<String> edgeNames = new ArrayList<>();
-        run(Lexer.SHOW + Lexer.EDGES).colValues(NAME)
+        run(KeyWord.SHOW + " " + KeyWord.EDGES).colValues(NAME)
             .forEach(tagName -> {
                 try {
                     edgeNames.add(tagName.asString());
@@ -446,8 +450,8 @@ public class Graph {
      */
     public void dropTagIndex(String indexName) {
         StringBuffer tagIndexJoin = new StringBuffer();
-        tagIndexJoin.append(Lexer.DROP).append(Lexer.TAG)
-            .append(Lexer.INDEX).append(Lexer.IF_EXISTS)
+        tagIndexJoin.append(KeyWord.DROP).append(" ").append(KeyWord.TAG).append(" ")
+            .append(KeyWord.INDEX).append(" ").append(KeyWord.IF_EXISTS).append(" ")
             .append(indexName);
         ResultSet resultSet = run(tagIndexJoin.toString());
         if (!resultSet.isSucceeded()) {
@@ -463,8 +467,8 @@ public class Graph {
      */
     public void dropEdgeIndex(String indexName) {
         StringBuffer edgeIndexJoin = new StringBuffer();
-        edgeIndexJoin.append(Lexer.DROP).append(Lexer.EDGE)
-            .append(Lexer.INDEX).append(Lexer.IF_EXISTS)
+        edgeIndexJoin.append(KeyWord.DROP).append(" ").append(KeyWord.EDGE).append(" ")
+            .append(KeyWord.INDEX).append(" ").append(KeyWord.IF_EXISTS).append(" ")
             .append(indexName);
         ResultSet resultSet = run(edgeIndexJoin.toString());
         if (!resultSet.isSucceeded()) {
@@ -502,9 +506,8 @@ public class Graph {
      */
     public void createTag(Schema schema) {
         StringBuffer tagJoin = new StringBuffer();
-        tagJoin.append(Lexer.CREATE).append(Lexer.TAG)
-            .append(Lexer.IF_NOT_EXISTS).append(Encoding.joinSchema(schema));
-        System.out.println(tagJoin);
+        tagJoin.append(KeyWord.CREATE).append(" ").append(KeyWord.TAG).append(" ")
+            .append(KeyWord.IF_NOT_EXISTS).append(" ").append(Encoding.joinSchema(schema));
         ResultSet resultSet = run(tagJoin.toString());
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
@@ -519,9 +522,8 @@ public class Graph {
      */
     public void createEdge(Schema schema) {
         StringBuffer edgeJoin = new StringBuffer();
-        edgeJoin.append(Lexer.CREATE).append(Lexer.EDGE)
-            .append(Lexer.IF_NOT_EXISTS).append(Encoding.joinSchema(schema));
-        System.out.println(edgeJoin);
+        edgeJoin.append(KeyWord.CREATE).append(" ").append(KeyWord.EDGE).append(" ")
+            .append(KeyWord.IF_NOT_EXISTS).append(" ").append(Encoding.joinSchema(schema));
         ResultSet resultSet = run(edgeJoin.toString());
         if (!resultSet.isSucceeded()) {
             throw new ExecuteException(resultSet.getErrorMessage());
@@ -537,8 +539,8 @@ public class Graph {
         ArrayList<String> tagSentence = new ArrayList<>();
         for (String tagName : tagNameList) {
             StringBuffer tagJoin = new StringBuffer();
-            tagJoin.append(Lexer.DROP).append(Lexer.TAG)
-                .append(Lexer.IF_EXISTS).append("`").append(tagName).append("`");
+            tagJoin.append(KeyWord.DROP).append(" ").append(KeyWord.TAG).append(" ")
+                .append(KeyWord.IF_EXISTS).append(" `").append(tagName).append("`");
             tagSentence.add(tagJoin.toString());
         }
         ResultSet resultSet = run(String.join(";", tagSentence));
@@ -558,8 +560,8 @@ public class Graph {
         ArrayList<String> edgeSentence = new ArrayList<>();
         for (String edgeName : edgeNameList) {
             StringBuffer edgeJoin = new StringBuffer();
-            edgeJoin.append(Lexer.DROP).append(Lexer.EDGE)
-                .append(Lexer.IF_EXISTS).append("`").append(edgeName).append("`");
+            edgeJoin.append(KeyWord.DROP).append(" ").append(KeyWord.EDGE).append(" ")
+                .append(KeyWord.IF_EXISTS).append(" `").append(edgeName).append("`");
             edgeSentence.add(edgeJoin.toString());
         }
         ResultSet resultSet = run(String.join(";", edgeSentence));
@@ -601,7 +603,7 @@ public class Graph {
      * @throws UnsupportedEncodingException revert type is fail
      */
     public long vertexNumber(String tagName) throws UnsupportedEncodingException {
-        ResultSet showStats = run(Lexer.SHOW + Lexer.STATS);
+        ResultSet showStats = run(KeyWord.SHOW + " " + KeyWord.STATS);
         if (!showStats.isSucceeded()) {
             throw new ExecuteException(showStats.getErrorMessage());
         }
@@ -630,7 +632,7 @@ public class Graph {
      * @throws UnsupportedEncodingException revert type is fail
      */
     public long relationshipNumber(String edgeName) throws UnsupportedEncodingException {
-        ResultSet showStats = run(Lexer.SHOW + Lexer.STATS);
+        ResultSet showStats = run(KeyWord.SHOW + " " + KeyWord.STATS);
         if (!showStats.isSucceeded()) {
             throw new ExecuteException(showStats.getErrorMessage());
         }
@@ -655,7 +657,7 @@ public class Graph {
                 ? "\"" + vertex.getVid() + "\"" : vertex.getVid().toString());
         }
         ResultSet findRemote =
-            run(String.format(Lexer.FETCH_PROP_ON + Lexer.ALL + "%s",
+            run(String.format(KeyWord.FETCH_PROP_ON + " " + KeyWord.ALL + " %s",
                 String.join(",", idList)));
         if (!findRemote.isSucceeded()) {
             throw new ExecuteException(findRemote.getErrorMessage());
@@ -667,7 +669,7 @@ public class Graph {
     }
 
     private ResultSet judgeExistEdge(Relationship relationship) {
-        ResultSet findRemote = run(String.format(Lexer.FETCH_PROP_ON + "`%s` %s->%s@%d ",
+        ResultSet findRemote = run(String.format(KeyWord.FETCH_PROP_ON + " " + "`%s` %s->%s@%d ",
             relationship.getEdgeName(), relationship.getStartVid() instanceof String
                 ? "\"" + relationship.getStartVid() + "\"" : relationship.getStartVid(),
             relationship.getEndVid() instanceof String

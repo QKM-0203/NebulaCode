@@ -7,10 +7,10 @@
 package com.vesoft.nebula.orm.match;
 
 import com.vesoft.nebula.orm.operator.Sort;
+import com.vesoft.nebula.orm.query.QueryBase;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-import com.vesoft.nebula.orm.query.cypher.Lexer;
-import com.vesoft.nebula.orm.query.cypher.QueryBase;
 import com.vesoft.nebula.orm.query.ngql.Column;
+import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @author Qi Kai Meng
  */
 public class Match extends QueryBase {
-    public static String joinTag(String tagName, Map<String, Object> tagMap) {
+    public String joinTag(String tagName, Map<String, Object> tagMap) {
         if (tagName == null) {
             return "";
         } else if (tagMap == null || tagMap.isEmpty()) {
@@ -31,7 +31,7 @@ public class Match extends QueryBase {
         }
     }
 
-    public static String joinEdge(Map<String, Object> edgeMap, List<String> types) {
+    public String joinEdge(Map<String, Object> edgeMap, List<String> types) {
         if (types != null && !types.isEmpty()) {
             if (types.size() == 1) {
                 if (edgeMap == null || edgeMap.isEmpty()) {
@@ -47,7 +47,7 @@ public class Match extends QueryBase {
         }
     }
 
-    private static String joinOrderByAlias(Map<Column, Sort> orderBy) {
+    private String joinOrderByAlias(Map<Column, Sort> orderBy) {
         ArrayList<String> orderByStrings = new ArrayList<>();
         for (Column column : orderBy.keySet()) {
             if (orderBy.get(column) != null) {
@@ -59,39 +59,42 @@ public class Match extends QueryBase {
         return String.join(",", orderByStrings);
     }
 
-    public static String joinGroupByAndOrderBy(List<Column> groupBy,
-                                               List<Column> aggregateFunctions,
-                                               Map<Column, Sort> orderBy, int isEdgeOrNode) {
+    public String joinGroupByAndOrderBy(List<Column> groupBy,
+                                        List<Column> aggregateFunctions,
+                                        Map<Column, Sort> orderBy, int isEdgeOrNode) {
         StringBuilder result = new StringBuilder();
         if (groupBy != null && !groupBy.isEmpty()) {
-            result.append(String.format(Lexer.RETURN + "%s,%s", joinAttributeAlias(groupBy),
-                joinAggregateFunctionsAlias(aggregateFunctions)));
+            result.append(" ").append(String.format(KeyWord.RETURN + " %s,%s",
+                joinAttributeAlias(groupBy), joinAggregateFunctionsAlias(aggregateFunctions)));
             if (orderBy != null && !orderBy.isEmpty()) {
-                result.append(Lexer.ORDER_BY).append(joinOrderByAlias(orderBy));
+                result.append(" ").append(KeyWord.ORDER_BY)
+                    .append(" ").append(joinOrderByAlias(orderBy));
             }
         } else {
             if (orderBy == null || orderBy.isEmpty()) {
                 if (isEdgeOrNode == 0) {
-                    result.append(Lexer.RETURN).append("v ");
+                    result.append(" ").append(KeyWord.RETURN).append(" v ");
                 } else {
-                    result.append(Lexer.RETURN).append("e ");
+                    result.append(" ").append(KeyWord.RETURN).append(" e ");
                 }
             } else {
                 ArrayList<Column> columns = new ArrayList<>(orderBy.keySet());
-                result.append(Lexer.RETURN).append(joinAttributeAlias(columns));
-                result.append(Lexer.ORDER_BY).append(joinOrderByAlias(orderBy));
+                result.append(" ").append(KeyWord.RETURN).append(" ")
+                    .append(joinAttributeAlias(columns));
+                result.append(" ").append(KeyWord.ORDER_BY).append(" ")
+                    .append(joinOrderByAlias(orderBy));
             }
         }
         return result.toString();
     }
 
-    public static String joinSkipAndLimit(long skip, long limit) {
+    public String joinSkipAndLimit(long skip, long limit) {
         StringBuilder result = new StringBuilder();
         if (skip >= 1) {
-            result.append(Lexer.SKIP).append(skip);
+            result.append(" ").append(KeyWord.SKIP).append(" ").append(skip);
         }
         if (limit >= 0) {
-            result.append(Lexer.LIMIT).append(limit);
+            result.append(" ").append(KeyWord.LIMIT).append(" ").append(limit);
         }
         return result.toString();
     }

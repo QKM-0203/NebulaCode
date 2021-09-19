@@ -6,15 +6,16 @@
 
 package com.vesoft.nebula.orm.query.cypher;
 
-import com.vesoft.nebula.orm.datatype.Date;
-import com.vesoft.nebula.orm.datatype.DateTime;
-import com.vesoft.nebula.orm.datatype.Time;
 import com.vesoft.nebula.orm.entity.Property;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Schema;
 import com.vesoft.nebula.orm.entity.Vertex;
 import com.vesoft.nebula.orm.exception.DataTypeException;
 import com.vesoft.nebula.orm.exception.InitException;
+import com.vesoft.nebula.orm.query.util.KeyWord;
+import com.vesoft.nebula.orm.timetype.Date;
+import com.vesoft.nebula.orm.timetype.DateTime;
+import com.vesoft.nebula.orm.timetype.Time;
 import java.util.*;
 
 /**
@@ -160,11 +161,11 @@ public class Encoding {
         } else if (object instanceof String) {
             return "\"" + object + "\"";
         } else if (object instanceof DateTime) {
-            return String.format(Lexer.DATETIME + "(\"%s\")", object);
+            return String.format(KeyWord.DATETIME + "(\"%s\")", object);
         } else if (object instanceof Time) {
-            return String.format(Lexer.TIME + "(\"%s\")", object);
+            return String.format(KeyWord.TIME + "(\"%s\")", object);
         } else if (object instanceof Date) {
-            return String.format(Lexer.DATE + "(\"%s\")", object);
+            return String.format(KeyWord.DATE + "(\"%s\")", object);
         } else if (object instanceof Boolean) {
             return String.format("%s", object);
         } else if (object instanceof List) { // has question
@@ -212,10 +213,10 @@ public class Encoding {
         if (propertyList != null && !propertyList.isEmpty()) {
             prop.append(traversalProp(propertyList));
             if (schema.getTtlDuration() != 0) {
-                expired.add(Lexer.TTL_DURATION + " = " + schema.getTtlDuration());
+                expired.add(KeyWord.TTL_DURATION + " = " + schema.getTtlDuration());
             }
             if (schema.getTtlCol() != null) {
-                expired.add(Lexer.TTL_COL + " = \"" + schema.getTtlCol() + "\"");
+                expired.add(KeyWord.TTL_COL + " = \"" + schema.getTtlCol() + "\"");
             }
         }
         return String.format("`%s`(%s)%s",
@@ -233,16 +234,17 @@ public class Encoding {
         StringBuilder part = new StringBuilder();
         for (Property property : propertyList) {
             part.append("`").append(property.getPropName()).append("` ")
-                .append(property.getDataType().toString().equals(Lexer.FIXED_STRING)
-                    ? String.format(Lexer.FIXED_STRING + "(%d)",
+                .append(property.getDataType().toString().equals(KeyWord.FIXED_STRING)
+                    ? String.format(KeyWord.FIXED_STRING + "(%d)",
                     property.getDataType().getLength()) : property.getDataType()).append(" ");
             if (property.isNullable()) {
-                part.append(Lexer.NULL);
+                part.append(KeyWord.NULL);
             } else {
-                part.append(Lexer.NULL);
+                part.append(KeyWord.NOT_NULL);
             }
             if (property.getDefaultValue() != null) {
-                part.append(Lexer.DEFAULT).append(Encoding.judgeDataType(property.getDefaultValue()));
+                part.append(KeyWord.DEFAULT).append(" ")
+                    .append(Encoding.judgeDataType(property.getDefaultValue()));
             }
             prop.add(part.toString());
             part.delete(0, part.length());
