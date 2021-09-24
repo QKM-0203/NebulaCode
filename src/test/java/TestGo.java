@@ -10,7 +10,6 @@ import com.vesoft.nebula.orm.operator.*;
 import com.vesoft.nebula.orm.query.ngql.Column;
 import com.vesoft.nebula.orm.query.ngql.Go;
 import com.vesoft.nebula.orm.query.ngql.Goer;
-
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

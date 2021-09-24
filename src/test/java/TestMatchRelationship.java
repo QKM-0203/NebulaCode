@@ -9,18 +9,14 @@ import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.match.RelationshipMatch;
 import com.vesoft.nebula.orm.match.RelationshipMatcher;
-import com.vesoft.nebula.orm.match.VertexMatch;
-import com.vesoft.nebula.orm.match.VertexMatcher;
 import com.vesoft.nebula.orm.operator.AggregateFunction;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.operator.Sort;
 import com.vesoft.nebula.orm.query.ngql.Column;
-
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.junit.Test;
 
 /**

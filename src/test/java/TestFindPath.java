@@ -11,11 +11,9 @@ import com.vesoft.nebula.orm.operator.PathDirection;
 import com.vesoft.nebula.orm.operator.PathType;
 import com.vesoft.nebula.orm.query.ngql.FindPath;
 import com.vesoft.nebula.orm.query.ngql.FinderPath;
-
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Test;
 
 /**

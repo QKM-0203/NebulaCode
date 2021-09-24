@@ -53,8 +53,8 @@ public class TestGetSubgraph extends TestDataBase {
         List<ValueWrapper> vertices = all.colValues("_vertices");
         List<ValueWrapper> edges = all.colValues("_edges");
         Node node = vertices.get(0).asList().get(0).asNode();
-        Node node1 = vertices.get(0).asList().get(0).asNode();
-        Node node2 = vertices.get(0).asList().get(0).asNode();
+        Node node1 = vertices.get(1).asList().get(0).asNode();
+        Node node2 = vertices.get(1).asList().get(1).asNode();
         Relationship relationship = edges.get(0).asList().get(0).asRelationship();
         Relationship relationship1 = edges.get(0).asList().get(1).asRelationship();
         Relationship relationship2 = edges.get(1).asList().get(0).asRelationship();

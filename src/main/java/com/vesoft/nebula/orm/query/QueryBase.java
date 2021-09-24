@@ -242,7 +242,7 @@ public class QueryBase<E> {
      * get all result,if you get all by fetchRelationship if you can
      * call {@link FetchEdge#fetchAll()}.
      *
-     * @return object this object is List<ResultSet> or ResultSet.
+     * @return ResultSet
      */
     public ResultSet all() {
         String matchRelationship = null;
