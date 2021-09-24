@@ -6,9 +6,7 @@
 
 package com.vesoft.nebula.orm.query.ngql;
 
-import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
 import com.vesoft.nebula.orm.query.util.KeyWord;
@@ -29,11 +27,16 @@ import java.util.List;
 public class FetchVertex extends NGqlQuery<FetchVertex> {
     private List<String> tagNames;
     private List<Object> vidList;
-    private final Graph graph;
+    private StringBuffer clause = new StringBuffer();
 
     protected FetchVertex(Graph graph) {
-        this.graph = graph;
+        super(graph);
     }
+
+    public StringBuffer getClause() {
+        return clause;
+    }
+
 
     public FetchVertex on(String... tagNames) {
         this.tagNames = Arrays.asList(tagNames);
@@ -51,7 +54,7 @@ public class FetchVertex extends NGqlQuery<FetchVertex> {
         return this;
     }
 
-    private String connectParameters() {
+    public String connectParameters() {
         if (vidList == null || vidList.isEmpty()) {
             throw new InitException("vidList can not be null");
         }
@@ -66,38 +69,10 @@ public class FetchVertex extends NGqlQuery<FetchVertex> {
         if (yields != null && !yields.isEmpty()) {
             result.append(" ").append(KeyWord.YIELD).append(" ").append(String.join(",", yields));
         }
+        if (clause != null) {
+            result.append(clause);
+        }
+        System.out.println(result);
         return result.toString().trim();
-    }
-
-    /**
-     * @return all qualified
-     */
-    public ResultSet all() {
-        String query = connectParameters();
-        ResultSet resultSet = graph.run(query);
-        if (!resultSet.isSucceeded()) {
-            throw new ExecuteException(resultSet.getErrorMessage());
-        }
-        return resultSet;
-    }
-
-    /**
-     * @return from result get the first
-     */
-    public ResultSet.Record first() {
-        ResultSet all = all();
-        if (!all.isEmpty()) {
-            return all.rowValues(0);
-        }
-        return null;
-    }
-
-    /**
-     * is there data that meets the conditions.
-     *
-     * @return true or false
-     */
-    public boolean exist() {
-        return !all().isEmpty();
     }
 }

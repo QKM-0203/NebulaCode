@@ -27,7 +27,7 @@ public class FetcherEdge {
         return fetchEdge.init(relationships);
     }
 
-    public FetchEdge fetchOneEdge(Relationship relationship) {
+    public FetchEdge fetchEdge(Relationship relationship) {
         return fetchEdge.init(relationship);
     }
 }

@@ -6,8 +6,8 @@
 
 package com.vesoft.nebula.orm.query.ngql;
 
+import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.entity.Relationship;
-import com.vesoft.nebula.orm.operator.Sort;
 import com.vesoft.nebula.orm.query.QueryBase;
 import com.vesoft.nebula.orm.query.util.KeyWord;
 import com.vesoft.nebula.orm.query.util.Util;
@@ -18,8 +18,12 @@ import java.util.*;
  *
  * @author Qi Kai Meng
  */
-public class NGqlQuery<E> extends QueryBase {
-    public List<String> yields;
+public class NGqlQuery<E> extends QueryBase<E> {
+    protected List<String> yields;
+
+    protected NGqlQuery(Graph graph) {
+        super(graph);
+    }
 
     private String joinRelationshipNoHasValue(List<Relationship> relationships) {
         ArrayList<String> result = new ArrayList<>();
@@ -31,18 +35,6 @@ public class NGqlQuery<E> extends QueryBase {
                 relationship.getRank()));
         }
         return String.join(",", result);
-    }
-
-    public String joinOrderBy(Map<String, Sort> orderBy) {
-        ArrayList<String> orderByStrings = new ArrayList<>();
-        for (String propName : orderBy.keySet()) {
-            if (orderBy.get(propName) != null) {
-                orderByStrings.add(propName + " " + orderBy.get(propName));
-            } else {
-                orderByStrings.add(propName);
-            }
-        }
-        return String.join(",", orderByStrings);
     }
 
     public String joinGroupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
@@ -57,7 +49,7 @@ public class NGqlQuery<E> extends QueryBase {
         return result.toString();
     }
 
-    public List<String> joinFetch(List<Relationship> relationships) {
+    public List<String> joinFetch(List<Relationship> relationships, StringBuffer condition) {
         HashMap<String, List<Relationship>> joinSameEdgeRelationships =
             Util.joinSameEdgeRelationships(relationships, 1);
         ArrayList<String> fetchStrings = new ArrayList<>();
@@ -68,6 +60,9 @@ public class NGqlQuery<E> extends QueryBase {
             if (yields != null && !yields.isEmpty()) {
                 fetch.append(" ").append(KeyWord.YIELD).append(" ")
                     .append(String.join(",", yields));
+            }
+            if (condition != null) {
+                fetch.append(condition);
             }
             fetchStrings.add(fetch.toString());
         }
@@ -96,4 +91,46 @@ public class NGqlQuery<E> extends QueryBase {
         return (E) this;
     }
 
+    /**
+     * get the number of rows of the result.
+     *
+     * @param offsetValue start from line 0 of the default value and end with line limit.
+     * @param numberRows  return some rows.
+     * @return Go
+     */
+    public E limit(long offsetValue, long numberRows) {
+        if (this instanceof Go) {
+            Go go = (Go) this;
+            go.getCondition().append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(offsetValue)
+                .append(",").append(numberRows).append(" ");
+        } else if (this instanceof LookUp) {
+            LookUp lookUp = (LookUp) this;
+            lookUp.getClause().append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(offsetValue)
+                .append(",").append(numberRows).append(" ");
+        } else if (this instanceof FetchEdge) {
+            FetchEdge fetchEdge = (FetchEdge) this;
+            fetchEdge.getClause().append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(offsetValue)
+                .append(",").append(numberRows).append(" ");
+
+        } else if (this instanceof FetchVertex) {
+            FetchVertex fetchVertex = (FetchVertex) this;
+            fetchVertex.getClause().append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(offsetValue)
+                .append(",").append(numberRows).append(" ");
+        } else if (this instanceof FindPath) {
+            FindPath findPath = (FindPath) this;
+            findPath.getClause().append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(offsetValue)
+                .append(",").append(numberRows).append(" ");
+        } else if (this instanceof GetSubgraph) {
+            GetSubgraph getSubgraph = (GetSubgraph) this;
+            getSubgraph.getClause().append(" ").append(KeyWord.PIPE).append(" ")
+                .append(KeyWord.LIMIT).append(" ").append(offsetValue)
+                .append(",").append(numberRows).append(" ");
+        }
+        return (E) this;
+    }
 }

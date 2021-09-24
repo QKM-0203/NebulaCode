@@ -6,12 +6,9 @@
 
 package com.vesoft.nebula.orm.query.ngql;
 
-import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.Filter;
-import com.vesoft.nebula.orm.query.QueryBase;
 import com.vesoft.nebula.orm.query.util.KeyWord;
 import java.util.Arrays;
 import java.util.List;
@@ -30,11 +27,16 @@ public class LookUp extends NGqlQuery<LookUp> {
     private String schema;
     private List<String> filterString;
     private Map<String, Filter> conMap;
-    private Graph graph;
+    private StringBuffer clause = new StringBuffer();
 
-    public LookUp(Graph graph) {
-        this.graph = graph;
+    protected LookUp(Graph graph) {
+        super(graph);
     }
+
+    public StringBuffer getClause() {
+        return clause;
+    }
+
 
     protected LookUp init(String schema) {
         this.schema = schema;
@@ -63,7 +65,7 @@ public class LookUp extends NGqlQuery<LookUp> {
         return this;
     }
 
-    private String connectParameters() {
+    public String connectParameters() {
         if (schema == null) {
             throw new InitException("schema can not be null");
         }
@@ -73,51 +75,10 @@ public class LookUp extends NGqlQuery<LookUp> {
         if (yields != null && !yields.isEmpty()) {
             result.append(" ").append(KeyWord.YIELD).append(" ").append(String.join(",", yields));
         }
+        if (clause != null) {
+            result.append(clause);
+        }
+        System.out.println(result);
         return result.toString().trim();
-    }
-
-    /**
-     * @return all qualified
-     */
-    public ResultSet all() {
-        String query = connectParameters();
-        ResultSet resultSet = graph.run(query);
-        if (!resultSet.isSucceeded()) {
-            throw new ExecuteException(resultSet.getErrorMessage());
-        }
-        return resultSet;
-    }
-
-    /**
-     * @return from result get the first
-     */
-    public ResultSet.Record first() {
-        ResultSet all = all();
-        if (!all.isEmpty()) {
-            return all.rowValues(0);
-        }
-        return null;
-    }
-
-    /**
-     * count of results.
-     *
-     * @return count
-     */
-    public long count() {
-        ResultSet all = all();
-        if (!all.isEmpty()) {
-            return all.rowsSize();
-        }
-        return 0;
-    }
-
-    /**
-     * is there data that meets the conditions.
-     *
-     * @return true or false
-     */
-    public boolean exist() {
-        return !all().isEmpty();
     }
 }

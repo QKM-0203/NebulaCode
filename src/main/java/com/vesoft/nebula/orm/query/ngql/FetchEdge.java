@@ -18,7 +18,7 @@ import java.util.List;
  * <p>if you want to query the properties of an edge, pass in a relationship object
  * and finally call the {@link #one()} method.</p>
  * <p>if you want to query the properties of some edges,
- * pass in the relationshipList and finally call the {@link #all()} method,
+ * pass in the relationshipList and finally call the {@link #fetchAll()} method,
  * if you can get first result you can call {@link #one()}.</p>
  * <p>sentence of query is similar to 'FETCH PROP ON serve "player100" -> "team204[@0]"'
  * if you query multiple edges are separated by commas.</p>
@@ -27,10 +27,14 @@ import java.util.List;
  */
 public class FetchEdge extends NGqlQuery<FetchEdge> {
     private List<Relationship> relationships;
-    private final Graph graph;
+    private StringBuffer clause = new StringBuffer();
 
     protected FetchEdge(Graph graph) {
-        this.graph = graph;
+        super(graph);
+    }
+
+    public StringBuffer getClause() {
+        return clause;
     }
 
     protected FetchEdge init(List<Relationship> relationships) {
@@ -44,7 +48,6 @@ public class FetchEdge extends NGqlQuery<FetchEdge> {
         return this;
     }
 
-
     /**
      * classify the relationships with the same edgeName together,
      * and then assemble them into fetchStrings to return.
@@ -54,19 +57,15 @@ public class FetchEdge extends NGqlQuery<FetchEdge> {
      * @return fetchStrings
      */
     public List<String> connectParameters() {
-        return joinFetch(relationships);
+        return joinFetch(relationships, clause);
     }
 
-    /**
-     * query some relationships.
-     *
-     * @return all qualified
-     */
-    public List<ResultSet> all() {
-        List<String> query = connectParameters();
+    public List<ResultSet> fetchAll() {
+        List<String> fetchStrings = connectParameters();
         ArrayList<ResultSet> resultSets = new ArrayList<>();
-        for (String fetch : query) {
-            ResultSet resultSet = graph.run(fetch.trim());
+        for (String fetch : fetchStrings) {
+            System.out.println(fetch.trim());
+            ResultSet resultSet = getGraph().run(fetch.trim());
             if (!resultSet.isSucceeded()) {
                 throw new ExecuteException(resultSet.getErrorMessage()
                     + "the successful edge is " + resultSets);
@@ -76,26 +75,18 @@ public class FetchEdge extends NGqlQuery<FetchEdge> {
         return resultSets;
     }
 
+
     /**
      * query one relationship,can be null.
      *
      * @return all qualified
      */
     public ResultSet one() {
-        List<ResultSet> all = all();
+        List<ResultSet> all = fetchAll();
         if (!all.isEmpty()) {
             return all.get(0);
         }
         return null;
-    }
-
-    /**
-     * is there data that meets the conditions.
-     *
-     * @return true or false
-     */
-    public boolean exist() {
-        return !all().isEmpty();
     }
 
     /**
@@ -104,7 +95,7 @@ public class FetchEdge extends NGqlQuery<FetchEdge> {
      * @return count
      */
     public long count() {
-        List<ResultSet> all = all();
+        List<ResultSet> all = fetchAll();
         int count = 0;
         for (ResultSet resultSet : all) {
             count += resultSet.rowsSize();
@@ -112,4 +103,12 @@ public class FetchEdge extends NGqlQuery<FetchEdge> {
         return count;
     }
 
+    /**
+     * is there data that meets the conditions.
+     *
+     * @return true or false
+     */
+    public boolean exist() {
+        return !fetchAll().isEmpty();
+    }
 }

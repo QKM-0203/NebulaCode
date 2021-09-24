@@ -6,9 +6,7 @@
 
 package com.vesoft.nebula.orm.query.ngql;
 
-import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.*;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
@@ -20,8 +18,9 @@ import java.util.Map;
 /**
  * <p>you can use {@link #where(Map, String...)} for conditional filtering,
  * use {@link #limit(long, long)}、{@link #groupBy(List, List)}}
- * and {@link #orderBy(Map)} to operate the output results,
- * call {@link #yield(String...)}} as finally result.</p>
+ * and {@link com.vesoft.nebula.orm.query.QueryBase#orderBy(Map, Map, Boolean)}
+ * to operate the output results,call {@link NGqlQuery#yield(String...)}}
+ * as finally result.</p>
  * <p>the user does need to consider the calling order,for where and final yield
  * user can not need to consider.</p>
  * <p>the simple sentence of query is similar to 'GO FROM "player102" OVER serve'.</p>
@@ -36,11 +35,14 @@ public class Go extends NGqlQuery<Go> {
     private long leftSteps = 0;
     private long rightSteps = 1;
     private PathDirection pathDirection;
-    private StringBuilder condition = new StringBuilder();
-    private final Graph graph;
+    private StringBuffer clause = new StringBuffer();
 
     protected Go(Graph graph) {
-        this.graph = graph;
+        super(graph);
+    }
+
+    public StringBuffer getCondition() {
+        return clause;
     }
 
     protected Go init(List<?> srcIds, List<String> edges) {
@@ -101,19 +103,6 @@ public class Go extends NGqlQuery<Go> {
     }
 
     /**
-     * <p>orderBy is used to sort,you can pass in eg: (alias,{@link Sort}),
-     * Sort</p>
-     *
-     * @param orderBy sort by one or multiple attribute.String is alias at after yield field
-     * @return Go
-     */
-    public Go orderBy(Map<String, Sort> orderBy) {
-        condition.append(" ").append(KeyWord.PIPE).append(" ")
-            .append(KeyWord.ORDER_BY).append(" ").append(joinOrderBy(orderBy));
-        return this;
-    }
-
-    /**
      * achieve group by use aggregateFunctions.eg: | group by $$-.name [as name]
      * yield $$-.name [as name],max(v.age) [as maxAge].
      *
@@ -125,38 +114,8 @@ public class Go extends NGqlQuery<Go> {
      * @return RelationshipMatch
      */
     public Go groupBy(List<Column> groupBy, List<Column> aggregateFunctions) {
-        condition.append(joinGroupBy(groupBy, aggregateFunctions));
+        clause.append(joinGroupBy(groupBy, aggregateFunctions));
         return this;
-    }
-
-    /**
-     * get the number of rows of the result,if you pass in offsetValue is negative show all result
-     * if offsetValue is positive number and numberRows is negative show from 0 to offsetValue rows.
-     *
-     * @param offsetValue start from line 0 of the default value and end with line limit.
-     * @param numberRows  some rows
-     * @return Go
-     */
-    public Go limit(long offsetValue, long numberRows) {
-        if (offsetValue >= 0) {
-            condition.append(" ").append(KeyWord.PIPE).append(" ")
-                .append(KeyWord.LIMIT).append(" ").append(offsetValue);
-            if (numberRows >= 0) {
-                condition.append(",").append(numberRows).append(" ");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * @return from result get the first
-     */
-    public ResultSet.Record first() {
-        ResultSet all = all();
-        if (!all.isEmpty()) {
-            return all.rowValues(0);
-        }
-        return null;
     }
 
     /**
@@ -164,7 +123,7 @@ public class Go extends NGqlQuery<Go> {
      *
      * @return sentence
      */
-    private String connectParameters() {
+    public String connectParameters() {
         StringBuilder result = new StringBuilder();
         result.append(KeyWord.GO).append(" ").append(leftSteps)
             .append(" ").append(KeyWord.TO).append(" ")
@@ -185,43 +144,11 @@ public class Go extends NGqlQuery<Go> {
         if (yields != null && !yields.isEmpty()) {
             result.append(" ").append(KeyWord.YIELD).append(" ").append(String.join(",", yields));
         }
-        if (condition != null) {
-            result.append(condition);
+        if (clause != null) {
+            result.append(clause);
         }
+        System.out.println(result);
         return result.toString().trim();
     }
 
-    /**
-     * @return all qualified
-     */
-    public ResultSet all() {
-        String query = connectParameters();
-        ResultSet resultSet = graph.run(query);
-        if (!resultSet.isSucceeded()) {
-            throw new ExecuteException(resultSet.getErrorMessage());
-        }
-        return resultSet;
-    }
-
-    /**
-     * count of results.
-     *
-     * @return count
-     */
-    public long count() {
-        ResultSet all = all();
-        if (!all.isEmpty()) {
-            return all.rowsSize();
-        }
-        return 0;
-    }
-
-    /**
-     * is there data that meets the conditions.
-     *
-     * @return true or false
-     */
-    public boolean exist() {
-        return !all().isEmpty();
-    }
 }

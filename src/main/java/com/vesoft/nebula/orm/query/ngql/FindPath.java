@@ -6,9 +6,7 @@
 
 package com.vesoft.nebula.orm.query.ngql;
 
-import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.PathDirection;
 import com.vesoft.nebula.orm.operator.PathType;
@@ -32,14 +30,15 @@ public class FindPath extends NGqlQuery<FindPath> {
     private List<Object> dstIds;
     private List<String> edges;
     private PathDirection pathDirection;
-    private long limit = -1;
-    private boolean isSort = false;
-    private final Graph graph;
+    private StringBuffer clause = new StringBuffer();
 
-    public FindPath(Graph graph) {
-        this.graph = graph;
+    protected FindPath(Graph graph) {
+        super(graph);
     }
 
+    public StringBuffer getClause() {
+        return clause;
+    }
 
     /**
      * @param pathType SHORTEST or NOLOOP or ALL
@@ -76,30 +75,7 @@ public class FindPath extends NGqlQuery<FindPath> {
         return this;
     }
 
-    /**
-     * sort result paths by $-.PATH.
-     *
-     * @param isSort true or false,default value is false
-     * @return FindPath
-     */
-    public FindPath orderBy(boolean isSort) {
-        this.isSort = isSort;
-        return this;
-    }
-
-    /**
-     * return to previous limit lines.
-     *
-     * @param limit limit
-     * @return FindPath
-     */
-    public FindPath limit(long limit) {
-        this.limit = limit;
-        return this;
-    }
-
-
-    private String connectParameters() {
+    public String connectParameters() {
         if (srcIds == null || srcIds.isEmpty()) {
             throw new InitException("srcIds can not be null");
         }
@@ -124,59 +100,10 @@ public class FindPath extends NGqlQuery<FindPath> {
         if (steps >= 0) {
             result.append(KeyWord.UPTO).append(" ").append(steps).append(" ").append(KeyWord.STEPS);
         }
-        if (isSort) {
-            result.append(" ").append(KeyWord.PIPE).append(" ")
-                .append(KeyWord.ORDER_BY).append(" ").append(KeyWord.$_PATH);
+        if (clause != null) {
+            result.append(clause);
         }
-        if (limit >= 0) {
-            result.append(" ").append(KeyWord.PIPE).append(" ")
-                .append(KeyWord.LIMIT).append(" ").append(limit);
-        }
+        System.out.println(result);
         return result.toString().trim();
-    }
-
-    /**
-     * @return from result get the first
-     */
-    public ResultSet.Record first() {
-        ResultSet all = all();
-        if (!all.isEmpty()) {
-            return all.rowValues(0);
-        }
-        return null;
-    }
-
-    /**
-     * @return all qualified
-     */
-    public ResultSet all() {
-        String query = connectParameters();
-        ResultSet resultSet = graph.run(query);
-        if (!resultSet.isSucceeded()) {
-            throw new ExecuteException(resultSet.getErrorMessage());
-        }
-        return resultSet;
-    }
-
-    /**
-     * count of results.
-     *
-     * @return count
-     */
-    public long count() {
-        ResultSet all = all();
-        if (!all.isEmpty()) {
-            return all.rowsSize();
-        }
-        return 0;
-    }
-
-    /**
-     * is there data that meets the conditions.
-     *
-     * @return true or false
-     */
-    public boolean exist() {
-        return !all().isEmpty();
     }
 }

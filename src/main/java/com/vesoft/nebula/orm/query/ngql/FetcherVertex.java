@@ -22,11 +22,11 @@ public class FetcherVertex {
         this.fetchVertex = new FetchVertex(graph);
     }
 
-    public FetchVertex fetch(List<?> vidList) {
+    public FetchVertex fetchVertex(List<?> vidList) {
         return fetchVertex.init(vidList);
     }
 
-    public FetchVertex fetchOne(Object id) {
+    public FetchVertex fetchVertex(Object id) {
         return fetchVertex.init(id);
     }
 }

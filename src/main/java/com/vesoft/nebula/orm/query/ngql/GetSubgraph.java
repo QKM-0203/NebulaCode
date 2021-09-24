@@ -6,9 +6,7 @@
 
 package com.vesoft.nebula.orm.query.ngql;
 
-import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
@@ -27,11 +25,15 @@ public class GetSubgraph extends NGqlQuery<GetSubgraph> {
     private long steps = 1;
     private List<Object> srcIds;
     private EdgeDirection edgeDirection = EdgeDirection.BOTH;
+    private StringBuffer clause = new StringBuffer();
     private List<String> edges;
-    private final Graph graph;
 
-    public GetSubgraph(Graph graph) {
-        this.graph = graph;
+    protected GetSubgraph(Graph graph) {
+        super(graph);
+    }
+
+    public StringBuffer getClause() {
+        return clause;
     }
 
     protected GetSubgraph init(List<?> srcIds) {
@@ -63,7 +65,7 @@ public class GetSubgraph extends NGqlQuery<GetSubgraph> {
         return this;
     }
 
-    private String connectParameters() {
+    public String connectParameters() {
         if (srcIds == null || srcIds.isEmpty()) {
             throw new InitException("srcIds can not be null");
         }
@@ -76,27 +78,10 @@ public class GetSubgraph extends NGqlQuery<GetSubgraph> {
         if (edges != null && !edges.isEmpty()) {
             result.append(edgeDirection.toString()).append(" ").append(String.join(",", edges));
         }
-        return result.toString().trim();
-    }
-
-    /**
-     * @return all qualified
-     */
-    public ResultSet all() {
-        String query = connectParameters();
-        ResultSet resultSet = graph.run(query);
-        if (!resultSet.isSucceeded()) {
-            throw new ExecuteException(resultSet.getErrorMessage());
+        if (clause != null) {
+            result.append(clause);
         }
-        return resultSet;
-    }
-
-    /**
-     * is there data that meets the conditions.
-     *
-     * @return true or false
-     */
-    public boolean exist() {
-        return !all().isEmpty();
+        System.out.println(result);
+        return result.toString().trim();
     }
 }
