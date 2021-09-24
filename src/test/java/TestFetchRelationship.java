@@ -7,6 +7,7 @@
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.entity.Relationship;
+import com.vesoft.nebula.orm.operator.Sort;
 import com.vesoft.nebula.orm.query.ngql.FetchEdge;
 import com.vesoft.nebula.orm.query.ngql.FetcherEdge;
 import java.io.UnsupportedEncodingException;
@@ -35,8 +36,7 @@ public class TestFetchRelationship extends TestDataBase {
     @Test
     public void testFetchOneEdge() throws UnsupportedEncodingException {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
-        Relationship relationship = new Relationship(1, 2, "team", 1);
-        FetchEdge fetchEdge = fetcherEdge.fetchOneEdge(relationship);
+        FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationship12);
         ResultSet one = fetchEdge.one();
         assert one.rowsSize() == 1;
         assert fetchEdge.exist();
@@ -50,14 +50,12 @@ public class TestFetchRelationship extends TestDataBase {
     public void testFetchMultipleEdge1() throws UnsupportedEncodingException {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
         ArrayList<Relationship> relationships = new ArrayList<>();
-        Relationship relationship12 = new Relationship(1, 2, "team", 1);
-        Relationship relationship24 = new Relationship(2, 4, "team", 1);
         Relationship relationship34 = new Relationship(3, 4, "team", 1);
         relationships.add(relationship12);
         relationships.add(relationship24);
         relationships.add(relationship34);
         FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationships);
-        List<ResultSet> all = fetchEdge.all();
+        List<ResultSet> all = fetchEdge.fetchAll();
         assert all.size() == 1;
         assert fetchEdge.exist();
         assert fetchEdge.count() == 2;
@@ -74,14 +72,13 @@ public class TestFetchRelationship extends TestDataBase {
     public void testFetchMultipleEdge2() {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
         ArrayList<Relationship> relationships = new ArrayList<>();
-        Relationship relationship12 = new Relationship(1, 2, "team", 1);
-        Relationship relationship24 = new Relationship(2, 4, "work", 1);
+        Relationship relationship12 = new Relationship(1, 2, "work", 1);
         Relationship relationship34 = new Relationship(3, 4, "team", 1);
         relationships.add(relationship12);
         relationships.add(relationship24);
         relationships.add(relationship34);
         FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationships);
-        List<ResultSet> all = fetchEdge.all();
+        List<ResultSet> all = fetchEdge.fetchAll();
         assert all.size() == 2;
         assert fetchEdge.exist();
         assert fetchEdge.count() == 1;
@@ -91,8 +88,7 @@ public class TestFetchRelationship extends TestDataBase {
     @Test
     public void testFetchEdgeAddYield() throws UnsupportedEncodingException {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
-        Relationship relationship12 = new Relationship(1, 2, "team", 1);
-        FetchEdge fetchEdge = fetcherEdge.fetchOneEdge(relationship12);
+        FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationship12);
         ResultSet one = fetchEdge.yield("team.teacherName as name").one();
         assert one.rowsSize() == 1;
         assert fetchEdge.exist();
@@ -108,10 +104,42 @@ public class TestFetchRelationship extends TestDataBase {
     }
 
     @Test
+    public void testFetchEdgeAddYieldAddOrderByAddLimit() throws UnsupportedEncodingException {
+        FetcherEdge fetcherEdge = new FetcherEdge(graph);
+        ArrayList<Relationship> relationships = new ArrayList<>();
+        relationships.add(relationship12);
+        relationships.add(relationship24);
+        FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationships);
+        HashMap<String, Sort> orderBy = new HashMap<>();
+        orderBy.put("name", Sort.DESC);
+        ResultSet one = fetchEdge.yield("team.teacherName as name")
+            .limit(0, 2).orderBy(null, orderBy,null).one();
+        assert one.rowsSize() == 2;
+        assert fetchEdge.exist();
+        assert fetchEdge.count() == 2;
+        List<ValueWrapper> srcId1 = one.colValues("team._src");
+        assert srcId1.get(0).asLong() == 2;
+        List<ValueWrapper> dstId1 = one.colValues("team._dst");
+        assert dstId1.get(0).asLong() == 4;
+        List<ValueWrapper> rank1 = one.colValues("team._rank");
+        assert rank1.get(0).asLong() == 1;
+        List<ValueWrapper> name1 = one.colValues("name");
+        assert name1.get(0).asString().equals("sc");
+        List<ValueWrapper> srcId2 = one.colValues("team._src");
+        assert srcId2.get(1).asLong() == 1;
+        List<ValueWrapper> dstId2 = one.colValues("team._dst");
+        assert dstId2.get(1).asLong() == 2;
+        List<ValueWrapper> rank = one.colValues("team._rank");
+        assert rank.get(1).asLong() == 1;
+        List<ValueWrapper> name2 = one.colValues("name");
+        assert name2.get(1).asString().equals("qkm");
+    }
+
+    @Test
     public void testFetchEdgeNameIsNullException() {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
         Relationship relationship12 = new Relationship(1, 2, null, 1);
-        FetchEdge fetchEdge = fetcherEdge.fetchOneEdge(relationship12);
+        FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationship12);
         try {
             ResultSet one = fetchEdge.yield("team.teacherName as name").one();
         } catch (Exception e) {

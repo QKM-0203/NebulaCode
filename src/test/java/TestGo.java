@@ -10,6 +10,7 @@ import com.vesoft.nebula.orm.operator.*;
 import com.vesoft.nebula.orm.query.ngql.Column;
 import com.vesoft.nebula.orm.query.ngql.Go;
 import com.vesoft.nebula.orm.query.ngql.Goer;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -230,7 +231,7 @@ public class TestGo extends TestDataBase {
         orderBy.put("object", null);
         Go go = goer.go(ids, edges);
         ResultSet all = go.where(null, "$$.QKM2.age > 19")
-            .yield("team.object as object").orderBy(orderBy).all();
+            .yield("team.object as object").orderBy(null, orderBy,null).all();
         assert go.exist();
         assert go.count() == 2;
         List<ValueWrapper> object = all.colValues("object");
@@ -252,7 +253,8 @@ public class TestGo extends TestDataBase {
         orderBy.put("object", null);
         Go go = goer.go(ids, edges);
         ResultSet all = go.where(null, "$$.QKM2.age > 19")
-            .yield("team.object as object").limit(0, 1).orderBy(orderBy).all();
+            .yield("team.object as object").limit(0, 1)
+            .orderBy(null, orderBy,null).all();
         assert go.exist();
         assert go.count() == 1;
         List<ValueWrapper> object = all.colValues("object");
@@ -260,8 +262,7 @@ public class TestGo extends TestDataBase {
     }
 
     @Test
-    public void testGoGetDstIDAddWhereYieldAddIllegalLimitAddOrderBy()
-        throws UnsupportedEncodingException {
+    public void testGoGetDstIDAddWhereYieldAddIllegalLimitAddOrderBy() {
         ArrayList<String> edges = new ArrayList<>();
         edges.add("team");
         ArrayList<Integer> ids = new ArrayList<>();
@@ -272,13 +273,13 @@ public class TestGo extends TestDataBase {
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("object", null);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.where(null, "$$.QKM2.age > 19")
-            .yield("team.object as object").limit(-1, 1).orderBy(orderBy).all();
-        assert go.exist();
-        assert go.count() == 2;
-        List<ValueWrapper> object = all.colValues("object");
-        assert object.get(0).asString().equals("chinese");
-        assert object.get(1).asString().equals("math");
+        try {
+            ResultSet all = go.where(null, "$$.QKM2.age > 19")
+                .yield("team.object as object").limit(-1, 1)
+                .orderBy(null, orderBy,null).all();
+        } catch (Exception e) {
+           assert e.getMessage().equals("SyntaxError: syntax error near `-1,1  | '");
+        }
     }
 
     @Test
@@ -299,7 +300,7 @@ public class TestGo extends TestDataBase {
         aggregateFunctions.add(aggregateColumn);
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.yield("team.object as object").orderBy(orderBy)
+        ResultSet all = go.yield("team.object as object").orderBy(null, orderBy,null)
             .groupBy(groupBy, aggregateFunctions).all();
         assert go.exist();
         assert go.count() == 2;
@@ -331,8 +332,8 @@ public class TestGo extends TestDataBase {
         edges.add("work");
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.yield("team.object as object").orderBy(orderBy)
-            .groupBy(groupBy, aggregateFunctions).orderBy(orderBy).all();
+        ResultSet all = go.yield("team.object as object").orderBy(null, orderBy,null)
+            .groupBy(groupBy, aggregateFunctions).orderBy(null, orderBy,null).all();
         assert go.exist();
         assert go.count() == 3;
         List<ValueWrapper> object = all.colValues("object");
@@ -344,7 +345,6 @@ public class TestGo extends TestDataBase {
             && count.get(1).asLong() == 1
             && count.get(2).asLong() == 2;
     }
-
 
     @Test
     public void testGoSrcIdsException() {

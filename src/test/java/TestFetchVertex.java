@@ -6,6 +6,7 @@
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
+import com.vesoft.nebula.orm.operator.Sort;
 import com.vesoft.nebula.orm.query.ngql.FetchVertex;
 import com.vesoft.nebula.orm.query.ngql.FetcherVertex;
 import java.io.UnsupportedEncodingException;
@@ -33,7 +34,7 @@ public class TestFetchVertex extends TestDataBase {
     @Test
     public void testFetchOneVertexOneTag() throws UnsupportedEncodingException {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
-        FetchVertex fetchVertex = fetcherVertex.fetchOne(1);
+        FetchVertex fetchVertex = fetcherVertex.fetchVertex(1);
         ResultSet all = fetchVertex.on("QKM2").all();
         List<ValueWrapper> vertices = all.colValues("vertices_");
         assert vertices.size() == 1;
@@ -48,7 +49,7 @@ public class TestFetchVertex extends TestDataBase {
     @Test
     public void testFetchOneVertexMultipleTag() throws UnsupportedEncodingException {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
-        FetchVertex fetchVertex = fetcherVertex.fetchOne(1);
+        FetchVertex fetchVertex = fetcherVertex.fetchVertex(1);
         ResultSet all = fetchVertex.on("QKM2", "QKM1").all();
         List<ValueWrapper> vertices = all.colValues("vertices_");
         assert vertices.size() == 1;
@@ -70,7 +71,7 @@ public class TestFetchVertex extends TestDataBase {
         ids.add(2);
         ids.add(3);
         ids.add(5);
-        FetchVertex fetchVertex = fetcherVertex.fetch(ids);
+        FetchVertex fetchVertex = fetcherVertex.fetchVertex(ids);
         ResultSet all = fetchVertex.on("QKM2", "QKM1").all();
         List<ValueWrapper> vertices = all.colValues("vertices_");
         assert fetchVertex.exist();
@@ -83,7 +84,7 @@ public class TestFetchVertex extends TestDataBase {
     @Test
     public void testFetchAddYield() throws UnsupportedEncodingException {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
-        FetchVertex fetchVertex = fetcherVertex.fetchOne(1);
+        FetchVertex fetchVertex = fetcherVertex.fetchVertex(1);
         ResultSet all = fetchVertex.on("QKM2").yield("QKM2.name as name", "QKM2.age as age").all();
         assert all.rowsSize() == 1;
         assert fetchVertex.exist();
@@ -96,9 +97,34 @@ public class TestFetchVertex extends TestDataBase {
     }
 
     @Test
+    public void testFetchAddYieldAddOrderByAddLimit() throws UnsupportedEncodingException {
+        FetcherVertex fetcherVertex = new FetcherVertex(graph);
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ids.add(2);
+        ids.add(3);
+        FetchVertex fetchVertex = fetcherVertex.fetchVertex(ids);
+        HashMap<String, Sort> orderBy = new HashMap<>();
+        orderBy.put("age", Sort.ASC);
+        ResultSet all = fetchVertex.on("QKM2").yield("QKM2.name as name", "QKM2.age as age")
+            .orderBy(null,orderBy,null).limit(1,3).all();
+        assert all.rowsSize() == 2;
+        assert fetchVertex.exist();
+        List<ValueWrapper> vid = all.colValues("VertexID");
+        List<ValueWrapper> name = all.colValues("name");
+        List<ValueWrapper> age = all.colValues("age");
+        assert vid.get(0).asLong() == 1;
+        assert name.get(0).asString().equals("qkm");
+        assert age.get(0).asLong() == 19;
+        assert vid.get(1).asLong() == 3;
+        assert name.get(1).asString().equals("sy");
+        assert age.get(1).asLong() == 20;
+    }
+
+    @Test
     public void testFetchIdException() {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
-        FetchVertex fetchVertex = fetcherVertex.fetch(null);
+        FetchVertex fetchVertex = fetcherVertex.fetchVertex(null);
         try {
             ResultSet all = fetchVertex.on("QKM2")
                 .yield("QKM2.name as name", "QKM2.age as age").all();

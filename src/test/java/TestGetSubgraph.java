@@ -50,8 +50,8 @@ public class TestGetSubgraph extends TestDataBase {
         assert getSubgraph.exist();
         List<ValueWrapper> vertices = all.colValues("_vertices");
         List<ValueWrapper> edges = all.colValues("_edges");
-        assert vertices.get(0).asList().get(0).asNode().getId().asLong() == 1;
-        assert vertices.get(1).asList().get(0).asNode().getId().asLong() == 3
+        assert vertices.get(0).asList().get(0).asNode().getId().asLong() == 1
+            && vertices.get(1).asList().get(0).asNode().getId().asLong() == 3
             && vertices.get(1).asList().get(1).asNode().getId().asLong() == 2;
         assert edges.get(0).asList().get(0).asRelationship().srcId().asLong() == 1
             && edges.get(0).asList().get(0).asRelationship().dstId().asLong() == 3
@@ -69,6 +69,29 @@ public class TestGetSubgraph extends TestDataBase {
             && edges.get(1).asList().get(1).asRelationship().dstId().asLong() == 3
             && edges.get(1).asList().get(1).asRelationship().ranking() == 0
             && edges.get(1).asList().get(1).asRelationship().edgeName().equals("team");
+    }
+
+    @Test
+    public void testGetSubgraphAddLimit() throws UnsupportedEncodingException {
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        GetterSubgraph getterSubgraph = new GetterSubgraph(graph);
+        GetSubgraph getSubgraph = getterSubgraph.get(ids);
+        ResultSet all = getSubgraph.edges(EdgeDirection.OUT, "team", "work")
+            .limit(1,1).all();
+        assert getSubgraph.exist();
+        List<ValueWrapper> vertices = all.colValues("_vertices");
+        List<ValueWrapper> edges = all.colValues("_edges");
+        assert vertices.get(0).asList().get(0).asNode().getId().asLong() == 3
+            && vertices.get(0).asList().get(1).asNode().getId().asLong() == 2;
+        assert edges.get(0).asList().get(0).asRelationship().srcId().asLong() == 3
+            && edges.get(0).asList().get(0).asRelationship().dstId().asLong() == 2
+            && edges.get(0).asList().get(0).asRelationship().ranking() == 1
+            && edges.get(0).asList().get(0).asRelationship().edgeName().equals("work")
+            && edges.get(0).asList().get(1).asRelationship().srcId().asLong() == 2
+            && edges.get(0).asList().get(1).asRelationship().dstId().asLong() == 3
+            && edges.get(0).asList().get(1).asRelationship().ranking() == 0
+            && edges.get(0).asList().get(1).asRelationship().edgeName().equals("team");
     }
 
     @Test

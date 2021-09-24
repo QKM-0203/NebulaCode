@@ -303,7 +303,8 @@ public class TestMatchVertex extends TestDataBase {
         orderBy.put(column, Sort.DESC);
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20").orderBy(orderBy).all();
+        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20")
+            .orderBy(orderBy,null,null).all();
         List<ValueWrapper> outPut = matchByTagQKM1.colValues("age");
         assert qkm2.exist();
         assert qkm2.count() == 3;
@@ -324,7 +325,8 @@ public class TestMatchVertex extends TestDataBase {
         aggregateFunctions.add(aggregateColumn);
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20").orderBy(orderBy)
+        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20")
+            .orderBy(orderBy,null,null)
             .groupBy(groupBy, aggregateFunctions).all();
         List<ValueWrapper> outPut = matchByTagQKM1.colValues("age");
         assert qkm2.exist();

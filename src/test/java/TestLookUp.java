@@ -8,6 +8,7 @@ import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.operator.Filter;
 import com.vesoft.nebula.orm.operator.Relational;
+import com.vesoft.nebula.orm.operator.Sort;
 import com.vesoft.nebula.orm.query.ngql.LookUp;
 import com.vesoft.nebula.orm.query.ngql.LookerUp;
 import java.io.UnsupportedEncodingException;
@@ -138,6 +139,24 @@ public class TestLookUp extends TestDataBase {
         assert names.get(0).asString().equals("qkm");
         assert vertexIDs.get(1).asLong() == 2;
         assert names.get(1).asString().equals("sc");
+    }
+
+    @Test
+    public void testLookUpOnTagAddWhereAddYieldAddOrderByAddLimit() throws UnsupportedEncodingException {
+        LookerUp lookerUp = new LookerUp(graph);
+        HashMap<String, Sort> orderBy = new HashMap<>();
+        orderBy.put("name", Sort.ASC);
+        HashMap<String, Filter> filter = new HashMap<>();
+        filter.put("QKM2.age", Relational.LE.setValue(19));
+        LookUp qkm21 = lookerUp.lookUp("QKM2");
+        ResultSet qkm2 = qkm21.where(filter).yield("DISTINCT QKM2.name as name")
+            .orderBy(null,orderBy,null).limit(1,1).all();
+        assert qkm21.exist();
+        assert qkm21.count() == 1;
+        List<ValueWrapper> vertexIDs = qkm2.colValues("VertexID");
+        List<ValueWrapper> names = qkm2.colValues("name");
+        assert vertexIDs.get(0).asLong() == 2;
+        assert names.get(0).asString().equals("sc");
     }
 
     @Test

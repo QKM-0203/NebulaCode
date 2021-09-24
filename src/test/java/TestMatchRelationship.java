@@ -8,6 +8,8 @@ import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.match.RelationshipMatch;
 import com.vesoft.nebula.orm.match.RelationshipMatcher;
+import com.vesoft.nebula.orm.match.VertexMatch;
+import com.vesoft.nebula.orm.match.VertexMatcher;
 import com.vesoft.nebula.orm.operator.AggregateFunction;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.operator.Sort;
@@ -48,6 +50,11 @@ public class TestMatchRelationship extends TestDataBase {
         graph.createEdgeIndex("team", "i_team_teacherName_object", indexOnTeam);
         indexOnTeam.remove("teacherName", 10);
         graph.createEdgeIndex("team", "i_team_object", indexOnTeam);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         graph.run("REBUILD EDGE INDEX i_work, i_team, i_team_teacherName, i_team_object, "
             + "i_team_teacherName_object");
         graph.createTagIndex("QKM1", "i_QKM1", null);
@@ -59,6 +66,11 @@ public class TestMatchRelationship extends TestDataBase {
         graph.createTagIndex("QKM2", "i_QKM2_name_age", indexOnQKM2);
         indexOnQKM2.remove("name", 10);
         graph.createTagIndex("QKM2", "i_QKM2_age", indexOnQKM2);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         graph.run("REBUILD TAG INDEX i_QKM1, i_QKM2_name, i_QKM2, i_QKM2_name_age, "
             + "i_QKM2_age");
     }
@@ -190,7 +202,7 @@ public class TestMatchRelationship extends TestDataBase {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         RelationshipMatch match = relationshipMatcher.match("QKM1", null, null, null,
             EdgeDirection.OUT, null, "team");
-        ResultSet work = match.where(null).orderBy(orderBy).all();
+        ResultSet work = match.where(null).orderBy(orderBy,null,null).all();
         List<ValueWrapper> edges = work.colValues("name");
         assert match.exist();
         assert match.count() == 3;
@@ -212,7 +224,7 @@ public class TestMatchRelationship extends TestDataBase {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         RelationshipMatch match = relationshipMatcher.match("QKM1", null, null, null,
             EdgeDirection.OUT, null, "team");
-        ResultSet work = match.where(null).orderBy(orderBy)
+        ResultSet work = match.where(null).orderBy(orderBy,null,null)
             .groupBy(groupBy, aggregateFunctions).all();
         assert match.exist();
         assert match.count() == 2;
