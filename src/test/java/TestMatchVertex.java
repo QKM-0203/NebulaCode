@@ -4,6 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
+import com.vesoft.nebula.client.graph.data.Node;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.match.VertexMatch;
@@ -84,8 +85,9 @@ public class TestMatchVertex extends TestDataBase {
         List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
         assert qkm2.exist();
         assert qkm2.count() == 1;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm")
-            && nodes.get(0).asNode().properties("QKM2").get("age").asLong() == 19;
+        Node node = nodes.get(0).asNode();
+        assert node.properties("QKM2").get("name").asString().equals("qkm")
+            && node.properties("QKM2").get("age").asLong() == 19;
     }
 
     @Test
@@ -96,10 +98,11 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
         ResultSet matchByTagQKM1 = qkm2.where(filter).all();
         List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        Node node = nodes.get(0).asNode();
         assert qkm2.exist();
         assert qkm2.count() == 1;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm")
-            && nodes.get(0).asNode().properties("QKM2").get("age").asLong() == 19;
+        assert node.properties("QKM2").get("name").asString().equals("qkm")
+            && node.properties("QKM2").get("age").asLong() == 19;
     }
 
     @Test
@@ -110,12 +113,14 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
         ResultSet matchByTagQKM1 = qkm2.where(filter).all();
         List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        Node node = nodes.get(0).asNode();
         assert qkm2.exist();
         assert qkm2.count() == 2;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm")
-            && nodes.get(0).asNode().properties("QKM2").get("age").asLong() == 19;
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("sc")
-            && nodes.get(1).asNode().properties("QKM2").get("age").asLong() == 19;
+        assert node.properties("QKM2").get("name").asString().equals("qkm")
+            && node.properties("QKM2").get("age").asLong() == 19;
+        Node node1 = nodes.get(1).asNode();
+        assert node1.properties("QKM2").get("name").asString().equals("sc")
+            && node1.properties("QKM2").get("age").asLong() == 19;
     }
 
     @Test
@@ -127,10 +132,11 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
         ResultSet matchByTagQKM1 = qkm2.where(filter).all();
         List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        Node node = nodes.get(0).asNode();
         assert qkm2.exist();
         assert qkm2.count() == 1;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm")
-            && nodes.get(0).asNode().properties("QKM2").get("age").asLong() == 19;
+        assert node.properties("QKM2").get("name").asString().equals("qkm")
+            && node.properties("QKM2").get("age").asLong() == 19;
     }
 
     @Test
@@ -213,10 +219,11 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
         ResultSet matchByTagQKM1 = qkm2.where(null, "v.name == \"qkm\"").all();
         List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        Node node = nodes.get(0).asNode();
         assert qkm2.exist();
         assert qkm2.count() == 1;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm")
-            && nodes.get(0).asNode().properties("QKM2").get("age").asLong() == 19;
+        assert node.properties("QKM2").get("name").asString().equals("qkm")
+            && node.properties("QKM2").get("age").asLong() == 19;
     }
 
     @Test
@@ -254,9 +261,9 @@ public class TestMatchVertex extends TestDataBase {
         filter.put("name", UnaryOperation.IsNull);
         VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
         ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
         assert !qkm2.exist();
         assert qkm2.count() == 0;
+        assert matchByTagQKM1.isEmpty();
     }
 
     @Test

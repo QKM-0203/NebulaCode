@@ -4,6 +4,8 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
+import com.vesoft.nebula.client.graph.data.Node;
+import com.vesoft.nebula.client.graph.data.Relationship;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
@@ -50,25 +52,32 @@ public class TestGetSubgraph extends TestDataBase {
         assert getSubgraph.exist();
         List<ValueWrapper> vertices = all.colValues("_vertices");
         List<ValueWrapper> edges = all.colValues("_edges");
-        assert vertices.get(0).asList().get(0).asNode().getId().asLong() == 1
-            && vertices.get(1).asList().get(0).asNode().getId().asLong() == 3
-            && vertices.get(1).asList().get(1).asNode().getId().asLong() == 2;
-        assert edges.get(0).asList().get(0).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asList().get(0).asRelationship().dstId().asLong() == 3
-            && edges.get(0).asList().get(0).asRelationship().ranking() == 0
-            && edges.get(0).asList().get(0).asRelationship().edgeName().equals("work")
-            && edges.get(0).asList().get(1).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asList().get(1).asRelationship().dstId().asLong() == 2
-            && edges.get(0).asList().get(1).asRelationship().ranking() == 1
-            && edges.get(0).asList().get(1).asRelationship().edgeName().equals("team");
-        assert edges.get(1).asList().get(0).asRelationship().srcId().asLong() == 3
-            && edges.get(1).asList().get(0).asRelationship().dstId().asLong() == 2
-            && edges.get(1).asList().get(0).asRelationship().ranking() == 1
-            && edges.get(1).asList().get(0).asRelationship().edgeName().equals("work")
-            && edges.get(1).asList().get(1).asRelationship().srcId().asLong() == 2
-            && edges.get(1).asList().get(1).asRelationship().dstId().asLong() == 3
-            && edges.get(1).asList().get(1).asRelationship().ranking() == 0
-            && edges.get(1).asList().get(1).asRelationship().edgeName().equals("team");
+        Node node = vertices.get(0).asList().get(0).asNode();
+        Node node1 = vertices.get(0).asList().get(0).asNode();
+        Node node2 = vertices.get(0).asList().get(0).asNode();
+        Relationship relationship = edges.get(0).asList().get(0).asRelationship();
+        Relationship relationship1 = edges.get(0).asList().get(1).asRelationship();
+        Relationship relationship2 = edges.get(1).asList().get(0).asRelationship();
+        Relationship relationship3 = edges.get(1).asList().get(1).asRelationship();
+        assert node.getId().asLong() == 1
+            && node1.getId().asLong() == 3
+            && node2.getId().asLong() == 2;
+        assert relationship.srcId().asLong() == 1
+            && relationship.dstId().asLong() == 3
+            && relationship.ranking() == 0
+            && relationship.edgeName().equals("work")
+            && relationship1.srcId().asLong() == 1
+            && relationship1.dstId().asLong() == 2
+            && relationship1.ranking() == 1
+            && relationship1.edgeName().equals("team");
+        assert relationship2.srcId().asLong() == 3
+            && relationship2.dstId().asLong() == 2
+            && relationship2.ranking() == 1
+            && relationship2.edgeName().equals("work")
+            && relationship3.srcId().asLong() == 2
+            && relationship3.dstId().asLong() == 3
+            && relationship3.ranking() == 0
+            && relationship3.edgeName().equals("team");
     }
 
     @Test
@@ -78,20 +87,24 @@ public class TestGetSubgraph extends TestDataBase {
         GetterSubgraph getterSubgraph = new GetterSubgraph(graph);
         GetSubgraph getSubgraph = getterSubgraph.get(ids);
         ResultSet all = getSubgraph.edges(EdgeDirection.OUT, "team", "work")
-            .limit(1,1).all();
+            .limit(1, 1).all();
         assert getSubgraph.exist();
         List<ValueWrapper> vertices = all.colValues("_vertices");
         List<ValueWrapper> edges = all.colValues("_edges");
-        assert vertices.get(0).asList().get(0).asNode().getId().asLong() == 3
-            && vertices.get(0).asList().get(1).asNode().getId().asLong() == 2;
-        assert edges.get(0).asList().get(0).asRelationship().srcId().asLong() == 3
-            && edges.get(0).asList().get(0).asRelationship().dstId().asLong() == 2
-            && edges.get(0).asList().get(0).asRelationship().ranking() == 1
-            && edges.get(0).asList().get(0).asRelationship().edgeName().equals("work")
-            && edges.get(0).asList().get(1).asRelationship().srcId().asLong() == 2
-            && edges.get(0).asList().get(1).asRelationship().dstId().asLong() == 3
-            && edges.get(0).asList().get(1).asRelationship().ranking() == 0
-            && edges.get(0).asList().get(1).asRelationship().edgeName().equals("team");
+        Node node = vertices.get(0).asList().get(0).asNode();
+        Node node1 = vertices.get(0).asList().get(1).asNode();
+        Relationship relationship = edges.get(0).asList().get(0).asRelationship();
+        Relationship relationship1 = edges.get(0).asList().get(1).asRelationship();
+        assert node.getId().asLong() == 3
+            && node1.getId().asLong() == 2;
+        assert relationship.srcId().asLong() == 3
+            && relationship.dstId().asLong() == 2
+            && relationship.ranking() == 1
+            && relationship.edgeName().equals("work")
+            && relationship1.srcId().asLong() == 2
+            && relationship1.dstId().asLong() == 3
+            && relationship1.ranking() == 0
+            && relationship1.edgeName().equals("team");
     }
 
     @Test
@@ -103,35 +116,45 @@ public class TestGetSubgraph extends TestDataBase {
         ResultSet all = getSubgraph.edges(EdgeDirection.OUT, "team", "work").steps(2).all();
         assert getSubgraph.exist();
         List<ValueWrapper> vertices = all.colValues("_vertices");
-        assert vertices.get(0).asList().get(0).asNode().getId().asLong() == 1;
-        assert vertices.get(1).asList().get(0).asNode().getId().asLong() == 3
-            && vertices.get(1).asList().get(1).asNode().getId().asLong() == 2;
-        assert vertices.get(2).asList().get(0).asNode().getId().asLong() == 4;
+        Node node = vertices.get(0).asList().get(0).asNode();
+        Node node1 = vertices.get(1).asList().get(0).asNode();
+        Node node2 = vertices.get(1).asList().get(1).asNode();
+        Node node3 = vertices.get(2).asList().get(0).asNode();
+        assert node.getId().asLong() == 1
+            && node1.getId().asLong() == 3
+            && node2.getId().asLong() == 2
+            && node3.getId().asLong() == 4;
         List<ValueWrapper> edges = all.colValues("_edges");
-        assert edges.get(0).asList().get(0).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asList().get(0).asRelationship().dstId().asLong() == 3
-            && edges.get(0).asList().get(0).asRelationship().ranking() == 0
-            && edges.get(0).asList().get(0).asRelationship().edgeName().equals("work")
-            && edges.get(0).asList().get(1).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asList().get(1).asRelationship().dstId().asLong() == 2
-            && edges.get(0).asList().get(1).asRelationship().ranking() == 1
-            && edges.get(0).asList().get(1).asRelationship().edgeName().equals("team");
-        assert edges.get(1).asList().get(0).asRelationship().srcId().asLong() == 3
-            && edges.get(1).asList().get(0).asRelationship().dstId().asLong() == 2
-            && edges.get(1).asList().get(0).asRelationship().ranking() == 1
-            && edges.get(1).asList().get(0).asRelationship().edgeName().equals("work")
-            && edges.get(1).asList().get(1).asRelationship().srcId().asLong() == 3
-            && edges.get(1).asList().get(1).asRelationship().dstId().asLong() == 4
-            && edges.get(1).asList().get(1).asRelationship().ranking() == 1
-            && edges.get(1).asList().get(1).asRelationship().edgeName().equals("work")
-            && edges.get(1).asList().get(2).asRelationship().srcId().asLong() == 2
-            && edges.get(1).asList().get(2).asRelationship().dstId().asLong() == 3
-            && edges.get(1).asList().get(2).asRelationship().ranking() == 0
-            && edges.get(1).asList().get(2).asRelationship().edgeName().equals("team")
-            && edges.get(1).asList().get(3).asRelationship().srcId().asLong() == 2
-            && edges.get(1).asList().get(3).asRelationship().dstId().asLong() == 4
-            && edges.get(1).asList().get(3).asRelationship().ranking() == 1
-            && edges.get(1).asList().get(3).asRelationship().edgeName().equals("team");
+        Relationship relationship = edges.get(0).asList().get(0).asRelationship();
+        Relationship relationship1 = edges.get(0).asList().get(1).asRelationship();
+        Relationship relationship2 = edges.get(1).asList().get(0).asRelationship();
+        Relationship relationship3 = edges.get(1).asList().get(1).asRelationship();
+        Relationship relationship4 = edges.get(1).asList().get(2).asRelationship();
+        Relationship relationship5 = edges.get(1).asList().get(3).asRelationship();
+        assert relationship.srcId().asLong() == 1
+            && relationship.dstId().asLong() == 3
+            && relationship.ranking() == 0
+            && relationship.edgeName().equals("work")
+            && relationship1.srcId().asLong() == 1
+            && relationship1.dstId().asLong() == 2
+            && relationship1.ranking() == 1
+            && relationship1.edgeName().equals("team");
+        assert relationship2.srcId().asLong() == 3
+            && relationship2.dstId().asLong() == 2
+            && relationship2.ranking() == 1
+            && relationship2.edgeName().equals("work")
+            && relationship3.srcId().asLong() == 3
+            && relationship3.dstId().asLong() == 4
+            && relationship3.ranking() == 1
+            && relationship3.edgeName().equals("work")
+            && relationship4.srcId().asLong() == 2
+            && relationship4.dstId().asLong() == 3
+            && relationship4.ranking() == 0
+            && relationship4.edgeName().equals("team")
+            && relationship5.srcId().asLong() == 2
+            && relationship5.dstId().asLong() == 4
+            && relationship5.ranking() == 1
+            && relationship5.edgeName().equals("team");
         assert edges.get(2).asList().isEmpty();
     }
 

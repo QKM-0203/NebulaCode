@@ -4,6 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
+import com.vesoft.nebula.client.graph.data.Relationship;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.orm.match.RelationshipMatch;
@@ -14,10 +15,12 @@ import com.vesoft.nebula.orm.operator.AggregateFunction;
 import com.vesoft.nebula.orm.operator.EdgeDirection;
 import com.vesoft.nebula.orm.operator.Sort;
 import com.vesoft.nebula.orm.query.ngql.Column;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import org.junit.Test;
 
 /**
@@ -82,20 +85,26 @@ public class TestMatchRelationship extends TestDataBase {
             EdgeDirection.BOTH, null, "work");
         ResultSet work = work1.all();
         List<ValueWrapper> edges = work.colValues("e");
+        Relationship relationship = edges.get(0).asRelationship();
         assert work1.exist();
         assert work1.count() == 6;
-        assert edges.get(0).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asRelationship().dstId().asLong() == 3;
-        assert edges.get(1).asRelationship().srcId().asLong() == 3
-            && edges.get(1).asRelationship().dstId().asLong() == 2;
-        assert edges.get(2).asRelationship().srcId().asLong() == 3
-            && edges.get(2).asRelationship().dstId().asLong() == 4;
-        assert edges.get(3).asRelationship().srcId().asLong() == 1
-            && edges.get(3).asRelationship().dstId().asLong() == 3;
-        assert edges.get(4).asRelationship().srcId().asLong() == 3
-            && edges.get(4).asRelationship().dstId().asLong() == 2;
-        assert edges.get(5).asRelationship().srcId().asLong() == 3
-            && edges.get(5).asRelationship().dstId().asLong() == 4;
+        assert relationship.srcId().asLong() == 1
+            && relationship.dstId().asLong() == 3;
+        Relationship relationship1 = edges.get(1).asRelationship();
+        assert relationship1.srcId().asLong() == 3
+            && relationship1.dstId().asLong() == 2;
+        Relationship relationship2 = edges.get(2).asRelationship();
+        assert relationship2.srcId().asLong() == 3
+            && relationship2.dstId().asLong() == 4;
+        Relationship relationship3 = edges.get(3).asRelationship();
+        assert relationship3.srcId().asLong() == 1
+            && relationship3.dstId().asLong() == 3;
+        Relationship relationship4 = edges.get(4).asRelationship();
+        assert relationship4.srcId().asLong() == 3
+            && relationship4.dstId().asLong() == 2;
+        Relationship relationship5 = edges.get(5).asRelationship();
+        assert relationship5.srcId().asLong() == 3
+            && relationship5.dstId().asLong() == 4;
     }
 
     @Test
@@ -107,14 +116,16 @@ public class TestMatchRelationship extends TestDataBase {
             EdgeDirection.OUT, edgeByTeam, "team");
         ResultSet work = team.all();
         List<ValueWrapper> edges = work.colValues("e");
+        Relationship relationship = edges.get(0).asRelationship();
         assert team.exist();
         assert team.count() == 2;
-        assert edges.get(0).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asRelationship().dstId().asLong() == 2
-            && edges.get(0).asRelationship().properties().get("object").asString().equals("math");
-        assert edges.get(1).asRelationship().srcId().asLong() == 2
-            && edges.get(1).asRelationship().dstId().asLong() == 3
-            && edges.get(1).asRelationship().properties().get("object").asString().equals("math");
+        assert relationship.srcId().asLong() == 1
+            && relationship.dstId().asLong() == 2
+            && relationship.properties().get("object").asString().equals("math");
+        Relationship relationship1 = edges.get(1).asRelationship();
+        assert relationship1.srcId().asLong() == 2
+            && relationship1.dstId().asLong() == 3
+            && relationship1.properties().get("object").asString().equals("math");
     }
 
     @Test
@@ -134,14 +145,16 @@ public class TestMatchRelationship extends TestDataBase {
             EdgeDirection.OUT, null, "team");
         ResultSet work = match.where(null, "v.name == \"sc\"").all();
         List<ValueWrapper> edges = work.colValues("e");
+        Relationship relationship = edges.get(0).asRelationship();
         assert match.exist();
         assert match.count() == 2;
-        assert edges.get(0).asRelationship().srcId().asLong() == 2
-            && edges.get(0).asRelationship().dstId().asLong() == 3
-            && edges.get(0).asRelationship().properties().get("object").asString().equals("math");
-        assert edges.get(1).asRelationship().srcId().asLong() == 2
-            && edges.get(1).asRelationship().dstId().asLong() == 4
-            && edges.get(1).asRelationship().properties()
+        assert relationship.srcId().asLong() == 2
+            && relationship.dstId().asLong() == 3
+            && relationship.properties().get("object").asString().equals("math");
+        Relationship relationship1 = edges.get(1).asRelationship();
+        assert relationship1.srcId().asLong() == 2
+            && relationship1.dstId().asLong() == 4
+            && relationship1.properties()
             .get("object").asString().equals("chinese");
     }
 
@@ -155,11 +168,12 @@ public class TestMatchRelationship extends TestDataBase {
             EdgeDirection.OUT, null, "team");
         ResultSet work = match.where(null, "v.age == 19").all();
         List<ValueWrapper> edges = work.colValues("e");
+        Relationship relationship = edges.get(0).asRelationship();
         assert match.exist();
         assert match.count() == 1;
-        assert edges.get(0).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asRelationship().dstId().asLong() == 2
-            && edges.get(0).asRelationship().properties().get("object").asString().equals("math");
+        assert relationship.srcId().asLong() == 1
+            && relationship.dstId().asLong() == 2
+            && relationship.properties().get("object").asString().equals("math");
     }
 
     @Test
@@ -170,11 +184,12 @@ public class TestMatchRelationship extends TestDataBase {
             EdgeDirection.OUT, null, "team");
         ResultSet work = match.where(null, "v.name == \"sc\" and v1.name == \"sy\"").all();
         List<ValueWrapper> edges = work.colValues("e");
+        Relationship relationship = edges.get(0).asRelationship();
         assert match.exist();
         assert match.count() == 1;
-        assert edges.get(0).asRelationship().srcId().asLong() == 2
-            && edges.get(0).asRelationship().dstId().asLong() == 3
-            && edges.get(0).asRelationship().properties().get("object").asString().equals("math");
+        assert relationship.srcId().asLong() == 2
+            && relationship.dstId().asLong() == 3
+            && relationship.properties().get("object").asString().equals("math");
     }
 
     @Test
@@ -184,14 +199,16 @@ public class TestMatchRelationship extends TestDataBase {
             EdgeDirection.OUT, null, "team", "work");
         ResultSet work = match.where(null, "v.name == \"qkm\"").all();
         List<ValueWrapper> edges = work.colValues("e");
+        Relationship relationship = edges.get(0).asRelationship();
         assert match.exist();
         assert match.count() == 2;
-        assert edges.get(0).asRelationship().srcId().asLong() == 1
-            && edges.get(0).asRelationship().dstId().asLong() == 2
-            && edges.get(0).asRelationship().properties().get("object").asString().equals("math");
-        assert edges.get(1).asRelationship().srcId().asLong() == 1
-            && edges.get(1).asRelationship().dstId().asLong() == 3
-            && edges.get(1).asRelationship().edgeName().equals("work");
+        assert relationship.srcId().asLong() == 1
+            && relationship.dstId().asLong() == 2
+            && relationship.properties().get("object").asString().equals("math");
+        Relationship relationship1 = edges.get(1).asRelationship();
+        assert relationship1.srcId().asLong() == 1
+            && relationship1.dstId().asLong() == 3
+            && relationship1.edgeName().equals("work");
     }
 
     @Test
@@ -202,7 +219,7 @@ public class TestMatchRelationship extends TestDataBase {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         RelationshipMatch match = relationshipMatcher.match("QKM1", null, null, null,
             EdgeDirection.OUT, null, "team");
-        ResultSet work = match.where(null).orderBy(orderBy,null,null).all();
+        ResultSet work = match.where(null).orderBy(orderBy, null, null).all();
         List<ValueWrapper> edges = work.colValues("name");
         assert match.exist();
         assert match.count() == 3;
@@ -224,7 +241,7 @@ public class TestMatchRelationship extends TestDataBase {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         RelationshipMatch match = relationshipMatcher.match("QKM1", null, null, null,
             EdgeDirection.OUT, null, "team");
-        ResultSet work = match.where(null).orderBy(orderBy,null,null)
+        ResultSet work = match.where(null).orderBy(orderBy, null, null)
             .groupBy(groupBy, aggregateFunctions).all();
         assert match.exist();
         assert match.count() == 2;
