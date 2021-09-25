@@ -7,7 +7,9 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * used to represent attribute relationships
+ * used to represent attribute relationships.
+ *
+ * @author Qi Kai Meng
  */
 public enum Relational implements Filter {
     EQ("=="),
@@ -24,6 +26,7 @@ public enum Relational implements Filter {
 
     private final String symbol;
     private Object value;
+
     Relational(String symbol) {
         this.symbol = symbol;
     }

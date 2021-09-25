@@ -7,7 +7,9 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * used to do orderBy operate,eg: order by name desc
+ * used to do orderBy operate,eg: order by name desc.
+ *
+ * @author Qi Kai Meng
  */
 public enum Sort {
     ASC,

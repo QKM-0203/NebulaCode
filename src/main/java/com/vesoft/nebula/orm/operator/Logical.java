@@ -7,7 +7,9 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * used to represent logical relationships
+ * used to represent logical relationships.
+ *
+ * @author Qi Kai Meng
  */
 public enum Logical implements Filter {
     AND("AND"),
@@ -28,7 +30,8 @@ public enum Logical implements Filter {
 
     /**
      * pass in two relational,logical representation of two relations
-     * @param leftRelational logical front
+     *
+     * @param leftRelational  logical front
      * @param rightRelational logical behind
      * @return Logical
      */

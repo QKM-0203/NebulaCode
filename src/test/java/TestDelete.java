@@ -4,11 +4,25 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
+import com.vesoft.nebula.orm.entity.Schema;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.junit.Test;
 
+/**
+ * because the schema creation and index creation steps are implemented asynchronously,
+ * the Nepal graph cannot be created until the next heartbeat cycle,
+ * so you can wait and execute the method again.
+ */
 public class TestDelete extends TestDataBase {
+
+    {
+        graph.createTag(qkm1);
+        graph.createTag(qkm2);
+        graph.createEdge(team);
+        graph.createEdge(work);
+    }
+
     @Test
     public void testDropSpace() {
         ArrayList<String> spaceNameList = new ArrayList<>();
@@ -50,44 +64,51 @@ public class TestDelete extends TestDataBase {
 
     @Test
     public void deleteTag() {
-        graph.createTag(qkm6);
-        assert graph.getTags().contains("\"" + qkm6.getName() + "\"");
+        Schema tag = new Schema("QKM3", tagProperties, 0, null);
+        graph.createTag(tag);
+        assert graph.getTags().contains(tag.getName());
         ArrayList<String> tagList = new ArrayList<>();
-        tagList.add("QKM6");
+        tagList.add("QKM3");
+        graph.dropTagIndex("i_QKM3");//first delete tagIndex
         graph.dropTagList(tagList);
-        graph.dropTag("QKM6");
-        assert !graph.getTags().contains("\"" + qkm6.getName() + "\"");
+        graph.dropTag("QKM3");
+        assert !graph.getTags().contains(tag.getName());
     }
 
     @Test
     public void deleteEdge() {
-        graph.createEdge(qkm5);
-        assert graph.getTags().contains("\"" + qkm5.getName() + "\"");
+        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        graph.createEdge(edge);
+        assert graph.getEdges().contains(edge.getName());
         ArrayList<String> edgeList = new ArrayList<>();
-        edgeList.add("QKM5");
+        edgeList.add("QKM4");
+        graph.dropEdgeIndex("i_QKM4_teacherName_object");//first delete edgeIndex
         graph.dropEdgeList(edgeList);
-        graph.dropEdge("QKM5");
-        assert !graph.getEdges().contains("\"" + qkm5.getName() + "\"");
+        graph.dropEdge("QKM4");
+        assert !graph.getEdges().contains(edge.getName());
     }
 
     @Test
     public void deleteEdgeIndex() {
         HashMap<String, Integer> edgeIndexes = new HashMap<>();
-        edgeIndexes.put("money", 10);
-        edgeIndexes.put("number", null);
-        graph.createEdgeIndex("QKM5", "t_qkm5", edgeIndexes);
-        assert graph.getEdgeIndexes("QKM5").contains("\"t_qkm5\"");
-        graph.dropEdgeIndex("t_qkm5");
-        assert !graph.getEdgeIndexes("QKM5").contains("\"t_qkm5\"");
+        edgeIndexes.put("teacherName", 10);
+        edgeIndexes.put("object", 10);
+        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        graph.createEdge(edge);
+        graph.createEdgeIndex("QKM4", "i_QKM4_teacherName_object", edgeIndexes);
+        assert graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object");
+        graph.dropEdgeIndex("i_QKM4_teacherName_object");
+        assert !graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object");
     }
 
     @Test
     public void deleteTagIndex() {
-        HashMap<String, Integer> tagIndexes = new HashMap<>();
-        graph.createTagIndex("QKM6", "t_qkm6", null);
-        assert graph.getTagIndexes("QKM6").contains("\"t_qkm6\"");
-        graph.dropTagIndex("t_qkm6");
-        assert !graph.getTagIndexes("QKM6").contains("\"t_qkm6\"");
+        Schema tag = new Schema("QKM3", tagProperties, 0, null);
+        graph.createTag(tag);
+        graph.createTagIndex("QKM3", "i_QKM3", null);
+        assert graph.getTagIndexes("QKM3").contains("i_QKM3");
+        graph.dropTagIndex("i_QKM3");
+        assert !graph.getTagIndexes("QKM3").contains("i_QKM3");
     }
 
 }

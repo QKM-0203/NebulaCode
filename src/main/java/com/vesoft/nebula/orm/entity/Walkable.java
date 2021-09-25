@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * is a traversable object,can traverse traversable subgraph and paths.
  *
- * <p>you can get the start node, end node, and step size</p>
+ * <p>you can get the start node, end node, and step size.</p>
  *
  * @author Qi Kai Meng
  */

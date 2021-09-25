@@ -6,10 +6,26 @@
 
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.operator.DataType;
+import com.vesoft.nebula.orm.timetype.Date;
+import com.vesoft.nebula.orm.timetype.DateTime;
+import com.vesoft.nebula.orm.timetype.Time;
 import java.util.HashMap;
 import org.junit.Test;
 
+/**
+ * because the schema creation and index creation steps are implemented asynchronously,
+ * the Nepal graph cannot be created until the next heartbeat cycle,
+ * so you can wait and execute the method again.
+ */
 public class TestCreate extends TestDataBase {
+
+    {
+        graph.createTag(qkm1);
+        graph.createTag(qkm2);
+        graph.createEdge(team);
+        graph.createEdge(work);
+    }
+
     @Test
     public void testCreateSpace() {
         Space testOne = new Space("test1", 10, 1, DataType.FIXED_STRING.setLength(30));
@@ -57,28 +73,40 @@ public class TestCreate extends TestDataBase {
     }
 
     @Test
-    public void testCreateSchema() {
-        graph.createEdge(qkm5);
-        graph.createTag(qkm6);
-        assert graph.getEdges().contains("\"" + qkm5.getName() + "\"");
-        assert graph.getTags().contains("\"" + qkm6.getName() + "\"");
+    public void testCreateHasExpiredSchema() {
+        Schema tag = new Schema("QKM3", tagProperties, 1000, "age");
+        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        graph.createEdge(edge);
+        graph.createTag(tag);
+        System.out.println(graph.getEdges());
+        assert graph.getEdges().contains(edge.getName());
+        assert graph.getTags().contains(tag.getName());
     }
 
     @Test
     public void createEdgeIndex() {
-        graph.createEdge(qkm5);
+        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        graph.createEdge(edge);
         HashMap<String, Integer> edgeIndexes = new HashMap<>();
-        edgeIndexes.put("money", null);
-        edgeIndexes.put("number", null);
-        graph.createEdgeIndex("QKM5", "t_qkm5", edgeIndexes);
-        assert graph.getEdgeIndexes("QKM5").contains("\"t_qkm5\"");
+        edgeIndexes.put("teacherName", 10);
+        edgeIndexes.put("object", 10);
+        graph.createEdgeIndex("QKM4", "i_QKM4_teacherName_object", edgeIndexes);
+        assert graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object");
     }
 
     @Test
     public void createTagIndex() {
-        graph.createTag(qkm6);
-        HashMap<String, Integer> tagIndexes = new HashMap<>();
-        graph.createTagIndex("QKM6", "t_qkm6", null);
-        assert graph.getTagIndexes("QKM6").contains("\"t_qkm6\"");
+        Schema tag = new Schema("QKM3", tagProperties, 0, null);
+        graph.createTag(tag);
+        graph.createTagIndex("QKM3", "i_QKM3", null);
+        assert graph.getTagIndexes("QKM3").contains("i_QKM3");
+    }
+
+    @Test
+    public void createTimeType() {
+        DateTime dateTime = new DateTime("2021-08-06T12:23:45:123");
+        Time time = new Time("12:23:45:123");
+        long timestamp = 1234241312;
+        Date date = new Date("2021-02-04");
     }
 }
