@@ -4,21 +4,60 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import org.junit.Test;
 
+/**
+ * because the schema creation and index creation steps are implemented asynchronously,
+ * the Nepal graph cannot be created until the next heartbeat cycle,
+ * so you can wait and execute the method again.
+ */
 public class TestGet extends TestDataBase {
+    {
+        graph.createTag(qkm1);
+        graph.createTag(qkm2);
+        graph.createEdge(team);
+        graph.createEdge(work);
+        graph.create(vertexOne);
+        graph.create(vertexTwo);
+        graph.create(vertexThird);
+        graph.create(vertexFour);
+        graph.create(relationship12);
+        graph.create(relationship32);
+        graph.create(relationship24);
+        graph.create(relationship34);
+        graph.create(relationship23);
+        graph.create(relationship13);
+    }
+
     @Test
     public void testGetTags() {
         List<String> tags = graph.getTags();
-        assert tags.toString().equals("[QKM1, QKM2, QKM3, QKM4, "
-            + "QKM6]");
+        assert !tags.isEmpty();
     }
 
     @Test
     public void testGetEdges() {
         List<String> tags = graph.getEdges();
-        assert tags.toString().equals("[QKM5, team, work]");
+        assert !tags.isEmpty();
     }
 
+    @Test//you first execute submit job stats
+    public void testGetAllVertexNumber() throws UnsupportedEncodingException {
+        long number = graph.vertexNumber(null);
+        assert number == 4;
+    }
+
+    @Test//you first execute submit job stats
+    public void testGetDesignatedVertexNumber() throws UnsupportedEncodingException {
+        long number = graph.vertexNumber("QKM1");
+        assert number == 4;
+    }
+
+    @Test//you first execute submit job stats
+    public void testGetAllDesignatedEdgesNumber() throws UnsupportedEncodingException {
+        long number = graph.relationshipNumber("team");
+        assert number == 3;
+    }
 }

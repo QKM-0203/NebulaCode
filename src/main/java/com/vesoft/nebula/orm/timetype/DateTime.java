@@ -4,20 +4,23 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package com.vesoft.nebula.orm.datatype;
+package com.vesoft.nebula.orm.timetype;
 
 import com.vesoft.nebula.client.graph.data.DateTimeWrapper;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.GraphService;
 import com.vesoft.nebula.orm.exception.ExecuteException;
+import java.util.Objects;
 
 /**
  * this class is a DateTime class.
  *
  * <p>users can pass in time strings like this "2021-08-06T12:23:45:123",
- * it should be noted that users must call setSession to pass in Session Object,
- * in order to convert the time string into DateTimeWrapper, users can obtain
- * hour / minute / second of local and UTC .</p>
+ * it should be noted that users must call {@link #setGraphService(GraphService)}
+ * to pass in {@link GraphService} Object,in order to convert the time string into DateTimeWrapper,
+ * users can obtain hour / minute / second of local and UTC .</p>
+ *
+ * @author Qi Kai Meng
  */
 public class DateTime {
     private String dateTimeString;
@@ -116,12 +119,25 @@ public class DateTime {
         }
     }
 
-    public String getDateTimeString() {
+    @Override
+    public String toString() {
         return dateTimeString;
     }
 
     @Override
-    public String toString() {
-        return dateTimeString;
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DateTime dateTime = (DateTime) o;
+        return Objects.equals(dateTimeString, dateTime.dateTimeString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dateTimeString);
     }
 }

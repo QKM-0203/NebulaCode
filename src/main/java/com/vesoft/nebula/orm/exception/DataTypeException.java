@@ -8,6 +8,8 @@ package com.vesoft.nebula.orm.exception;
 
 /**
  * when inserting data, the data type passed did not match the type given.
+ *
+ * @author Qi Kai Meng
  */
 public class DataTypeException extends RuntimeException {
     public DataTypeException() {

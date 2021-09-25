@@ -8,9 +8,7 @@ package com.vesoft.nebula.orm.entity;
 
 import com.vesoft.nebula.orm.exception.ExecuteException;
 import com.vesoft.nebula.orm.exception.InitException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * users can create a path by passing in List<{@link Segment}> to insert data,
@@ -25,15 +23,17 @@ import java.util.List;
  * <p>The user can obtain the end node on the path
  * according to {@link Walkable#getEndVertex()} and the start node according to
  * {@link Walkable#getStartVertex()}.
- * The user can call {@link #walk()} to traverse the path and output the form of points and edges
+ * The user can call {@link #walk()} to traverse the path and output the form of points and edges.
  * </p>
  *
  * @author Qi Kai Meng
  */
 public class Path extends Walkable {
     private List<Object> sequence = new ArrayList<>();
+    private List<Segment> segments;
 
     public Path(List<Segment> path) {
+        this.segments = path;
         init(path);
     }
 
@@ -50,49 +50,99 @@ public class Path extends Walkable {
         sequence.add(path.get(0).getStartVertex());
         for (Segment segment : path) {
             Vertex lastVertex = (Vertex) sequence.get(sequence.size() - 1);
-            if (lastVertex.getVid().equals(segment.getStartVertex().getVid())) {
-                if (lastVertex.getVid().equals(segment.getRelationship().getStartVid())) {
+            if (lastVertex != null && segment != null
+                && segment.getStartVertex() != null
+                && lastVertex.getVid().equals(segment.getStartVertex().getVid())) {
+                if (segment.getRelationship() != null
+                    && lastVertex.getVid().equals(segment.getRelationship().getStartVid())) {
                     sequence.add(segment.getRelationship());
-                    if (segment.getEndVertex().getVid().equals(segment.getRelationship().getEndVid())) {
+                    if (segment.getEndVertex() != null
+                        && segment.getRelationship().getEndVid()
+                        .equals(segment.getEndVertex().getVid())) {
                         sequence.add(segment.getEndVertex());
+                    } else if (segment.getEndVertex() == null) {
+                        sequence.add(null);
                     } else {
                         sequence.clear();
                         throw new ExecuteException(String.format("%s can not connect %s",
-                            segment.getRelationship().getEndVid(), segment.getEndVertex()));
+                            segment.getRelationship(), segment.getEndVertex()));
                     }
-                } else if (lastVertex.getVid().equals(segment.getRelationship().getEndVid())) {
+                } else if (segment.getRelationship() != null
+                    && lastVertex.getVid().equals(segment.getRelationship().getEndVid())) {
                     sequence.add(segment.getRelationship());
-                    if (segment.getEndVertex().getVid().equals(segment.getRelationship().getStartVid())) {
+                    if (segment.getEndVertex() != null
+                        && segment.getRelationship().getStartVid()
+                        .equals(segment.getEndVertex().getVid())) {
                         sequence.add(segment.getEndVertex());
+                    } else if (segment.getEndVertex() == null) {
+                        sequence.add(null);
                     } else {
                         sequence.clear();
                         throw new ExecuteException(String.format("%s can not connect %s",
-                            segment.getRelationship().getStartVid(), segment.getEndVertex()));
+                            segment.getRelationship(), segment.getEndVertex()));
                     }
+                } else if (segment.getRelationship() == null) {
+                    if (segment.getEndVertex() == null) {
+                        Relationship relationship = new Relationship(segment.getStartVertex()
+                            .getVid(), segment.getStartVertex().getVid(), "Relationship");
+                        segment.setRelationship(relationship);
+                        segment.setEndVertex(segment.getStartVertex());
+                    } else {
+                        Relationship relationship = new Relationship(segment.getStartVertex()
+                            .getVid(), segment.getEndVertex().getVid(), "Relationship");
+                        segment.setRelationship(relationship);
+                    }
+                    sequence.add(segment.getRelationship());
+                    sequence.add(segment.getEndVertex());
                 } else {
                     sequence.clear();
                     throw new ExecuteException(String.format("%s can not connect %s",
                         lastVertex, segment.getRelationship()));
                 }
-            } else if (lastVertex.getVid().equals(segment.getEndVertex().getVid())) {
-                if (lastVertex.getVid().equals(segment.getRelationship().getStartVid())) {
+            } else if (lastVertex != null && segment != null
+                && segment.getEndVertex() != null
+                && lastVertex.getVid().equals(segment.getEndVertex().getVid())) {
+                if (segment.getRelationship() != null
+                    && lastVertex.getVid().equals(segment.getRelationship().getStartVid())) {
                     sequence.add(segment.getRelationship());
-                    if (segment.getStartVertex().getVid().equals(segment.getRelationship().getEndVid())) {
+                    if (segment.getStartVertex().getVid() != null
+                        && segment.getRelationship().getEndVid()
+                        .equals(segment.getStartVertex().getVid())) {
                         sequence.add(segment.getStartVertex());
+                    } else if (segment.getStartVertex().getVid() == null) {
+                        sequence.add(null);
                     } else {
                         sequence.clear();
                         throw new ExecuteException(String.format("%s can not connect %s",
-                            segment.getRelationship().getEndVid(), segment.getStartVertex()));
+                            segment.getRelationship(), segment.getStartVertex()));
                     }
-                } else if (lastVertex.getVid().equals(segment.getRelationship().getEndVid())) {
+                } else if (segment.getRelationship() != null
+                    && lastVertex.getVid().equals(segment.getRelationship().getEndVid())) {
                     sequence.add(segment.getRelationship());
-                    if (segment.getStartVertex().getVid().equals(segment.getRelationship().getStartVid())) {
+                    if (segment.getStartVertex() != null
+                        && segment.getRelationship().getStartVid()
+                        .equals(segment.getStartVertex().getVid())) {
                         sequence.add(segment.getStartVertex());
+                    } else if (segment.getStartVertex() == null) {
+                        sequence.add(null);
                     } else {
                         sequence.clear();
                         throw new ExecuteException(String.format("%s can not connect %s",
-                            segment.getRelationship().getStartVid(), segment.getStartVertex()));
+                            segment.getRelationship(), segment.getStartVertex()));
                     }
+                } else if (segment.getRelationship() == null) {
+                    if (segment.getEndVertex() == null) {
+                        Relationship relationship = new Relationship(segment.getStartVertex()
+                            .getVid(), segment.getStartVertex().getVid(), "Relationship");
+                        segment.setRelationship(relationship);
+                        segment.setEndVertex(segment.getStartVertex());
+                    } else {
+                        Relationship relationship = new Relationship(segment.getStartVertex()
+                            .getVid(), segment.getEndVertex().getVid(), "Relationship");
+                        segment.setRelationship(relationship);
+                    }
+                    sequence.add(segment.getRelationship());
+                    sequence.add(segment.getEndVertex());
                 } else {
                     sequence.clear();
                     throw new ExecuteException(String.format("%s can not connect %s",
@@ -109,7 +159,7 @@ public class Path extends Walkable {
         for (Object o : sequence) {
             if (o instanceof Vertex) {
                 vertices.add((Vertex) o);
-            } else {
+            } else if (o instanceof Relationship) {
                 relationships.add((Relationship) o);
             }
         }
@@ -119,13 +169,11 @@ public class Path extends Walkable {
     /**
      * traversal {@link #sequence} output.
      */
-    public void walk() {
+    public List<Object> walk() {
         if (sequence.isEmpty()) {
             throw new InitException("path cannot be traversed");
         }
-        for (Object o : sequence) {
-            System.out.println(o);
-        }
+        return sequence;
     }
 
     @Override
@@ -136,7 +184,7 @@ public class Path extends Walkable {
                 result.append(sequence.get(index));
             } else {
                 ArrayList<String> prop = new ArrayList<>();
-                HashMap<String, Object> propMap = ((Relationship) sequence.get(index)).getPropMap();
+                Map<String, Object> propMap = ((Relationship) sequence.get(index)).getPropMap();
                 StringBuilder propValue = new StringBuilder();
                 if (propMap != null && !propMap.isEmpty()) {
                     for (String propName : ((Relationship)
@@ -164,5 +212,26 @@ public class Path extends Walkable {
             }
         }
         return String.format("<%s>", result);
+    }
+
+    public List<Segment> getSegments() {
+        return segments;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Path path = (Path) o;
+        return Objects.equals(segments, path.segments);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(segments);
     }
 }

@@ -7,13 +7,16 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * unary operator
+ * unary operator.
+ *
+ * @author Qi Kai Meng
  */
 public enum UnaryOperation implements Filter {
     IsNotNull("IS NOT NULL"),
     IsNull("IS NULL");
 
     private final String symbol;
+
     UnaryOperation(String symbol) {
         this.symbol = symbol;
     }

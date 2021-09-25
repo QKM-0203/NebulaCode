@@ -7,7 +7,9 @@
 package com.vesoft.nebula.orm.operator;
 
 /**
- * aggregate function
+ * aggregate function.
+ *
+ * @author Qi Kai Meng
  */
 public enum AggregateFunction {
     COLLECT,

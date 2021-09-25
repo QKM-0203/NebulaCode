@@ -10,7 +10,19 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import org.junit.Test;
 
+/**
+ * because the schema creation and index creation steps are implemented asynchronously,
+ * the Nepal graph cannot be created until the next heartbeat cycle,
+ * so you can wait and execute the method again.
+ */
 public class TestPull extends TestDataBase {
+    {
+        graph.createTag(qkm1);
+        graph.createTag(qkm2);
+        graph.createEdge(team);
+        graph.createEdge(work);
+    }
+
     @Test
     public void testCanNotPullOtherObject() {
         StringBuffer qkm = new StringBuffer("qkm");

@@ -9,19 +9,22 @@ package com.vesoft.nebula.orm.match;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.orm.entity.Graph;
 import com.vesoft.nebula.orm.query.cypher.Encoding;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * the user gets the {@link VertexMatcher} object by passing the {@link Graph} object,
- * and user can use {@link #match(String, HashMap)} method by pass in about tag,use
+ * and user can use {@link #match(String, Map)} method by pass in about tag,use
  * {@link #getVertexByVid(Object)} method by pass in vid get Vertex and use
  * {@link #getVertexByListVid(List)} method by pass in vidList get Vertexes.
+ *
+ * @author Qi Kai Meng
  */
-public class VertexMatcher extends VertexMatch {
+public class VertexMatcher {
+    private final VertexMatch vertexMatch;
 
     public VertexMatcher(Graph graph) {
-        super(graph);
+        this.vertexMatch = new VertexMatch(graph);
     }
 
     /**
@@ -32,9 +35,8 @@ public class VertexMatcher extends VertexMatch {
      *                match (v:player).
      * @return VertexMatch
      */
-    public VertexMatch match(String tagName, HashMap<String, Object> propMap) {
-        init(tagName, propMap);
-        return this;
+    public VertexMatch match(String tagName, Map<String, Object> propMap) {
+        return vertexMatch.init(tagName, propMap);
     }
 
     /**

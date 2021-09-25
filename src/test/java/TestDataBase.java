@@ -5,13 +5,10 @@
  */
 
 import com.vesoft.nebula.client.graph.data.HostAddress;
-import com.vesoft.nebula.orm.datatype.DateTime;
 import com.vesoft.nebula.orm.entity.*;
 import com.vesoft.nebula.orm.operator.DataType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import com.vesoft.nebula.orm.timetype.DateTime;
+import java.util.*;
 
 public class TestDataBase {
     public GraphService graphService = new GraphService(
@@ -37,12 +34,24 @@ public class TestDataBase {
     Relationship relationship32;
     Relationship relationship24;
     Relationship relationship34;
-    Property propertyOne = new Property("class", DataType.INT8, false, 1);
-    Property propertyTwo = new Property("grade", DataType.INT32, true, null);
-    ArrayList<Property> properties = new ArrayList<>();
-    Schema qkm5;
-    Schema qkm6;
+    Relationship relationship23;
+    Relationship relationship13;
+    Property propertyOne = new Property("name", DataType.STRING.setLength(10), true, null);
+    Property propertyTwo = new Property("age", DataType.INT, true, null);
+    Property propertyThird = new Property("birth", DataType.DATETIME, true, null);
+    Property propertyFour = new Property("teacherName", DataType.STRING.setLength(10), true, null);
+    Property propertyFive = new Property("object", DataType.STRING.setLength(20), true, null);
+    ArrayList<Property> tagProperties = new ArrayList<>();
+    ArrayList<Property> edgeProperties = new ArrayList<>();
+    Schema qkm1;
+    Schema qkm2;
+    Schema team;
+    Schema work;
     Subgraph subgraph;
+    Segment segment12;
+    Segment segment32;
+    Segment segment24;
+    Segment segment34;
     Path path;
 
     {
@@ -76,12 +85,19 @@ public class TestDataBase {
         relationshipValueTwo.put("object", "chinese");
         relationship12 = new Relationship(1, 2, "team", relationshipValueOne, 1);
         relationship32 = new Relationship(3, 2, "work", null, 1);
+        relationship13 = new Relationship(1, 3, "work", null, 0);
         relationship24 = new Relationship(2, 4, "team", relationshipValueTwo, 1);
         relationship34 = new Relationship(3, 4, "work", null, 1);
-        properties.add(propertyOne);
-        properties.add(propertyTwo);
-        qkm5 = new Schema("QKM6", properties, 0, null);
-        qkm6 = new Schema("QKM5", null);
+        relationship23 = new Relationship(2, 3, "team", relationshipValueOne, 0);
+        tagProperties.add(propertyOne);
+        tagProperties.add(propertyTwo);
+        tagProperties.add(propertyThird);
+        edgeProperties.add(propertyFour);
+        edgeProperties.add(propertyFive);
+        qkm2 = new Schema("QKM2", tagProperties, 0, null);
+        qkm1 = new Schema("QKM1", null);
+        team = new Schema("team", edgeProperties);
+        work = new Schema("work", null);
         ArrayList<Relationship> relationshipList = new ArrayList<>();
         relationshipList.add(relationship12);
         relationshipList.add(relationship32);
@@ -90,10 +106,10 @@ public class TestDataBase {
         vertices.add(vertexTwo);
         vertices.add(vertexThird);
         subgraph = new Subgraph(vertices, relationshipList);
-        Segment segment12 = new Segment(vertexOne, relationship12, vertexTwo);
-        Segment segment32 = new Segment(vertexThird, relationship32, vertexTwo);
-        Segment segment24 = new Segment(vertexTwo, relationship24, vertexFour);
-        Segment segment34 = new Segment(vertexThird, relationship34, vertexFour);
+        segment12 = new Segment(vertexOne, relationship12, vertexTwo);
+        segment32 = new Segment(vertexThird, relationship32, vertexTwo);
+        segment24 = new Segment(vertexTwo, relationship24, vertexFour);
+        segment34 = new Segment(vertexThird, relationship34, vertexFour);
         List<Segment> segments = new ArrayList<>();
         segments.add(segment12);
         segments.add(segment32);

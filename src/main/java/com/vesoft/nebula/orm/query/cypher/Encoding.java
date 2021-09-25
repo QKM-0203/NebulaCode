@@ -6,15 +6,16 @@
 
 package com.vesoft.nebula.orm.query.cypher;
 
-import com.vesoft.nebula.Date;
-import com.vesoft.nebula.orm.datatype.DateTime;
-import com.vesoft.nebula.orm.datatype.Time;
 import com.vesoft.nebula.orm.entity.Property;
 import com.vesoft.nebula.orm.entity.Relationship;
 import com.vesoft.nebula.orm.entity.Schema;
 import com.vesoft.nebula.orm.entity.Vertex;
 import com.vesoft.nebula.orm.exception.DataTypeException;
 import com.vesoft.nebula.orm.exception.InitException;
+import com.vesoft.nebula.orm.query.util.KeyWord;
+import com.vesoft.nebula.orm.timetype.Date;
+import com.vesoft.nebula.orm.timetype.DateTime;
+import com.vesoft.nebula.orm.timetype.Time;
 import java.util.*;
 
 /**
@@ -29,14 +30,14 @@ public class Encoding {
      * @param propMap tagMap
      * @return tagString spliced by tagMap, eg:player(name,age)
      */
-    public static String joinTag(HashMap<String,
-        HashMap<String, Object>> propMap) {
+    public static String joinTag(Map<String,
+            HashMap<String, Object>> propMap) {
         ArrayList<String> tagStringList = new ArrayList<>();
         StringBuilder tagPartFormat = new StringBuilder();
         StringBuilder tagPart = new StringBuilder();
         for (String tagName : propMap.keySet()) {
             tagPart.append("`").append(tagName).append("`").append("(%s)");
-            HashMap<String, Object> propValueMap = propMap.get(tagName);
+            Map<String, Object> propValueMap = propMap.get(tagName);
             if (propValueMap != null) {
                 if (propValueMap.containsKey(null)) {
                     throw new DataTypeException("attribute name cannot be null");
@@ -54,7 +55,7 @@ public class Encoding {
     }
 
     /**
-     * use parameter to connect a attribute values of vertex.
+     * use parameter to connect an attribute values of vertex.
      *
      * @param vertex vertex object
      * @return attribute values of vertex, eg:"1":("qkm",19)
@@ -65,7 +66,7 @@ public class Encoding {
         String result = "%s:(%s)";
         HashMap<String, HashMap<String, Object>> propMap = vertex.getPropMap();
         for (String tagName : propMap.keySet()) {
-            HashMap<String, Object> valueMap = propMap.get(tagName);
+            Map<String, Object> valueMap = propMap.get(tagName);
             if (valueMap == null || valueMap.isEmpty()) {
                 continue;
             }
@@ -123,11 +124,6 @@ public class Encoding {
             relationship.getRank(), String.join(",", values));
     }
 
-    public static String encodeDate(Date date) {
-        return String.format("%d-%02d-%02d", date.getYear(), date.getMonth(),
-            date.getDay());
-    }
-
     public static String encodeList(List<?> list) {
         ArrayList<String> listString = new ArrayList<>();
         for (Object o : list) {
@@ -165,19 +161,29 @@ public class Encoding {
         } else if (object instanceof String) {
             return "\"" + object + "\"";
         } else if (object instanceof DateTime) {
-            return String.format("datetime(\"%s\")", ((DateTime) object).getDateTimeString());
+            return String.format(KeyWord.DATETIME + "(\"%s\")", object);
         } else if (object instanceof Time) {
-            return String.format("time(\"%s\")", ((Time) object).getTimeString());
+            return String.format(KeyWord.TIME + "(\"%s\")", object);
         } else if (object instanceof Date) {
-            return String.format("date(\"%s\")", encodeDate((Date) object));
+            return String.format(KeyWord.DATE + "(\"%s\")", object);
         } else if (object instanceof Boolean) {
             return String.format("%s", object);
         } else if (object instanceof List) { // has question
             return encodeList((List<?>) object);
+        } else if (object instanceof Set) { // has question
+            return encodeSet((Set<?>) object);
         } else {
             throw new DataTypeException(String.format("nGql does not support type %s",
                 object.getClass().getName()));
         }
+    }
+
+    private static String encodeSet(Set<?> set) {
+        HashSet<String> setString = new HashSet<>();
+        for (Object o : set) {
+            setString.add(judgeDataType(o));
+        }
+        return setString.toString();
     }
 
     /**
@@ -207,10 +213,10 @@ public class Encoding {
         if (propertyList != null && !propertyList.isEmpty()) {
             prop.append(traversalProp(propertyList));
             if (schema.getTtlDuration() != 0) {
-                expired.add("TTL_DURATION = " + schema.getTtlDuration());
+                expired.add(KeyWord.TTL_DURATION + " = " + schema.getTtlDuration());
             }
             if (schema.getTtlCol() != null) {
-                expired.add("TTL_COL = \"" + schema.getTtlCol() + "\"");
+                expired.add(KeyWord.TTL_COL + " = \"" + schema.getTtlCol() + "\"");
             }
         }
         return String.format("`%s`(%s)%s",
@@ -228,16 +234,17 @@ public class Encoding {
         StringBuilder part = new StringBuilder();
         for (Property property : propertyList) {
             part.append("`").append(property.getPropName()).append("` ")
-                .append(property.getDataType().toString().equals("FIXED_STRING")
-                    ? String.format("FIXED_STRING(%d)",
+                .append(property.getDataType().toString().equals(KeyWord.FIXED_STRING)
+                    ? String.format(KeyWord.FIXED_STRING + "(%d)",
                     property.getDataType().getLength()) : property.getDataType()).append(" ");
             if (property.isNullable()) {
-                part.append("NULL");
+                part.append(KeyWord.NULL);
             } else {
-                part.append("NOT NULL");
+                part.append(KeyWord.NOT_NULL);
             }
             if (property.getDefaultValue() != null) {
-                part.append(" DEFAULT ").append(Encoding.judgeDataType(property.getDefaultValue()));
+                part.append(KeyWord.DEFAULT).append(" ")
+                    .append(Encoding.judgeDataType(property.getDefaultValue()));
             }
             prop.add(part.toString());
             part.delete(0, part.length());
@@ -249,7 +256,7 @@ public class Encoding {
      * @param propMap attribute value of schema
      * @return eg: set name = "qkm",age = 10
      */
-    public static String connectProp(HashMap<String, Object> propMap) {
+    public static String connectProp(Map<String, Object> propMap) {
         ArrayList<String> keyValue = new ArrayList<>();
         for (String propName : propMap.keySet()) {
             keyValue.add(String.format("`%s`: %s", propName, judgeDataType(propMap.get(propName))));
@@ -262,7 +269,7 @@ public class Encoding {
      *
      * @param indexMap indexMap,String is attribute name ,Integer is index length
      */
-    public static String joinIndexProp(HashMap<String, Integer> indexMap) {
+    public static String joinIndexProp(Map<String, Integer> indexMap) {
         ArrayList<String> indexList = new ArrayList<>();
         if (indexMap == null) {
             return null;
