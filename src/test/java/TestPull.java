@@ -4,8 +4,8 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-import com.vesoft.nebula.orm.entity.Relationship;
-import com.vesoft.nebula.orm.entity.Vertex;
+import com.vesoft.nebula.ngqlbuilder.entity.Relationship;
+import com.vesoft.nebula.ngqlbuilder.entity.Vertex;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import org.junit.Test;

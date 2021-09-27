@@ -5,7 +5,7 @@
  */
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
-import com.vesoft.nebula.orm.entity.*;
+import com.vesoft.nebula.ngqlbuilder.entity.*;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

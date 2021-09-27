@@ -5,12 +5,12 @@
  */
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
-import com.vesoft.nebula.orm.entity.Property;
-import com.vesoft.nebula.orm.entity.Relationship;
-import com.vesoft.nebula.orm.entity.Schema;
-import com.vesoft.nebula.orm.entity.Vertex;
-import com.vesoft.nebula.orm.operator.DataType;
-import com.vesoft.nebula.orm.timetype.DateTime;
+import com.vesoft.nebula.ngqlbuilder.entity.Property;
+import com.vesoft.nebula.ngqlbuilder.entity.Relationship;
+import com.vesoft.nebula.ngqlbuilder.entity.Schema;
+import com.vesoft.nebula.ngqlbuilder.entity.Vertex;
+import com.vesoft.nebula.ngqlbuilder.operator.DataType;
+import com.vesoft.nebula.ngqlbuilder.timetype.DateTime;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

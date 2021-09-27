@@ -6,10 +6,10 @@
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
-import com.vesoft.nebula.orm.entity.Relationship;
-import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.query.ngql.FetchEdge;
-import com.vesoft.nebula.orm.query.ngql.FetcherEdge;
+import com.vesoft.nebula.ngqlbuilder.entity.Relationship;
+import com.vesoft.nebula.ngqlbuilder.operator.Sort;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.FetchEdge;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.FetcherEdge;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

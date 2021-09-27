@@ -5,8 +5,8 @@
  */
 
 import com.vesoft.nebula.client.graph.data.HostAddress;
-import com.vesoft.nebula.orm.entity.Graph;
-import com.vesoft.nebula.orm.entity.GraphService;
+import com.vesoft.nebula.ngqlbuilder.entity.Graph;
+import com.vesoft.nebula.ngqlbuilder.entity.GraphService;
 import java.util.Arrays;
 import org.junit.Test;
 

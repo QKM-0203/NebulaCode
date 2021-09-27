@@ -6,9 +6,9 @@
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
-import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.query.ngql.FetchVertex;
-import com.vesoft.nebula.orm.query.ngql.FetcherVertex;
+import com.vesoft.nebula.ngqlbuilder.operator.Sort;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.FetchVertex;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.FetcherVertex;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

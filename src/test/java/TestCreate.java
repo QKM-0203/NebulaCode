@@ -4,11 +4,12 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-import com.vesoft.nebula.orm.entity.*;
-import com.vesoft.nebula.orm.operator.DataType;
-import com.vesoft.nebula.orm.timetype.Date;
-import com.vesoft.nebula.orm.timetype.DateTime;
-import com.vesoft.nebula.orm.timetype.Time;
+import com.vesoft.nebula.ngqlbuilder.entity.*;
+import com.vesoft.nebula.ngqlbuilder.operator.DataType;
+import com.vesoft.nebula.ngqlbuilder.timetype.Date;
+import com.vesoft.nebula.ngqlbuilder.timetype.DateTime;
+import com.vesoft.nebula.ngqlbuilder.timetype.Time;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import org.junit.Test;
 
@@ -84,7 +85,7 @@ public class TestCreate extends TestDataBase {
     }
 
     @Test
-    public void createEdgeIndex() {
+    public void createEdgeIndex() throws UnsupportedEncodingException {
         Schema edge = new Schema("QKM4", edgeProperties, 0, null);
         graph.createEdge(edge);
         HashMap<String, Integer> edgeIndexes = new HashMap<>();
@@ -95,7 +96,7 @@ public class TestCreate extends TestDataBase {
     }
 
     @Test
-    public void createTagIndex() {
+    public void createTagIndex() throws UnsupportedEncodingException {
         Schema tag = new Schema("QKM3", tagProperties, 0, null);
         graph.createTag(tag);
         graph.createTagIndex("QKM3", "i_QKM3", null);

@@ -7,10 +7,10 @@
 import com.vesoft.nebula.client.graph.data.Relationship;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
-import com.vesoft.nebula.orm.operator.PathDirection;
-import com.vesoft.nebula.orm.operator.PathType;
-import com.vesoft.nebula.orm.query.ngql.FindPath;
-import com.vesoft.nebula.orm.query.ngql.FinderPath;
+import com.vesoft.nebula.ngqlbuilder.operator.PathDirection;
+import com.vesoft.nebula.ngqlbuilder.operator.PathType;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.FindPath;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.FinderPath;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,30 +63,30 @@ public class TestFindPath extends TestDataBase {
             && relationship.edgeName().equals("work");
         List<Relationship> relationships1 = path.get(1).asPath().getRelationships();
         Relationship relationship1 = relationships1.get(0);
-        Relationship relationship2 = relationships1.get(1);
         assert relationships1.size() == 2
             && relationship1.srcId().asLong() == 1
             && relationship1.dstId().asLong() == 2
             && relationship1.ranking() == 1
-            && relationship1.edgeName().equals("team")
-            && relationship2.srcId().asLong() == 2
+            && relationship1.edgeName().equals("team");
+        Relationship relationship2 = relationships1.get(1);
+        assert relationship2.srcId().asLong() == 2
             && relationship2.dstId().asLong() == 3
             && relationship2.ranking() == 0
             && relationship2.edgeName().equals("team");
         List<Relationship> relationships2 = path.get(2).asPath().getRelationships();
         Relationship relationship3 = relationships2.get(0);
-        Relationship relationship4 = relationships2.get(1);
-        Relationship relationship5 = relationships2.get(2);
         assert relationships2.size() == 3
             && relationship3.srcId().asLong() == 1
             && relationship3.dstId().asLong() == 3
             && relationship3.ranking() == 0
-            && relationship3.edgeName().equals("work")
-            && relationship4.srcId().asLong() == 3
+            && relationship3.edgeName().equals("work");
+        Relationship relationship4 = relationships2.get(1);
+        assert relationship4.srcId().asLong() == 3
             && relationship4.dstId().asLong() == 2
             && relationship4.ranking() == 1
-            && relationship4.edgeName().equals("work")
-            && relationship5.srcId().asLong() == 2
+            && relationship4.edgeName().equals("work");
+        Relationship relationship5 = relationships2.get(2);
+        assert relationship5.srcId().asLong() == 2
             && relationship5.dstId().asLong() == 3
             && relationship5.ranking() == 0
             && relationship5.edgeName().equals("team");
@@ -158,13 +158,13 @@ public class TestFindPath extends TestDataBase {
             && relationship.edgeName().equals("work");
         List<Relationship> relationships1 = path.get(1).asPath().getRelationships();
         Relationship relationship1 = relationships1.get(0);
-        Relationship relationship2 = relationships1.get(1);
         assert relationships1.size() == 2
             && relationship1.srcId().asLong() == 1
             && relationship1.dstId().asLong() == 2
             && relationship1.ranking() == 1
-            && relationship1.edgeName().equals("team")
-            && relationship2.srcId().asLong() == 2
+            && relationship1.edgeName().equals("team");
+        Relationship relationship2 = relationships1.get(1);
+        assert relationship2.srcId().asLong() == 2
             && relationship2.dstId().asLong() == 3
             && relationship2.ranking() == 0
             && relationship2.edgeName().equals("team");
@@ -242,13 +242,13 @@ public class TestFindPath extends TestDataBase {
             && relationship.edgeName().equals("work");
         List<Relationship> relationships1 = path.get(1).asPath().getRelationships();
         Relationship relationship1 = relationships1.get(0);
-        Relationship relationship2 = relationships1.get(1);
         assert relationships1.size() == 2
             && relationship1.srcId().asLong() == 1
             && relationship1.dstId().asLong() == 2
             && relationship1.ranking() == 1
-            && relationship1.edgeName().equals("team")
-            && relationship2.srcId().asLong() == 2
+            && relationship1.edgeName().equals("team");
+        Relationship relationship2 = relationships1.get(1);
+        assert relationship2.srcId().asLong() == 2
             && relationship2.dstId().asLong() == 3
             && relationship2.ranking() == 0
             && relationship2.edgeName().equals("team");
@@ -271,13 +271,13 @@ public class TestFindPath extends TestDataBase {
         List<ValueWrapper> path = all.colValues("path");
         List<Relationship> relationships = path.get(0).asPath().getRelationships();
         Relationship relationship = relationships.get(0);
-        Relationship relationship1 = relationships.get(1);
         assert relationships.size() == 2
             && relationship.srcId().asLong() == 1
             && relationship.dstId().asLong() == 2
             && relationship.ranking() == 1
-            && relationship.edgeName().equals("team")
-            && relationship1.srcId().asLong() == 2
+            && relationship.edgeName().equals("team");
+        Relationship relationship1 = relationships.get(1);
+        assert relationship1.srcId().asLong() == 2
             && relationship1.dstId().asLong() == 3
             && relationship1.ranking() == 0
             && relationship1.edgeName().equals("team");
