@@ -7,12 +7,12 @@
 import com.vesoft.nebula.client.graph.data.Relationship;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
-import com.vesoft.nebula.orm.match.RelationshipMatch;
-import com.vesoft.nebula.orm.match.RelationshipMatcher;
-import com.vesoft.nebula.orm.operator.AggregateFunction;
-import com.vesoft.nebula.orm.operator.EdgeDirection;
-import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.query.ngql.Column;
+import com.vesoft.nebula.ngqlbuilder.match.RelationshipMatch;
+import com.vesoft.nebula.ngqlbuilder.match.RelationshipMatcher;
+import com.vesoft.nebula.ngqlbuilder.operator.AggregateFunction;
+import com.vesoft.nebula.ngqlbuilder.operator.EdgeDirection;
+import com.vesoft.nebula.ngqlbuilder.operator.Sort;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.Column;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,11 +49,6 @@ public class TestMatchRelationship extends TestDataBase {
         graph.createEdgeIndex("team", "i_team_teacherName_object", indexOnTeam);
         indexOnTeam.remove("teacherName", 10);
         graph.createEdgeIndex("team", "i_team_object", indexOnTeam);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         graph.run("REBUILD EDGE INDEX i_work, i_team, i_team_teacherName, i_team_object, "
             + "i_team_teacherName_object");
         graph.createTagIndex("QKM1", "i_QKM1", null);
@@ -65,11 +60,6 @@ public class TestMatchRelationship extends TestDataBase {
         graph.createTagIndex("QKM2", "i_QKM2_name_age", indexOnQKM2);
         indexOnQKM2.remove("name", 10);
         graph.createTagIndex("QKM2", "i_QKM2_age", indexOnQKM2);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         graph.run("REBUILD TAG INDEX i_QKM1, i_QKM2_name, i_QKM2, i_QKM2_name_age, "
             + "i_QKM2_age");
     }

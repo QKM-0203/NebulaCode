@@ -6,11 +6,11 @@
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
-import com.vesoft.nebula.orm.operator.Filter;
-import com.vesoft.nebula.orm.operator.Relational;
-import com.vesoft.nebula.orm.operator.Sort;
-import com.vesoft.nebula.orm.query.ngql.LookUp;
-import com.vesoft.nebula.orm.query.ngql.LookerUp;
+import com.vesoft.nebula.ngqlbuilder.operator.Filter;
+import com.vesoft.nebula.ngqlbuilder.operator.Relational;
+import com.vesoft.nebula.ngqlbuilder.operator.Sort;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.LookUp;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.LookerUp;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;

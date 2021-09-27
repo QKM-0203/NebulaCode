@@ -5,9 +5,9 @@
  */
 
 import com.vesoft.nebula.client.graph.data.HostAddress;
-import com.vesoft.nebula.orm.entity.*;
-import com.vesoft.nebula.orm.operator.DataType;
-import com.vesoft.nebula.orm.timetype.DateTime;
+import com.vesoft.nebula.ngqlbuilder.entity.*;
+import com.vesoft.nebula.ngqlbuilder.operator.DataType;
+import com.vesoft.nebula.ngqlbuilder.timetype.DateTime;
 import java.util.*;
 
 public class TestDataBase {
@@ -57,16 +57,16 @@ public class TestDataBase {
     {
         vertexValueOne.put("name", "qkm");
         vertexValueOne.put("age", 19);
-        vertexValueOne.put("birth", new DateTime("2002-02-03 06:12:12:123"));
+        vertexValueOne.put("birth", new DateTime("2002-02-03T06:12:12:123"));
         vertexValueTwo.put("name", "sc");
         vertexValueTwo.put("age", 19);
-        vertexValueTwo.put("birth", new DateTime("2001-04-07 06:12:12:123"));
+        vertexValueTwo.put("birth", new DateTime("2001-04-07T06:12:12:123"));
         vertexValueThree.put("name", "sy");
         vertexValueThree.put("age", 20);
-        vertexValueThree.put("birth", new DateTime("2001-08-13 06:12:12:123"));
+        vertexValueThree.put("birth", new DateTime("2001-08-13T06:12:12:123"));
         vertexValueFour.put("name", "yq");
         vertexValueFour.put("age", 21);
-        vertexValueFour.put("birth", new DateTime("1999-12-25 06:12:12:123"));
+        vertexValueFour.put("birth", new DateTime("1999-12-25T06:12:12:123"));
         vertexMapOne.put("QKM1", null);
         vertexMapOne.put("QKM2", vertexValueOne);
         vertexMapTwo.put("QKM1", null);

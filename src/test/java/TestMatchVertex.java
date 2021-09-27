@@ -7,10 +7,10 @@
 import com.vesoft.nebula.client.graph.data.Node;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
-import com.vesoft.nebula.orm.match.VertexMatch;
-import com.vesoft.nebula.orm.match.VertexMatcher;
-import com.vesoft.nebula.orm.operator.*;
-import com.vesoft.nebula.orm.query.ngql.Column;
+import com.vesoft.nebula.ngqlbuilder.match.VertexMatch;
+import com.vesoft.nebula.ngqlbuilder.match.VertexMatcher;
+import com.vesoft.nebula.ngqlbuilder.operator.*;
+import com.vesoft.nebula.ngqlbuilder.query.ngql.Column;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

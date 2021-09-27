@@ -4,8 +4,8 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-import com.vesoft.nebula.orm.entity.Path;
-import com.vesoft.nebula.orm.entity.Segment;
+import com.vesoft.nebula.ngqlbuilder.entity.Path;
+import com.vesoft.nebula.ngqlbuilder.entity.Segment;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;

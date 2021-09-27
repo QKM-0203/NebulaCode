@@ -4,9 +4,14 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-import com.vesoft.nebula.orm.entity.Schema;
+import com.vesoft.nebula.ngqlbuilder.entity.Schema;
+import com.vesoft.nebula.ngqlbuilder.entity.Space;
+import com.vesoft.nebula.ngqlbuilder.operator.DataType;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import org.junit.Test;
 
 /**
@@ -24,10 +29,19 @@ public class TestDelete extends TestDataBase {
     }
 
     @Test
-    public void testDropSpace() {
+    public void testDropSpace() throws UnsupportedEncodingException {
+        Space testOne = new Space("test1", 10, 1, DataType.FIXED_STRING.setLength(30));
+        Space testTwo = new Space("test2", 10, 1, DataType.INT64);
+        graphService.createSpace(testOne);
+        graphService.createSpace(testTwo);
+        assert null != graphService.getGraph("test1");
+        assert null != graphService.getGraph("test2");
         ArrayList<String> spaceNameList = new ArrayList<>();
         spaceNameList.add("test1");
-        spaceNameList.add("test2");
+        graphService.dropSpaces(spaceNameList);
+        List<String> spaces = graphService.showSpaces();
+        assert !spaces.contains("test1")
+            && spaces.contains("test2");
     }
 
     @Test
@@ -89,26 +103,29 @@ public class TestDelete extends TestDataBase {
     }
 
     @Test
-    public void deleteEdgeIndex() {
-        HashMap<String, Integer> edgeIndexes = new HashMap<>();
-        edgeIndexes.put("teacherName", 10);
-        edgeIndexes.put("object", 10);
+    public void deleteEdgeIndex() throws UnsupportedEncodingException {
         Schema edge = new Schema("QKM4", edgeProperties, 0, null);
         graph.createEdge(edge);
+        HashMap<String, Integer> edgeIndexes = new HashMap<>();
+        edgeIndexes.put("teacherName", 10);
+        graph.createEdgeIndex("QKM4", "i_QKM4_teacherName", edgeIndexes);
+        edgeIndexes.put("object", 10);
         graph.createEdgeIndex("QKM4", "i_QKM4_teacherName_object", edgeIndexes);
-        assert graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object");
+        assert graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object")
+            && graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName");
         graph.dropEdgeIndex("i_QKM4_teacherName_object");
-        assert !graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object");
+        assert !graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object")
+            && graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName");
     }
 
     @Test
-    public void deleteTagIndex() {
+    public void deleteTagIndex() throws UnsupportedEncodingException {
         Schema tag = new Schema("QKM3", tagProperties, 0, null);
         graph.createTag(tag);
         graph.createTagIndex("QKM3", "i_QKM3", null);
         assert graph.getTagIndexes("QKM3").contains("i_QKM3");
         graph.dropTagIndex("i_QKM3");
-        assert !graph.getTagIndexes("QKM3").contains("i_QKM3");
+        assert graph.getTagIndexes("QKM3") == null;
     }
 
 }

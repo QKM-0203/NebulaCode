@@ -5,7 +5,7 @@
  */
 
 import com.vesoft.nebula.client.graph.data.ResultSet;
-import com.vesoft.nebula.orm.entity.Schema;
+import com.vesoft.nebula.ngqlbuilder.entity.Schema;
 import java.util.HashMap;
 import org.junit.Test;
 
