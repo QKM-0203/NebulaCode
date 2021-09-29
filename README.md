@@ -1,6 +1,5 @@
 # NebulaCode 项目
 
-***
 NebulaCode 是一个基于 [nebula-java](https://github.com/vesoft-inc/nebula-java)
 来让用户更方便操作 [Nebula Group](https://nebula-graph.com.cn/ ) 的工具。
 
