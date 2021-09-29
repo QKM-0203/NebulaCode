@@ -19,9 +19,9 @@ import org.junit.Test;
 public class TestMerge extends TestDataBase {
 
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(person);
+        graph.createTag(hobby);
+        graph.createEdge(subject);
         graph.createEdge(work);
     }
 
@@ -29,7 +29,7 @@ public class TestMerge extends TestDataBase {
     public void mergeVertexThatDoesNotExistTagHasProp() throws UnsupportedEncodingException {
         graph.delete(vertexOne);
         assert !graph.exists(vertexOne);
-        graph.merge(vertexOne, "QKM2", "name");
+        graph.merge(vertexOne, "person", "name");
         graph.exists(vertexOne);
     }
 
@@ -37,7 +37,7 @@ public class TestMerge extends TestDataBase {
     public void mergeVertexThatDoesNotExistTagNotHasProp() throws UnsupportedEncodingException {
         graph.delete(vertexOne);
         assert !graph.exists(vertexOne);
-        graph.merge(vertexOne, "QKM1");
+        graph.merge(vertexOne, "hobby");
         graph.exists(vertexOne);
     }
 
@@ -47,7 +47,7 @@ public class TestMerge extends TestDataBase {
         assert graph.exists(vertexOne);
         graph.run("submit job stats");
         final long oldVertexNumber = graph.vertexNumber(null);
-        graph.merge(vertexOne, "QKM2", "name");
+        graph.merge(vertexOne, "person", "name");
         graph.run("submit job stats");
         final long newVertexNumber = graph.vertexNumber(null);
         assert newVertexNumber == oldVertexNumber;
@@ -57,9 +57,9 @@ public class TestMerge extends TestDataBase {
     public void mergeVertexThatUpdatePropValue() throws UnsupportedEncodingException {
         graph.create(vertexOne);
         assert graph.exists(vertexOne);
-        vertexValueOne.put("name", "QKM");
-        graph.merge(vertexOne, "QKM2", "name");
-        assertTagPropValue("QKM2", vertexOne.getVid() instanceof String
+        qkmPersonValues.put("name", "QKM");
+        graph.merge(vertexOne, "person", "name");
+        assertTagPropValue("person", vertexOne.getVid() instanceof String
             ? "\"" + vertexOne.getVid() + "\"" : vertexOne.getVid().toString());
     }
 
@@ -72,7 +72,7 @@ public class TestMerge extends TestDataBase {
         graph.createTag(qkm7);
         vertexMapOneAddTag.put("QKM7", null);
         Vertex vertexOneAddTag = new Vertex(vertexOne.getVid(), vertexMapOneAddTag);
-        graph.merge(vertexOneAddTag, "QKM2", "age");
+        graph.merge(vertexOneAddTag, "person", "age");
         graph.pull(vertexOne);
         assert vertexOne.hasTag("QKM7");
 
@@ -99,7 +99,7 @@ public class TestMerge extends TestDataBase {
         graph.create(relationship12);
         assert graph.exists(relationship12);
         final long oldEdgeNumber = graph.relationshipNumber(null);
-        graph.merge(relationship12, "team", "teamName");
+        graph.merge(relationship12, "subject", "subjectName");
         final long newEdgeNumber = graph.relationshipNumber(null);
         assert oldEdgeNumber == newEdgeNumber;
     }
@@ -108,7 +108,7 @@ public class TestMerge extends TestDataBase {
     public void mergeRelationshipThatUpdatePropValue() throws UnsupportedEncodingException {
         graph.create(relationship12);
         assert graph.exists(relationship12);
-        relationshipValueOne.put("teacherName", "China");
+        qkmSubjectValues.put("teacherName", "China");
         graph.merge(relationship12);
         assertEdgePropValue(relationship12);
     }
@@ -133,7 +133,7 @@ public class TestMerge extends TestDataBase {
         assert !graph.exists(vertexOne);
         assert !graph.exists(vertexOne);
         assert !graph.exists(vertexThird);
-        graph.merge(subgraph, "QKM2", "name");
+        graph.merge(subgraph, "person", "name");
         assert graph.exists(vertexOne);
         assert graph.exists(vertexTwo);
         assert graph.exists(vertexThird);
@@ -154,7 +154,7 @@ public class TestMerge extends TestDataBase {
         vertices.add(vertexTwo);
         vertices.add(vertexThird);
         Subgraph subgraph = new Subgraph(vertices);
-        graph.merge(subgraph, "QKM2", "name");
+        graph.merge(subgraph, "person", "name");
         graph.exists(subgraph);
     }
 
@@ -162,7 +162,7 @@ public class TestMerge extends TestDataBase {
     public void mergePathThatOneVertexExist() throws UnsupportedEncodingException {
         graph.create(vertexOne);
         assert graph.exists(vertexOne);
-        graph.merge(path, "QKM2", "name");
+        graph.merge(path, "person", "name");
         assert graph.exists(path);
     }
 

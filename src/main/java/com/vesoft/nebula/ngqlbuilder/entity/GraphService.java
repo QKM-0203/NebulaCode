@@ -11,6 +11,7 @@ import com.vesoft.nebula.client.graph.data.HostAddress;
 import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.client.graph.exception.AuthFailedException;
+import com.vesoft.nebula.client.graph.exception.ClientServerIncompatibleException;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.exception.NotValidConnectionException;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
@@ -18,7 +19,6 @@ import com.vesoft.nebula.client.graph.net.Session;
 import com.vesoft.nebula.ngqlbuilder.exception.ExecuteException;
 import com.vesoft.nebula.ngqlbuilder.operator.DataType;
 import com.vesoft.nebula.ngqlbuilder.query.util.KeyWord;
-
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -34,9 +34,9 @@ import java.util.List;
  * @author Qi Kai Meng
  */
 public class GraphService {
-    private String username;
-    private String password;
-    private List<HostAddress> hostAddresses;
+    private  String username;
+    private  String password;
+    private  List<HostAddress> hostAddresses;
     private boolean reconnect = false;
     private NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
     private static final String NAME = "Name";
@@ -75,7 +75,7 @@ public class GraphService {
         }
         try {
             session = nebulaPool.getSession(username, password, reconnect);
-        } catch (NotValidConnectionException | IOErrorException | AuthFailedException e) {
+        } catch (NotValidConnectionException | IOErrorException | AuthFailedException | ClientServerIncompatibleException e) {
             e.printStackTrace();
         }
         return session;
@@ -100,7 +100,6 @@ public class GraphService {
         if (space.getSpaceName() == null) {
             throw new IllegalArgumentException("spaceName cannot be null");
         }
-        Session session = getSession();
         String createSpace;
         if (space.getVidDataType().equals(DataType.FIXED_STRING)) {
             createSpace = String.format(KeyWord.CREATE + " " + KeyWord.SPACE + " "

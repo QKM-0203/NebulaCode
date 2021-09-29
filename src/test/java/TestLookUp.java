@@ -23,9 +23,9 @@ import org.junit.Test;
  */
 public class TestLookUp extends TestDataBase {
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(person);
+        graph.createTag(hobby);
+        graph.createEdge(subject);
         graph.createEdge(work);
         graph.create(vertexOne);
         graph.create(vertexTwo);
@@ -38,31 +38,31 @@ public class TestLookUp extends TestDataBase {
         graph.create(relationship23);
         graph.create(relationship13);
         graph.createEdgeIndex("work", "i_work", null);
-        graph.createEdgeIndex("team", "i_team", null);
+        graph.createEdgeIndex("subject", "i_subject", null);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        graph.run("REBUILD EDGE INDEX i_work, i_team");
-        graph.createTagIndex("QKM1", "i_QKM1", null);
-        graph.createTagIndex("QKM2", "i_QKM2", null);
+        graph.run("REBUILD EDGE INDEX i_work, i_subject");
+        graph.createTagIndex("hobby", "i_hobby", null);
+        graph.createTagIndex("person", "i_person", null);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        graph.run("REBUILD TAG INDEX i_QKM1,i_QKM2");
+        graph.run("REBUILD TAG INDEX i_hobby,i_person");
     }
 
     @Test
     public void testLookUpOnTag() {
         LookerUp lookerUp = new LookerUp(graph);
-        LookUp qkm21 = lookerUp.lookUp("QKM2");
-        ResultSet qkm2 = qkm21.all();
-        assert qkm21.exist();
-        assert qkm21.count() == 4;
-        List<ValueWrapper> vertexID = qkm2.colValues("VertexID");
+        LookUp personLook = lookerUp.lookUp("person");
+        ResultSet person = personLook.all();
+        assert personLook.exist();
+        assert personLook.count() == 4;
+        List<ValueWrapper> vertexID = person.colValues("VertexID");
         assert vertexID.get(0).asLong() == 1;
         assert vertexID.get(1).asLong() == 2;
         assert vertexID.get(2).asLong() == 3;
@@ -72,13 +72,13 @@ public class TestLookUp extends TestDataBase {
     @Test
     public void testLookUpOnEdge() {
         LookerUp lookerUp = new LookerUp(graph);
-        LookUp team = lookerUp.lookUp("team");
-        ResultSet qkm2 = team.all();
-        assert team.exist();
-        assert team.count() == 3;
-        List<ValueWrapper> srcVID = qkm2.colValues("SrcVID");
-        List<ValueWrapper> dstVid = qkm2.colValues("DstVID");
-        List<ValueWrapper> ranking = qkm2.colValues("Ranking");
+        LookUp subject = lookerUp.lookUp("subject");
+        ResultSet person = subject.all();
+        assert subject.exist();
+        assert subject.count() == 3;
+        List<ValueWrapper> srcVID = person.colValues("SrcVID");
+        List<ValueWrapper> dstVid = person.colValues("DstVID");
+        List<ValueWrapper> ranking = person.colValues("Ranking");
         assert srcVID.get(0).asLong() == 1;
         assert dstVid.get(0).asLong() == 2;
         assert ranking.get(0).asLong() == 1;
@@ -94,12 +94,12 @@ public class TestLookUp extends TestDataBase {
     public void testLookUpOnTagAddWhere() {
         LookerUp lookerUp = new LookerUp(graph);
         HashMap<String, Filter> filter = new HashMap<>();
-        filter.put("QKM2.age", Relational.LE.setValue(19));
-        LookUp qkm21 = lookerUp.lookUp("QKM2");
-        ResultSet qkm2 = qkm21.where(filter).all();
-        assert qkm21.exist();
-        assert qkm21.count() == 2;
-        List<ValueWrapper> vertexID = qkm2.colValues("VertexID");
+        filter.put("person.age", Relational.LE.setValue(19));
+        LookUp person1 = lookerUp.lookUp("person");
+        ResultSet person = person1.where(filter).all();
+        assert person1.exist();
+        assert person1.count() == 2;
+        List<ValueWrapper> vertexID = person.colValues("VertexID");
         assert vertexID.get(0).asLong() == 1;
         assert vertexID.get(1).asLong() == 2;
     }
@@ -108,14 +108,14 @@ public class TestLookUp extends TestDataBase {
     public void testLookUpOnEdgeAddWhere() {
         LookerUp lookerUp = new LookerUp(graph);
         HashMap<String, Filter> filter = new HashMap<>();
-        filter.put("team.object", Relational.EQ.setValue("math"));
-        LookUp team = lookerUp.lookUp("team");
-        ResultSet qkm2 = team.where(filter).all();
-        assert team.exist();
-        assert team.count() == 2;
-        List<ValueWrapper> srcVid = qkm2.colValues("SrcVID");
-        List<ValueWrapper> dstVid = qkm2.colValues("DstVID");
-        List<ValueWrapper> ranking = qkm2.colValues("Ranking");
+        filter.put("subject.object", Relational.EQ.setValue("math"));
+        LookUp subject = lookerUp.lookUp("subject");
+        ResultSet person = subject.where(filter).all();
+        assert subject.exist();
+        assert subject.count() == 2;
+        List<ValueWrapper> srcVid = person.colValues("SrcVID");
+        List<ValueWrapper> dstVid = person.colValues("DstVID");
+        List<ValueWrapper> ranking = person.colValues("Ranking");
         assert srcVid.get(0).asLong() == 1;
         assert dstVid.get(0).asLong() == 2;
         assert ranking.get(0).asLong() == 1;
@@ -128,13 +128,13 @@ public class TestLookUp extends TestDataBase {
     public void testLookUpOnTagAddWhereAddYield() throws UnsupportedEncodingException {
         LookerUp lookerUp = new LookerUp(graph);
         HashMap<String, Filter> filter = new HashMap<>();
-        filter.put("QKM2.age", Relational.LE.setValue(19));
-        LookUp qkm21 = lookerUp.lookUp("QKM2");
-        ResultSet qkm2 = qkm21.where(filter).yield("DISTINCT QKM2.name as name").all();
-        assert qkm21.exist();
-        assert qkm21.count() == 2;
-        List<ValueWrapper> vertexIDs = qkm2.colValues("VertexID");
-        List<ValueWrapper> names = qkm2.colValues("name");
+        filter.put("person.age", Relational.LE.setValue(19));
+        LookUp person1 = lookerUp.lookUp("person");
+        ResultSet person = person1.where(filter).yield("DISTINCT person.name as name").all();
+        assert person1.exist();
+        assert person1.count() == 2;
+        List<ValueWrapper> vertexIDs = person.colValues("VertexID");
+        List<ValueWrapper> names = person.colValues("name");
         assert vertexIDs.get(0).asLong() == 1;
         assert names.get(0).asString().equals("qkm");
         assert vertexIDs.get(1).asLong() == 2;
@@ -147,14 +147,14 @@ public class TestLookUp extends TestDataBase {
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("name", Sort.ASC);
         HashMap<String, Filter> filter = new HashMap<>();
-        filter.put("QKM2.age", Relational.LE.setValue(19));
-        LookUp qkm21 = lookerUp.lookUp("QKM2");
-        ResultSet qkm2 = qkm21.where(filter).yield("DISTINCT QKM2.name as name")
+        filter.put("person.age", Relational.LE.setValue(19));
+        LookUp person1 = lookerUp.lookUp("person");
+        ResultSet person = person1.where(filter).yield("DISTINCT person.name as name")
             .orderBy(null,orderBy,null).limit(1,1).all();
-        assert qkm21.exist();
-        assert qkm21.count() == 1;
-        List<ValueWrapper> vertexIDs = qkm2.colValues("VertexID");
-        List<ValueWrapper> names = qkm2.colValues("name");
+        assert person1.exist();
+        assert person1.count() == 1;
+        List<ValueWrapper> vertexIDs = person.colValues("VertexID");
+        List<ValueWrapper> names = person.colValues("name");
         assert vertexIDs.get(0).asLong() == 2;
         assert names.get(0).asString().equals("sc");
     }
@@ -162,9 +162,9 @@ public class TestLookUp extends TestDataBase {
     @Test
     public void testLookUpSchemaException() {
         LookerUp lookerUp = new LookerUp(graph);
-        LookUp qkm21 = lookerUp.lookUp(null);
+        LookUp person1 = lookerUp.lookUp(null);
         try {
-            ResultSet qkm2 = qkm21.yield("DISTINCT QKM2.name as name").all();
+            ResultSet person = person1.yield("DISTINCT person.name as name").all();
         } catch (Exception e) {
             assert e.getMessage().equals("schema can not be null");
         }

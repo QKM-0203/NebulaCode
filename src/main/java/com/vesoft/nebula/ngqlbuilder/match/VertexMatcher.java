@@ -16,7 +16,7 @@ import java.util.Map;
  * the user gets the {@link VertexMatcher} object by passing the {@link Graph} object,
  * and user can use {@link #match(String, Map)} method by pass in about tag,use
  * {@link #getVertexByVid(Object)} method by pass in vid get Vertex and use
- * {@link #getVertexByListVid(List)} method by pass in vidList get Vertexes.
+ * {@link #getVertexByVid(List)} method by pass in vidList get Vertexes.
  *
  * @author Qi Kai Meng
  */
@@ -56,7 +56,7 @@ public class VertexMatcher {
      * @param vidList vidList
      * @return vertexList
      */
-    public ResultSet getVertexByListVid(List<?> vidList) {
+    public ResultSet getVertexByVid(List<?> vidList) {
         return match(null, null)
             .where(null, String.format("id(v) IN [%s]", Encoding.encodeIdList(vidList))).all();
     }

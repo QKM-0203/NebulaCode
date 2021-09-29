@@ -23,9 +23,9 @@ import org.junit.Test;
  */
 public class TestPush extends TestDataBase {
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(person);
+        graph.createTag(hobby);
+        graph.createEdge(subject);
         graph.createEdge(work);
     }
 
@@ -101,18 +101,18 @@ public class TestPush extends TestDataBase {
     @Test
     public void testPushVertexValueFullCoverage() throws UnsupportedEncodingException {
         graph.create(vertexOne);
-        vertexValueOne.remove("age", 19);
-        vertexValueOne.put("name", "QKM");
+        qkmPersonValues.remove("age", 19);
+        qkmPersonValues.put("name", "QKM");
         graph.push(vertexOne);
         graph.pull(vertexOne);
-        assert vertexOne.getTag("QKM2").get("name").equals("QKM");
-        assert vertexOne.getTag("QKM2").get("age") == null;
+        assert vertexOne.getTag("person").get("name").equals("QKM");
+        assert vertexOne.getTag("person").get("age") == null;
     }
 
     @Test
     public void testPushRelationshipValue() throws UnsupportedEncodingException {
         graph.create(relationship12);
-        relationshipValueOne.put("teacherName", "SC");
+        qkmSubjectValues.put("teacherName", "SC");
         graph.push(relationship12);
         graph.pull(relationship12);
         assert relationship12.properties().get("teacherName").equals("SC");
@@ -143,12 +143,12 @@ public class TestPush extends TestDataBase {
     @Test
     public void testPushSubgraph() throws UnsupportedEncodingException {
         graph.create(subgraph);
-        relationshipValueOne.put("teacherName", "SC");
-        vertexValueOne.put("name", "QKM");
+        qkmSubjectValues.put("teacherName", "SC");
+        qkmPersonValues.put("name", "QKM");
         graph.push(subgraph);
         graph.pull(subgraph);
         assertEdgePropValue(relationship12, "teacherName", "SC");
-        assertTagPropValue("QKM2", vertexOne.getVid() instanceof String
+        assertTagPropValue("person", vertexOne.getVid() instanceof String
             ? "\"" + vertexOne.getVid() + "\"" : vertexOne.getVid().toString(), "name", "QKM");
     }
 

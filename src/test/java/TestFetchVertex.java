@@ -23,8 +23,8 @@ import org.junit.Test;
 public class TestFetchVertex extends TestDataBase {
 
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
+        graph.createTag(hobby);
+        graph.createTag(person);
         graph.create(vertexOne);
         graph.create(vertexTwo);
         graph.create(vertexThird);
@@ -35,14 +35,14 @@ public class TestFetchVertex extends TestDataBase {
     public void testFetchOneVertexOneTag() throws UnsupportedEncodingException {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
         FetchVertex fetchVertex = fetcherVertex.fetchVertex(1);
-        ResultSet all = fetchVertex.on("QKM2").all();
+        ResultSet all = fetchVertex.on("person").all();
         List<ValueWrapper> vertices = all.colValues("vertices_");
         assert vertices.size() == 1;
         assert fetchVertex.exist();
-        HashMap<String, ValueWrapper> qkm2 = vertices.get(0).asNode().properties("QKM2");
-        assert qkm2.get("name").asString().equals("qkm");
-        assert qkm2.get("age").asLong() == 19;
-        assert qkm2.get("birth").asDateTime().getLocalDateTimeStr()
+        HashMap<String, ValueWrapper> person = vertices.get(0).asNode().properties("person");
+        assert person.get("name").asString().equals("qkm");
+        assert person.get("age").asLong() == 19;
+        assert person.get("birth").asDateTime().getLocalDateTimeStr()
             .equals("2002-02-03T06:12:12.000000");
     }
 
@@ -50,16 +50,16 @@ public class TestFetchVertex extends TestDataBase {
     public void testFetchOneVertexMultipleTag() throws UnsupportedEncodingException {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
         FetchVertex fetchVertex = fetcherVertex.fetchVertex(1);
-        ResultSet all = fetchVertex.on("QKM2", "QKM1").all();
+        ResultSet all = fetchVertex.on("person", "hobby").all();
         List<ValueWrapper> vertices = all.colValues("vertices_");
         assert vertices.size() == 1;
         assert fetchVertex.exist();
-        HashMap<String, ValueWrapper> qkm2 = vertices.get(0).asNode().properties("QKM2");
-        HashMap<String, ValueWrapper> qkm1 = vertices.get(0).asNode().properties("QKM1");
-        assert qkm1.isEmpty();
-        assert qkm2.get("name").asString().equals("qkm");
-        assert qkm2.get("age").asLong() == 19;
-        assert qkm2.get("birth").asDateTime().getLocalDateTimeStr()
+        HashMap<String, ValueWrapper> person = vertices.get(0).asNode().properties("person");
+        HashMap<String, ValueWrapper> hobby = vertices.get(0).asNode().properties("hobby");
+        assert hobby.isEmpty();
+        assert person.get("name").asString().equals("qkm");
+        assert person.get("age").asLong() == 19;
+        assert person.get("birth").asDateTime().getLocalDateTimeStr()
             .equals("2002-02-03T06:12:12.000000");
     }
 
@@ -72,20 +72,20 @@ public class TestFetchVertex extends TestDataBase {
         ids.add(3);
         ids.add(5);
         FetchVertex fetchVertex = fetcherVertex.fetchVertex(ids);
-        ResultSet all = fetchVertex.on("QKM2", "QKM1").all();
+        ResultSet all = fetchVertex.on("person", "hobby").all();
         List<ValueWrapper> vertices = all.colValues("vertices_");
         assert fetchVertex.exist();
         assert vertices.size() == 3;
-        assert vertices.get(0).asNode().properties("QKM2").get("name").asString().equals("sc");
-        assert vertices.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert vertices.get(2).asNode().properties("QKM2").get("name").asString().equals("sy");
+        assert vertices.get(0).asNode().properties("person").get("name").asString().equals("sc");
+        assert vertices.get(1).asNode().properties("person").get("name").asString().equals("qkm");
+        assert vertices.get(2).asNode().properties("person").get("name").asString().equals("sy");
     }
 
     @Test
     public void testFetchAddYield() throws UnsupportedEncodingException {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
         FetchVertex fetchVertex = fetcherVertex.fetchVertex(1);
-        ResultSet all = fetchVertex.on("QKM2").yield("QKM2.name as name", "QKM2.age as age").all();
+        ResultSet all = fetchVertex.on("person").yield("person.name as name", "person.age as age").all();
         assert all.rowsSize() == 1;
         assert fetchVertex.exist();
         List<ValueWrapper> vid = all.colValues("VertexID");
@@ -106,7 +106,7 @@ public class TestFetchVertex extends TestDataBase {
         FetchVertex fetchVertex = fetcherVertex.fetchVertex(ids);
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("age", Sort.ASC);
-        ResultSet all = fetchVertex.on("QKM2").yield("QKM2.name as name", "QKM2.age as age")
+        ResultSet all = fetchVertex.on("person").yield("person.name as name", "person.age as age")
             .orderBy(null,orderBy,null).limit(1,3).all();
         assert all.rowsSize() == 2;
         assert fetchVertex.exist();
@@ -126,8 +126,8 @@ public class TestFetchVertex extends TestDataBase {
         FetcherVertex fetcherVertex = new FetcherVertex(graph);
         FetchVertex fetchVertex = fetcherVertex.fetchVertex(null);
         try {
-            ResultSet all = fetchVertex.on("QKM2")
-                .yield("QKM2.name as name", "QKM2.age as age").all();
+            ResultSet all = fetchVertex.on("person")
+                .yield("person.name as name", "person.age as age").all();
         } catch (Exception e) {
             assert e.getMessage().equals("vidList can not be null");
         }

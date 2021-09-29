@@ -26,9 +26,9 @@ import org.junit.Test;
  */
 public class TestMatchRelationship extends TestDataBase {
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(hobby);
+        graph.createTag(person);
+        graph.createEdge(subject);
         graph.createEdge(work);
         graph.create(vertexOne);
         graph.create(vertexTwo);
@@ -40,28 +40,28 @@ public class TestMatchRelationship extends TestDataBase {
         graph.create(relationship34);
         graph.create(relationship23);
         graph.create(relationship13);
-        HashMap<String, Integer> indexOnTeam = new HashMap<>();
+        HashMap<String, Integer> indexOnsubject = new HashMap<>();
         graph.createEdgeIndex("work", "i_work", null);
-        graph.createEdgeIndex("team", "i_team", null);
-        indexOnTeam.put("teacherName", 10);
-        graph.createEdgeIndex("team", "i_team_teacherName", indexOnTeam);
-        indexOnTeam.put("object", 10);
-        graph.createEdgeIndex("team", "i_team_teacherName_object", indexOnTeam);
-        indexOnTeam.remove("teacherName", 10);
-        graph.createEdgeIndex("team", "i_team_object", indexOnTeam);
-        graph.run("REBUILD EDGE INDEX i_work, i_team, i_team_teacherName, i_team_object, "
-            + "i_team_teacherName_object");
-        graph.createTagIndex("QKM1", "i_QKM1", null);
-        HashMap<String, Integer> indexOnQKM2 = new HashMap<>();
-        graph.createTagIndex("QKM2", "i_QKM2", null);
-        indexOnQKM2.put("name", 10);
-        graph.createTagIndex("QKM2", "i_QKM2_name", indexOnQKM2);
-        indexOnQKM2.put("age", null);
-        graph.createTagIndex("QKM2", "i_QKM2_name_age", indexOnQKM2);
-        indexOnQKM2.remove("name", 10);
-        graph.createTagIndex("QKM2", "i_QKM2_age", indexOnQKM2);
-        graph.run("REBUILD TAG INDEX i_QKM1, i_QKM2_name, i_QKM2, i_QKM2_name_age, "
-            + "i_QKM2_age");
+        graph.createEdgeIndex("subject", "i_subject", null);
+        indexOnsubject.put("teacherName", 10);
+        graph.createEdgeIndex("subject", "i_subject_teacherName", indexOnsubject);
+        indexOnsubject.put("object", 10);
+        graph.createEdgeIndex("subject", "i_subject_teacherName_object", indexOnsubject);
+        indexOnsubject.remove("teacherName", 10);
+        graph.createEdgeIndex("subject", "i_subject_object", indexOnsubject);
+        graph.run("REBUILD EDGE INDEX i_work, i_subject, i_subject_teacherName, i_subject_object, "
+            + "i_subject_teacherName_object");
+        graph.createTagIndex("hobby", "i_hobby", null);
+        HashMap<String, Integer> indexOnperson = new HashMap<>();
+        graph.createTagIndex("person", "i_person", null);
+        indexOnperson.put("name", 10);
+        graph.createTagIndex("person", "i_person_name", indexOnperson);
+        indexOnperson.put("age", null);
+        graph.createTagIndex("person", "i_person_name_age", indexOnperson);
+        indexOnperson.remove("name", 10);
+        graph.createTagIndex("person", "i_person_age", indexOnperson);
+        graph.run("REBUILD TAG INDEX i_hobby, i_person_name, i_person, i_person_name_age, "
+            + "i_person_age");
     }
 
     @Test
@@ -96,15 +96,15 @@ public class TestMatchRelationship extends TestDataBase {
     @Test
     public void testMatchOutDirectionByEdge() throws UnsupportedEncodingException {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
-        HashMap<String, Object> edgeByTeam = new HashMap<>();
-        edgeByTeam.put("teacherName", "qkm");
-        RelationshipMatch team = relationshipMatcher.match(null, null, null, null,
-            EdgeDirection.OUT, edgeByTeam, "team");
-        ResultSet work = team.all();
+        HashMap<String, Object> edgeBysubject = new HashMap<>();
+        edgeBysubject.put("teacherName", "qkm");
+        RelationshipMatch subject = relationshipMatcher.match(null, null, null, null,
+            EdgeDirection.OUT, edgeBysubject, "subject");
+        ResultSet work = subject.all();
         List<ValueWrapper> edges = work.colValues("e");
         Relationship relationship = edges.get(0).asRelationship();
-        assert team.exist();
-        assert team.count() == 2;
+        assert subject.exist();
+        assert subject.count() == 2;
         assert relationship.srcId().asLong() == 1
             && relationship.dstId().asLong() == 2
             && relationship.properties().get("object").asString().equals("math");
@@ -117,18 +117,18 @@ public class TestMatchRelationship extends TestDataBase {
     @Test
     public void testMatchByEdgeNameAddWhere() {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
-        RelationshipMatch team = relationshipMatcher.match(null, null, null, null,
-            EdgeDirection.OUT, null, "team");
-        ResultSet work = team.where(null, "e.teacherName == \"sy\"").all();
-        assert !team.exist();
-        assert team.count() == 0;
+        RelationshipMatch subject = relationshipMatcher.match(null, null, null, null,
+            EdgeDirection.OUT, null, "subject");
+        ResultSet work = subject.where(null, "e.teacherName == \"sy\"").all();
+        assert !subject.exist();
+        assert subject.count() == 0;
     }
 
     @Test
     public void testMatchByEdgeNameAddSrcTagNameAddWhere() throws UnsupportedEncodingException {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
-        RelationshipMatch match = relationshipMatcher.match("QKM2", null, null, null,
-            EdgeDirection.OUT, null, "team");
+        RelationshipMatch match = relationshipMatcher.match("person", null, null, null,
+            EdgeDirection.OUT, null, "subject");
         ResultSet work = match.where(null, "v.name == \"sc\"").all();
         List<ValueWrapper> edges = work.colValues("e");
         Relationship relationship = edges.get(0).asRelationship();
@@ -150,8 +150,8 @@ public class TestMatchRelationship extends TestDataBase {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
         HashMap<String, Object> tag = new HashMap<>();
         tag.put("name", "qkm");
-        RelationshipMatch match = relationshipMatcher.match("QKM2", tag, null, null,
-            EdgeDirection.OUT, null, "team");
+        RelationshipMatch match = relationshipMatcher.match("person", tag, null, null,
+            EdgeDirection.OUT, null, "subject");
         ResultSet work = match.where(null, "v.age == 19").all();
         List<ValueWrapper> edges = work.colValues("e");
         Relationship relationship = edges.get(0).asRelationship();
@@ -166,8 +166,8 @@ public class TestMatchRelationship extends TestDataBase {
     public void testMatchByEdgeNameAddSrcTagNameAddDstTagNameAddWhere()
         throws UnsupportedEncodingException {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
-        RelationshipMatch match = relationshipMatcher.match("QKM2", null, "QKM1", null,
-            EdgeDirection.OUT, null, "team");
+        RelationshipMatch match = relationshipMatcher.match("person", null, "hobby", null,
+            EdgeDirection.OUT, null, "subject");
         ResultSet work = match.where(null, "v.name == \"sc\" and v1.name == \"sy\"").all();
         List<ValueWrapper> edges = work.colValues("e");
         Relationship relationship = edges.get(0).asRelationship();
@@ -181,8 +181,8 @@ public class TestMatchRelationship extends TestDataBase {
     @Test
     public void testMatchMultipleEdgeNameAddWhere() throws UnsupportedEncodingException {
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
-        RelationshipMatch match = relationshipMatcher.match("QKM2", null, null, null,
-            EdgeDirection.OUT, null, "team", "work");
+        RelationshipMatch match = relationshipMatcher.match("person", null, null, null,
+            EdgeDirection.OUT, null, "subject", "work");
         ResultSet work = match.where(null, "v.name == \"qkm\"").all();
         List<ValueWrapper> edges = work.colValues("e");
         Relationship relationship = edges.get(0).asRelationship();
@@ -203,8 +203,8 @@ public class TestMatchRelationship extends TestDataBase {
         Column column = new Column("v.name", "name");
         orderBy.put(column, Sort.DESC);
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
-        RelationshipMatch match = relationshipMatcher.match("QKM1", null, null, null,
-            EdgeDirection.OUT, null, "team");
+        RelationshipMatch match = relationshipMatcher.match("hobby", null, null, null,
+            EdgeDirection.OUT, null, "subject");
         ResultSet work = match.where(null).orderBy(orderBy, null, null).all();
         List<ValueWrapper> edges = work.colValues("name");
         assert match.exist();
@@ -225,8 +225,8 @@ public class TestMatchRelationship extends TestDataBase {
         Column aggregateColumn = new Column(AggregateFunction.COUNT.setValue("*"), "count");
         aggregateFunctions.add(aggregateColumn);
         RelationshipMatcher relationshipMatcher = new RelationshipMatcher(graph);
-        RelationshipMatch match = relationshipMatcher.match("QKM1", null, null, null,
-            EdgeDirection.OUT, null, "team");
+        RelationshipMatch match = relationshipMatcher.match("hobby", null, null, null,
+            EdgeDirection.OUT, null, "subject");
         ResultSet work = match.where(null).orderBy(orderBy, null, null)
             .groupBy(groupBy, aggregateFunctions).all();
         assert match.exist();

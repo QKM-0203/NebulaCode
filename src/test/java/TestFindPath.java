@@ -23,9 +23,9 @@ import org.junit.Test;
  */
 public class TestFindPath extends TestDataBase {
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(person);
+        graph.createTag(hobby);
+        graph.createEdge(subject);
         graph.createEdge(work);
         graph.create(vertexOne);
         graph.create(vertexTwo);
@@ -46,7 +46,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.ALL, srcIds, dstIds, edgeNames);
@@ -67,12 +67,12 @@ public class TestFindPath extends TestDataBase {
             && relationship1.srcId().asLong() == 1
             && relationship1.dstId().asLong() == 2
             && relationship1.ranking() == 1
-            && relationship1.edgeName().equals("team");
+            && relationship1.edgeName().equals("subject");
         Relationship relationship2 = relationships1.get(1);
         assert relationship2.srcId().asLong() == 2
             && relationship2.dstId().asLong() == 3
             && relationship2.ranking() == 0
-            && relationship2.edgeName().equals("team");
+            && relationship2.edgeName().equals("subject");
         List<Relationship> relationships2 = path.get(2).asPath().getRelationships();
         Relationship relationship3 = relationships2.get(0);
         assert relationships2.size() == 3
@@ -89,7 +89,7 @@ public class TestFindPath extends TestDataBase {
         assert relationship5.srcId().asLong() == 2
             && relationship5.dstId().asLong() == 3
             && relationship5.ranking() == 0
-            && relationship5.edgeName().equals("team");
+            && relationship5.edgeName().equals("subject");
     }
 
     @Test
@@ -99,7 +99,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.ALL, srcIds, dstIds, edgeNames);
@@ -123,7 +123,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.ALL, srcIds, dstIds, edgeNames);
@@ -141,7 +141,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.ALL, srcIds, dstIds, edgeNames);
@@ -162,12 +162,12 @@ public class TestFindPath extends TestDataBase {
             && relationship1.srcId().asLong() == 1
             && relationship1.dstId().asLong() == 2
             && relationship1.ranking() == 1
-            && relationship1.edgeName().equals("team");
+            && relationship1.edgeName().equals("subject");
         Relationship relationship2 = relationships1.get(1);
         assert relationship2.srcId().asLong() == 2
             && relationship2.dstId().asLong() == 3
             && relationship2.ranking() == 0
-            && relationship2.edgeName().equals("team");
+            && relationship2.edgeName().equals("subject");
     }
 
     @Test
@@ -177,7 +177,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.ALL, srcIds, dstIds, edgeNames);
@@ -201,7 +201,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.SHORTEST, srcIds, dstIds, edgeNames);
@@ -225,7 +225,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.NOLOOP, srcIds, dstIds, edgeNames);
@@ -246,12 +246,12 @@ public class TestFindPath extends TestDataBase {
             && relationship1.srcId().asLong() == 1
             && relationship1.dstId().asLong() == 2
             && relationship1.ranking() == 1
-            && relationship1.edgeName().equals("team");
+            && relationship1.edgeName().equals("subject");
         Relationship relationship2 = relationships1.get(1);
         assert relationship2.srcId().asLong() == 2
             && relationship2.dstId().asLong() == 3
             && relationship2.ranking() == 0
-            && relationship2.edgeName().equals("team");
+            && relationship2.edgeName().equals("subject");
     }
 
     @Test
@@ -261,7 +261,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.NOLOOP, srcIds, dstIds, edgeNames);
@@ -275,12 +275,12 @@ public class TestFindPath extends TestDataBase {
             && relationship.srcId().asLong() == 1
             && relationship.dstId().asLong() == 2
             && relationship.ranking() == 1
-            && relationship.edgeName().equals("team");
+            && relationship.edgeName().equals("subject");
         Relationship relationship1 = relationships.get(1);
         assert relationship1.srcId().asLong() == 2
             && relationship1.dstId().asLong() == 3
             && relationship1.ranking() == 0
-            && relationship1.edgeName().equals("team");
+            && relationship1.edgeName().equals("subject");
         List<Relationship> relationships1 = path.get(1).asPath().getRelationships();
         Relationship relationship2 = relationships1.get(0);
         assert relationships1.size() == 1
@@ -298,7 +298,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.NOLOOP, srcIds, dstIds, edgeNames);
@@ -320,7 +320,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(3);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         ArrayList<Integer> srcIds = new ArrayList<>();
@@ -338,7 +338,7 @@ public class TestFindPath extends TestDataBase {
         srcIds.add(1);
         ArrayList<Integer> dstIds = new ArrayList<>();
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(PathType.NOLOOP, srcIds, dstIds, edgeNames);
@@ -356,7 +356,7 @@ public class TestFindPath extends TestDataBase {
         ArrayList<Integer> dstIds = new ArrayList<>();
         dstIds.add(2);
         ArrayList<String> edgeNames = new ArrayList<>();
-        edgeNames.add("team");
+        edgeNames.add("subject");
         edgeNames.add("work");
         FinderPath finderPath = new FinderPath(graph);
         FindPath findPath = finderPath.find(null, srcIds, dstIds, edgeNames);

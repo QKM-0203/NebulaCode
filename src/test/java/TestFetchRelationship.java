@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public class TestFetchRelationship extends TestDataBase {
     {
-        graph.createEdge(team);
+        graph.createEdge(subject);
         graph.createEdge(work);
         graph.create(relationship12);
         graph.create(relationship32);
@@ -50,7 +50,7 @@ public class TestFetchRelationship extends TestDataBase {
     public void testFetchMultipleEdge1() throws UnsupportedEncodingException {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
         ArrayList<Relationship> relationships = new ArrayList<>();
-        Relationship relationship34 = new Relationship(3, 4, "team", 1);
+        Relationship relationship34 = new Relationship(3, 4, "subject", 1);
         relationships.add(relationship12);
         relationships.add(relationship24);
         relationships.add(relationship34);
@@ -73,7 +73,7 @@ public class TestFetchRelationship extends TestDataBase {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
         ArrayList<Relationship> relationships = new ArrayList<>();
         Relationship relationship12 = new Relationship(1, 2, "work", 1);
-        Relationship relationship34 = new Relationship(3, 4, "team", 1);
+        Relationship relationship34 = new Relationship(3, 4, "subject", 1);
         relationships.add(relationship12);
         relationships.add(relationship24);
         relationships.add(relationship34);
@@ -89,15 +89,15 @@ public class TestFetchRelationship extends TestDataBase {
     public void testFetchEdgeAddYield() throws UnsupportedEncodingException {
         FetcherEdge fetcherEdge = new FetcherEdge(graph);
         FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationship12);
-        ResultSet one = fetchEdge.yield("team.teacherName as name").one();
+        ResultSet one = fetchEdge.yield("subject.teacherName as name").one();
         assert one.rowsSize() == 1;
         assert fetchEdge.exist();
         assert fetchEdge.count() == 1;
-        List<ValueWrapper> srcId = one.colValues("team._src");
+        List<ValueWrapper> srcId = one.colValues("subject._src");
         assert srcId.get(0).asLong() == 1;
-        List<ValueWrapper> dstId = one.colValues("team._dst");
+        List<ValueWrapper> dstId = one.colValues("subject._dst");
         assert dstId.get(0).asLong() == 2;
-        List<ValueWrapper> rank = one.colValues("team._rank");
+        List<ValueWrapper> rank = one.colValues("subject._rank");
         assert rank.get(0).asLong() == 1;
         List<ValueWrapper> name = one.colValues("name");
         assert name.get(0).asString().equals("qkm");
@@ -112,24 +112,24 @@ public class TestFetchRelationship extends TestDataBase {
         FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationships);
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("name", Sort.DESC);
-        ResultSet one = fetchEdge.yield("team.teacherName as name")
+        ResultSet one = fetchEdge.yield("subject.teacherName as name")
             .limit(0, 2).orderBy(null, orderBy,null).one();
         assert one.rowsSize() == 2;
         assert fetchEdge.exist();
         assert fetchEdge.count() == 2;
-        List<ValueWrapper> srcId1 = one.colValues("team._src");
+        List<ValueWrapper> srcId1 = one.colValues("subject._src");
         assert srcId1.get(0).asLong() == 2;
-        List<ValueWrapper> dstId1 = one.colValues("team._dst");
+        List<ValueWrapper> dstId1 = one.colValues("subject._dst");
         assert dstId1.get(0).asLong() == 4;
-        List<ValueWrapper> rank1 = one.colValues("team._rank");
+        List<ValueWrapper> rank1 = one.colValues("subject._rank");
         assert rank1.get(0).asLong() == 1;
         List<ValueWrapper> name1 = one.colValues("name");
         assert name1.get(0).asString().equals("sc");
-        List<ValueWrapper> srcId2 = one.colValues("team._src");
+        List<ValueWrapper> srcId2 = one.colValues("subject._src");
         assert srcId2.get(1).asLong() == 1;
-        List<ValueWrapper> dstId2 = one.colValues("team._dst");
+        List<ValueWrapper> dstId2 = one.colValues("subject._dst");
         assert dstId2.get(1).asLong() == 2;
-        List<ValueWrapper> rank = one.colValues("team._rank");
+        List<ValueWrapper> rank = one.colValues("subject._rank");
         assert rank.get(1).asLong() == 1;
         List<ValueWrapper> name2 = one.colValues("name");
         assert name2.get(1).asString().equals("qkm");
@@ -141,7 +141,7 @@ public class TestFetchRelationship extends TestDataBase {
         Relationship relationship12 = new Relationship(1, 2, null, 1);
         FetchEdge fetchEdge = fetcherEdge.fetchEdge(relationship12);
         try {
-            ResultSet one = fetchEdge.yield("team.teacherName as name").one();
+            ResultSet one = fetchEdge.yield("subject.teacherName as name").one();
         } catch (Exception e) {
             assert e.getMessage().equals("edgeName of (1)-[:null@1{}]->(2) is null");
         }

@@ -56,9 +56,9 @@ public class TestPath extends TestDataBase {
         try {
             Path path = new Path(segments);
         } catch (Exception e) {
-            assert e.getMessage().equals("(1)-[:team@1{teacherName: \"qkm\", "
-                + "object: \"math\"}]->(2)" + " can not connect (3 :QKM2{name: \"sy\","
-                + " birth: 2001-08-13 06:12:12:123, age: 20} :QKM1{})");
+            assert e.getMessage().equals("(1)-[:subject@1{teacherName: \"qkm\", "
+                + "object: \"math\"}]->(2)" + " can not connect (3 :person{name: \"sy\","
+                + " birth: 2001-08-13 06:12:12:123, age: 20} :hobby{})");
         }
     }
 
@@ -70,8 +70,8 @@ public class TestPath extends TestDataBase {
         try {
             Path path = new Path(segments);
         } catch (Exception e) {
-            assert e.getMessage().equals("(1 :QKM2{name: \"qkm\", birth: 2002-02-03 06:12:12:123,"
-                + " age: 19} :QKM1{})" + " can not connect (3)-[:work@1{}]->(2)");
+            assert e.getMessage().equals("(1 :person{name: \"qkm\", birth: 2002-02-03 06:12:12:123,"
+                + " age: 19} :hobby{})" + " can not connect (3)-[:work@1{}]->(2)");
         }
     }
 
@@ -85,12 +85,12 @@ public class TestPath extends TestDataBase {
         try {
             Path path = new Path(segments);
         } catch (Exception e) {
-            assert e.getMessage().equals("(2 :QKM2{name: \"sc\","
-                + " birth: 2001-04-07 06:12:12:123, age: 19} :QKM1{})"
-                + " can not connect Segment{startVertex=(3 :QKM2{name: \"sy\", "
-                + "birth: 2001-08-13 06:12:12:123, age: 20} :QKM1{}), "
-                + "endVertex=(4 :QKM2{name: \"yq\", birth: 1999-12-25 06:12:12:123, "
-                + "age: 21} :QKM1{}), " + "relationship=(3)-[:work@1{}]->(4)}");
+            assert e.getMessage().equals("(2 :person{name: \"sc\","
+                + " birth: 2001-04-07 06:12:12:123, age: 19} :hobby{})"
+                + " can not connect Segment{startVertex=(3 :person{name: \"sy\", "
+                + "birth: 2001-08-13 06:12:12:123, age: 20} :hobby{}), "
+                + "endVertex=(4 :person{name: \"yq\", birth: 1999-12-25 06:12:12:123, "
+                + "age: 21} :hobby{}), " + "relationship=(3)-[:work@1{}]->(4)}");
         }
     }
 

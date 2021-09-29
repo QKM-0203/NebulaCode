@@ -15,9 +15,9 @@ import org.junit.Test;
  */
 public class TestGet extends TestDataBase {
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(person);
+        graph.createTag(hobby);
+        graph.createEdge(subject);
         graph.createEdge(work);
         graph.create(vertexOne);
         graph.create(vertexTwo);
@@ -51,13 +51,13 @@ public class TestGet extends TestDataBase {
 
     @Test//you first execute submit job stats
     public void testGetDesignatedVertexNumber() throws UnsupportedEncodingException {
-        long number = graph.vertexNumber("QKM1");
+        long number = graph.vertexNumber("hobby");
         assert number == 4;
     }
 
     @Test//you first execute submit job stats
     public void testGetAllDesignatedEdgesNumber() throws UnsupportedEncodingException {
-        long number = graph.relationshipNumber("team");
+        long number = graph.relationshipNumber("subject");
         assert number == 3;
     }
 }

@@ -21,9 +21,9 @@ import org.junit.Test;
 public class TestCreate extends TestDataBase {
 
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(hobby);
+        graph.createTag(person);
+        graph.createEdge(subject);
         graph.createEdge(work);
     }
 
@@ -75,32 +75,33 @@ public class TestCreate extends TestDataBase {
 
     @Test
     public void testCreateHasExpiredSchema() {
-        Schema tag = new Schema("QKM3", tagProperties, 1000, "age");
-        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        Schema tag = new Schema("expiredPerson", personSchema, 1000, "age");
+        Schema edge = new Schema("expiredTeam", subjectSchema, 2000, "teacherName");
         graph.createEdge(edge);
         graph.createTag(tag);
-        System.out.println(graph.getEdges());
         assert graph.getEdges().contains(edge.getName());
         assert graph.getTags().contains(tag.getName());
     }
 
     @Test
     public void createEdgeIndex() throws UnsupportedEncodingException {
-        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        Schema edge = new Schema("indexTeam", subjectSchema);
         graph.createEdge(edge);
-        HashMap<String, Integer> edgeIndexes = new HashMap<>();
-        edgeIndexes.put("teacherName", 10);
-        edgeIndexes.put("object", 10);
-        graph.createEdgeIndex("QKM4", "i_QKM4_teacherName_object", edgeIndexes);
-        assert graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object");
+        HashMap<String, Integer> teamIndexes = new HashMap<>();
+        teamIndexes.put("teacherName", 10);
+        teamIndexes.put("object", 10);
+        graph.createEdgeIndex("indexTeam", "i_indexTeam_teacherName_object", teamIndexes);
+        assert graph.getEdgeIndexes("indexTeam").contains("i_indexTeam_teacherName_object");
     }
 
     @Test
     public void createTagIndex() throws UnsupportedEncodingException {
-        Schema tag = new Schema("QKM3", tagProperties, 0, null);
+        Schema tag = new Schema("indexPerson", personSchema);
         graph.createTag(tag);
-        graph.createTagIndex("QKM3", "i_QKM3", null);
-        assert graph.getTagIndexes("QKM3").contains("i_QKM3");
+        HashMap<String, Integer> personIndexes = new HashMap<>();
+        personIndexes.put("name", 10);
+        graph.createTagIndex("indexPerson", "i_indexPerson_name", personIndexes);
+        assert graph.getTagIndexes("indexPerson").contains("i_indexPerson_name");
     }
 
     @Test

@@ -16,9 +16,9 @@ import org.junit.Test;
  */
 public class TestRun extends TestDataBase {
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(person);
+        graph.createTag(hobby);
+        graph.createEdge(subject);
         graph.createEdge(work);
         graph.create(vertexOne);
         graph.create(vertexTwo);
@@ -58,7 +58,7 @@ public class TestRun extends TestDataBase {
 
     @Test
     public void testRunCreateEdge() {
-        ResultSet run = graph.run("CREATE EDGE IF NOT EXISTS team(name string)");
+        ResultSet run = graph.run("CREATE EDGE IF NOT EXISTS subject(name string)");
         assert run.isSucceeded();
     }
 
@@ -86,39 +86,39 @@ public class TestRun extends TestDataBase {
 
     @Test
     public void testRunMatchVertex() {
-        HashMap<String, Integer> indexOnQKM2 = new HashMap<>();
-        indexOnQKM2.put("name", 10);
-        graph.createTagIndex("QKM2", "i_QKM2_name", indexOnQKM2);
-        graph.run("REBUILD TAG INDEX i_QKM2_mame");
-        ResultSet run = graph.run("MATCH (v:QKM2{name: \"qkm\"}) RETURN v");
+        HashMap<String, Integer> indexOnperson = new HashMap<>();
+        indexOnperson.put("name", 10);
+        graph.createTagIndex("person", "i_person_name", indexOnperson);
+        graph.run("REBUILD TAG INDEX i_person_mame");
+        ResultSet run = graph.run("MATCH (v:person{name: \"qkm\"}) RETURN v");
         assert run.isSucceeded();
     }
 
     @Test
     public void testRunMatchRelationship() {
-        graph.createTagIndex("QKM2", "i_QKM2", null);
-        graph.run("REBUILD TAG INDEX i_QKM2");
-        ResultSet run = graph.run("MATCH (v:QKM2)-[e:team]->(v1) RETURN e");
+        graph.createTagIndex("person", "i_person", null);
+        graph.run("REBUILD TAG INDEX i_person");
+        ResultSet run = graph.run("MATCH (v:person)-[e:subject]->(v1) RETURN e");
         assert run.isSucceeded();
     }
 
     @Test
     public void testRunLookUp() {
-        graph.createEdgeIndex("team", "i_team", null);
-        graph.run("REBUILD TAG INDEX i_team");
-        ResultSet run = graph.run("LOOKUP ON team YIELD team.object");
+        graph.createEdgeIndex("subject", "i_subject", null);
+        graph.run("REBUILD TAG INDEX i_subject");
+        ResultSet run = graph.run("LOOKUP ON subject YIELD subject.object");
         assert run.isSucceeded();
     }
 
     @Test
     public void testRunFetchVertex() {
-        ResultSet run = graph.run("FETCH PROP ON QKM2 1 YIELD QKM2.name");
+        ResultSet run = graph.run("FETCH PROP ON person 1 YIELD person.name");
         assert run.isSucceeded();
     }
 
     @Test
     public void testRunFetchRelationship() {
-        ResultSet run = graph.run("FETCH PROP ON team 1->2,3->4 YIELD team.object");
+        ResultSet run = graph.run("FETCH PROP ON subject 1->2,3->4 YIELD subject.object");
         assert run.isSucceeded();
     }
 
@@ -136,7 +136,7 @@ public class TestRun extends TestDataBase {
 
     @Test
     public void testRunGo() {
-        ResultSet run = graph.run("GO 0 TO 1 STEPS FROM 1,2,3 OVER * YIELD team.object as object "
+        ResultSet run = graph.run("GO 0 TO 1 STEPS FROM 1,2,3 OVER * YIELD subject.object as object "
             + "| ORDER BY object | GROUP BY $-.object YIELD $-.object AS object,COUNT(*) AS count "
             + "| ORDER BY object");
         assert run.isSucceeded();

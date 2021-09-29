@@ -11,7 +11,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.junit.Test;
 
 /**
@@ -22,9 +21,9 @@ import org.junit.Test;
 public class TestDelete extends TestDataBase {
 
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(hobby);
+        graph.createTag(person);
+        graph.createEdge(subject);
         graph.createEdge(work);
     }
 
@@ -78,54 +77,52 @@ public class TestDelete extends TestDataBase {
 
     @Test
     public void deleteTag() {
-        Schema tag = new Schema("QKM3", tagProperties, 0, null);
+        Schema tag = new Schema("deletePerson", personSchema, 0, null);
         graph.createTag(tag);
         assert graph.getTags().contains(tag.getName());
         ArrayList<String> tagList = new ArrayList<>();
-        tagList.add("QKM3");
-        graph.dropTagIndex("i_QKM3");//first delete tagIndex
+        tagList.add("deletePerson");
         graph.dropTagList(tagList);
-        graph.dropTag("QKM3");
+        graph.dropTag("deletePerson");
         assert !graph.getTags().contains(tag.getName());
     }
 
     @Test
     public void deleteEdge() {
-        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        Schema edge = new Schema("deleteTeam", subjectSchema, 0, null);
         graph.createEdge(edge);
         assert graph.getEdges().contains(edge.getName());
         ArrayList<String> edgeList = new ArrayList<>();
-        edgeList.add("QKM4");
-        graph.dropEdgeIndex("i_QKM4_teacherName_object");//first delete edgeIndex
+        edgeList.add("deleteTeam");
         graph.dropEdgeList(edgeList);
-        graph.dropEdge("QKM4");
+        graph.dropEdge("deleteTeam");
         assert !graph.getEdges().contains(edge.getName());
     }
 
     @Test
     public void deleteEdgeIndex() throws UnsupportedEncodingException {
-        Schema edge = new Schema("QKM4", edgeProperties, 0, null);
+        Schema edge = new Schema("deleteTeamIndex", subjectSchema, 0, null);
         graph.createEdge(edge);
         HashMap<String, Integer> edgeIndexes = new HashMap<>();
         edgeIndexes.put("teacherName", 10);
-        graph.createEdgeIndex("QKM4", "i_QKM4_teacherName", edgeIndexes);
+        graph.createEdgeIndex("deleteTeamIndex", "i_deleteTeamIndex_teacherName", edgeIndexes);
         edgeIndexes.put("object", 10);
-        graph.createEdgeIndex("QKM4", "i_QKM4_teacherName_object", edgeIndexes);
-        assert graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object")
-            && graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName");
-        graph.dropEdgeIndex("i_QKM4_teacherName_object");
-        assert !graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName_object")
-            && graph.getEdgeIndexes("QKM4").contains("i_QKM4_teacherName");
+        graph.createEdgeIndex("deleteTeamIndex", "i_deleteTeamIndex_teacherName_object", edgeIndexes);
+        assert graph.getEdgeIndexes("deleteTeamIndex").contains("i_deleteTeamIndex_teacherName_object")
+            && graph.getEdgeIndexes("deleteTeamIndex").contains("i_deleteTeamIndex_teacherName");
+        graph.dropEdgeIndex("i_deleteTeamIndex_teacherName_object");
+        assert !graph.getEdgeIndexes("deleteTeamIndex").contains("i_deleteTeamIndex_teacherName_object")
+            && graph.getEdgeIndexes("deleteTeamIndex").contains("i_deleteTeamIndex_teacherName");
     }
 
     @Test
     public void deleteTagIndex() throws UnsupportedEncodingException {
-        Schema tag = new Schema("QKM3", tagProperties, 0, null);
+        Schema tag = new Schema("deletePersonIndex", personSchema, 0, null);
         graph.createTag(tag);
-        graph.createTagIndex("QKM3", "i_QKM3", null);
-        assert graph.getTagIndexes("QKM3").contains("i_QKM3");
-        graph.dropTagIndex("i_QKM3");
-        assert graph.getTagIndexes("QKM3") == null;
+        graph.createTagIndex("deletePersonIndex", "i_deletePersonIndex", null);
+        assert graph.getTagIndexes("deletePersonIndex").contains("i_deletePersonIndex");
+        graph.dropTagIndex("i_deletePersonIndex");
+        assert graph.getTagIndexes("deletePersonIndex") == null;
     }
 
 }

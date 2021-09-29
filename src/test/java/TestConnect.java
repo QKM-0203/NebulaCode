@@ -16,7 +16,7 @@ public class TestConnect {
         GraphService graphService = new GraphService(
             Arrays.asList(new HostAddress("127.0.0.1", 9669),
                 new HostAddress("127.0.0.1", 9898)),
-            "root", "nebula", false);
+            "root", "nebula", true);
         Graph test = graphService.getGraph("test");
         assert test != null;
     }

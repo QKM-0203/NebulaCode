@@ -25,54 +25,54 @@ import org.junit.Test;
 public class TestMatchVertex extends TestDataBase {
 
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
+        graph.createTag(person);
+        graph.createTag(hobby);
         graph.create(vertexOne);
         graph.create(vertexTwo);
         graph.create(vertexThird);
         graph.create(vertexFour);
-        graph.createTagIndex("QKM1", "i_QKM1", null);
-        HashMap<String, Integer> indexOnQKM2 = new HashMap<>();
-        graph.createTagIndex("QKM2", "i_QKM2", null);
-        indexOnQKM2.put("name", 10);
-        graph.createTagIndex("QKM2", "i_QKM2_name", indexOnQKM2);
-        indexOnQKM2.put("age", null);
-        graph.createTagIndex("QKM2", "i_QKM2_name_age", indexOnQKM2);
-        indexOnQKM2.remove("name", 10);
-        graph.createTagIndex("QKM2", "i_QKM2_age", indexOnQKM2);
-        graph.run("REBUILD TAG INDEX i_QKM1, i_QKM2_name, i_QKM2, i_QKM2_name_age, "
-            + "i_QKM2_age");
+        graph.createTagIndex("hobby", "i_hobby", null);
+        HashMap<String, Integer> indexOnperson = new HashMap<>();
+        graph.createTagIndex("person", "i_person", null);
+        indexOnperson.put("name", 10);
+        graph.createTagIndex("person", "i_person_name", indexOnperson);
+        indexOnperson.put("age", null);
+        graph.createTagIndex("person", "i_person_name_age", indexOnperson);
+        indexOnperson.remove("name", 10);
+        graph.createTagIndex("person", "i_person_age", indexOnperson);
+        graph.run("REBUILD TAG INDEX i_hobby, i_person_name, i_person, i_person_name_age, "
+            + "i_person_age");
     }
 
     @Test
     public void testMatchByTagName() throws UnsupportedEncodingException {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm1 = vertexMatcher.match("QKM1", null);
-        ResultSet matchByTagQKM1 = qkm1.all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm1.exist();
-        assert qkm1.count() == 4;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("sc");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert nodes.get(2).asNode().properties("QKM2").get("name").asString().equals("sy");
-        assert nodes.get(3).asNode().properties("QKM2").get("name").asString().equals("yq");
+        VertexMatch hobby = vertexMatcher.match("hobby", null);
+        ResultSet matchByTaghobby = hobby.all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert hobby.exist();
+        assert hobby.count() == 4;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("sc");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("qkm");
+        assert nodes.get(2).asNode().properties("person").get("name").asString().equals("sy");
+        assert nodes.get(3).asNode().properties("person").get("name").asString().equals("yq");
     }
 
     @Test
     public void testMatchCount() {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm1 = vertexMatcher.match("QKM1", null);
-        ResultSet matchByTagQKM1 = qkm1.all();
-        assert qkm1.exist();
-        List<ValueWrapper> nodeWrapper = matchByTagQKM1.colValues("v");
-        assert nodeWrapper.size() == qkm1.count();
+        VertexMatch hobby = vertexMatcher.match("hobby", null);
+        ResultSet matchByTaghobby = hobby.all();
+        assert hobby.exist();
+        List<ValueWrapper> nodeWrapper = matchByTaghobby.colValues("v");
+        assert nodeWrapper.size() == hobby.count();
     }
 
     @Test
     public void testMatchByTagNameGetFirst() throws UnsupportedEncodingException {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        ResultSet.Record qkm1 = vertexMatcher.match("QKM1", null).first();
-        assert qkm1.get("v").asNode().properties("QKM2").get("name").asString().equals("sc");
+        ResultSet.Record hobby = vertexMatcher.match("hobby", null).first();
+        assert hobby.get("v").asNode().properties("person").get("name").asString().equals("sc");
     }
 
     @Test
@@ -80,14 +80,14 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Object> tag = new HashMap<>();
         tag.put("name", "qkm");
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", tag);
-        ResultSet matchByTagQKM1 = qkm2.all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 1;
+        VertexMatch person = vertexMatcher.match("person", tag);
+        ResultSet matchByTaghobby = person.all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 1;
         Node node = nodes.get(0).asNode();
-        assert node.properties("QKM2").get("name").asString().equals("qkm")
-            && node.properties("QKM2").get("age").asLong() == 19;
+        assert node.properties("person").get("name").asString().equals("qkm")
+            && node.properties("person").get("age").asLong() == 19;
     }
 
     @Test
@@ -95,14 +95,14 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("name", Relational.EQ.setValue("qkm"));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
         Node node = nodes.get(0).asNode();
-        assert qkm2.exist();
-        assert qkm2.count() == 1;
-        assert node.properties("QKM2").get("name").asString().equals("qkm")
-            && node.properties("QKM2").get("age").asLong() == 19;
+        assert person.exist();
+        assert person.count() == 1;
+        assert node.properties("person").get("name").asString().equals("qkm")
+            && node.properties("person").get("age").asLong() == 19;
     }
 
     @Test
@@ -110,17 +110,17 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("age", Relational.LE.setValue(19));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
         Node node = nodes.get(0).asNode();
-        assert qkm2.exist();
-        assert qkm2.count() == 2;
-        assert node.properties("QKM2").get("name").asString().equals("qkm")
-            && node.properties("QKM2").get("age").asLong() == 19;
+        assert person.exist();
+        assert person.count() == 2;
+        assert node.properties("person").get("name").asString().equals("qkm")
+            && node.properties("person").get("age").asLong() == 19;
         Node node1 = nodes.get(1).asNode();
-        assert node1.properties("QKM2").get("name").asString().equals("sc")
-            && node1.properties("QKM2").get("age").asLong() == 19;
+        assert node1.properties("person").get("name").asString().equals("sc")
+            && node1.properties("person").get("age").asLong() == 19;
     }
 
     @Test
@@ -129,14 +129,14 @@ public class TestMatchVertex extends TestDataBase {
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("age", Relational.LE.setValue(19));
         filter.put("name", Relational.EQ.setValue("qkm"));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
         Node node = nodes.get(0).asNode();
-        assert qkm2.exist();
-        assert qkm2.count() == 1;
-        assert node.properties("QKM2").get("name").asString().equals("qkm")
-            && node.properties("QKM2").get("age").asLong() == 19;
+        assert person.exist();
+        assert person.count() == 1;
+        assert node.properties("person").get("name").asString().equals("qkm")
+            && node.properties("person").get("age").asLong() == 19;
     }
 
     @Test
@@ -144,13 +144,13 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("name", Relational.CONTAINS.setValue("q"));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 2;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("yq");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 2;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("yq");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("qkm");
     }
 
     @Test
@@ -158,12 +158,12 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("name", Relational.STARTSWITH.setValue("q"));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 1;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 1;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("qkm");
     }
 
     @Test
@@ -171,12 +171,12 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("name", Relational.ENDSWITH.setValue("q"));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 1;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("yq");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 1;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("yq");
     }
 
     @Test
@@ -188,14 +188,14 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("name", Relational.IN.setValue(nameList));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 3;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("sc");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert nodes.get(2).asNode().properties("QKM2").get("name").asString().equals("sy");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 3;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("sc");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("qkm");
+        assert nodes.get(2).asNode().properties("person").get("name").asString().equals("sy");
     }
 
     @Test
@@ -204,38 +204,38 @@ public class TestMatchVertex extends TestDataBase {
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("age", Logical.AND.setRelational(Relational.GT.setValue(18),
             Relational.LT.setValue(20)));
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 2;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("sc");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 2;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("qkm");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("sc");
     }
 
     @Test
     public void testMatchByTagNameAddWhereString() throws UnsupportedEncodingException {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.name == \"qkm\"").all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(null, "v.name == \"qkm\"").all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
         Node node = nodes.get(0).asNode();
-        assert qkm2.exist();
-        assert qkm2.count() == 1;
-        assert node.properties("QKM2").get("name").asString().equals("qkm")
-            && node.properties("QKM2").get("age").asLong() == 19;
+        assert person.exist();
+        assert person.count() == 1;
+        assert node.properties("person").get("name").asString().equals("qkm")
+            && node.properties("person").get("age").asLong() == 19;
     }
 
     @Test
     public void testMatchByTagNameAddWhereStringLogical() throws UnsupportedEncodingException {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.name == \"qkm\" or v.name ==\"sc\"").all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 2;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("sc");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(null, "v.name == \"qkm\" or v.name ==\"sc\"").all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 2;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("qkm");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("sc");
     }
 
     @Test
@@ -243,15 +243,15 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("name", UnaryOperation.IsNotNull);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 4;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("sc");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert nodes.get(2).asNode().properties("QKM2").get("name").asString().equals("sy");
-        assert nodes.get(3).asNode().properties("QKM2").get("name").asString().equals("yq");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 4;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("sc");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("qkm");
+        assert nodes.get(2).asNode().properties("person").get("name").asString().equals("sy");
+        assert nodes.get(3).asNode().properties("person").get("name").asString().equals("yq");
     }
 
     @Test
@@ -259,48 +259,48 @@ public class TestMatchVertex extends TestDataBase {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
         HashMap<String, Filter> filter = new HashMap<>();
         filter.put("name", UnaryOperation.IsNull);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(filter).all();
-        assert !qkm2.exist();
-        assert qkm2.count() == 0;
-        assert matchByTagQKM1.isEmpty();
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(filter).all();
+        assert !person.exist();
+        assert person.count() == 0;
+        assert matchByTaghobby.isEmpty();
     }
 
     @Test
     public void testMatchByTagNameAddWhereAddLimit() throws UnsupportedEncodingException {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20").limit(2).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 2;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("sc");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(null, "v.age <= 20").limit(2).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 2;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("sc");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("qkm");
     }
 
     @Test
     public void testMatchByTagNameAddWhereAddLimitAddSkip() throws UnsupportedEncodingException {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20").limit(1).skip(2).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 1;
-        assert  nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("sy");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(null, "v.age <= 20").limit(1).skip(2).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 1;
+        assert  nodes.get(0).asNode().properties("person").get("name").asString().equals("sy");
     }
 
     @Test
     public void testMatchByTagNameAddWhereAddIllegalLimitAddIllegalSkip()
         throws UnsupportedEncodingException {
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20").limit(-1).skip(-1).all();
-        List<ValueWrapper> nodes = matchByTagQKM1.colValues("v");
-        assert qkm2.exist();
-        assert qkm2.count() == 3;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("sc");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert nodes.get(2).asNode().properties("QKM2").get("name").asString().equals("sy");
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(null, "v.age <= 20").limit(-1).skip(-1).all();
+        List<ValueWrapper> nodes = matchByTaghobby.colValues("v");
+        assert person.exist();
+        assert person.count() == 3;
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("sc");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("qkm");
+        assert nodes.get(2).asNode().properties("person").get("name").asString().equals("sy");
     }
 
     @Test
@@ -309,12 +309,12 @@ public class TestMatchVertex extends TestDataBase {
         Column column = new Column("v.age", "age");
         orderBy.put(column, Sort.DESC);
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20")
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(null, "v.age <= 20")
             .orderBy(orderBy,null,null).all();
-        List<ValueWrapper> outPut = matchByTagQKM1.colValues("age");
-        assert qkm2.exist();
-        assert qkm2.count() == 3;
+        List<ValueWrapper> outPut = matchByTaghobby.colValues("age");
+        assert person.exist();
+        assert person.count() == 3;
         assert outPut.get(0).asLong() == 20;
         assert outPut.get(1).asLong() == 19;
         assert outPut.get(2).asLong() == 19;
@@ -331,15 +331,15 @@ public class TestMatchVertex extends TestDataBase {
         Column aggregateColumn = new Column(AggregateFunction.COUNT.setValue("*"), "count");
         aggregateFunctions.add(aggregateColumn);
         VertexMatcher vertexMatcher = new VertexMatcher(graph);
-        VertexMatch qkm2 = vertexMatcher.match("QKM2", null);
-        ResultSet matchByTagQKM1 = qkm2.where(null, "v.age <= 20")
+        VertexMatch person = vertexMatcher.match("person", null);
+        ResultSet matchByTaghobby = person.where(null, "v.age <= 20")
             .orderBy(orderBy,null,null)
             .groupBy(groupBy, aggregateFunctions).all();
-        List<ValueWrapper> outPut = matchByTagQKM1.colValues("age");
-        assert qkm2.exist();
-        assert qkm2.count() == 2;
+        List<ValueWrapper> outPut = matchByTaghobby.colValues("age");
+        assert person.exist();
+        assert person.count() == 2;
         assert outPut.get(0).asLong() == 20;
-        List<ValueWrapper> outPut1 = matchByTagQKM1.colValues("count");
+        List<ValueWrapper> outPut1 = matchByTaghobby.colValues("count");
         assert outPut1.get(0).asLong() == 1;
         assert outPut.get(1).asLong() == 19;
         assert outPut1.get(1).asLong() == 2;
@@ -351,7 +351,7 @@ public class TestMatchVertex extends TestDataBase {
         ResultSet.Record vertexByVid = vertexMatcher.getVertexByVid(1);
         ValueWrapper vertex = vertexByVid.get("v");
         assert vertexByVid.size() == 1;
-        assert vertex.asNode().properties("QKM2").get("name").asString().equals("qkm");
+        assert vertex.asNode().properties("person").get("name").asString().equals("qkm");
     }
 
     @Test
@@ -362,12 +362,12 @@ public class TestMatchVertex extends TestDataBase {
         ids.add(2);
         ids.add(3);
         ids.add(9);
-        ResultSet vertexByListVid = vertexMatcher.getVertexByListVid(ids);
+        ResultSet vertexByListVid = vertexMatcher.getVertexByVid(ids);
         List<ValueWrapper> nodes = vertexByListVid.colValues("v");
         assert nodes.size() == 3;
-        assert nodes.get(0).asNode().properties("QKM2").get("name").asString().equals("sc");
-        assert nodes.get(1).asNode().properties("QKM2").get("name").asString().equals("qkm");
-        assert nodes.get(2).asNode().properties("QKM2").get("name").asString().equals("sy");
+        assert nodes.get(0).asNode().properties("person").get("name").asString().equals("sc");
+        assert nodes.get(1).asNode().properties("person").get("name").asString().equals("qkm");
+        assert nodes.get(2).asNode().properties("person").get("name").asString().equals("sy");
     }
 
 }

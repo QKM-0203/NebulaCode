@@ -23,9 +23,9 @@ import org.junit.Test;
  */
 public class TestGo extends TestDataBase {
     {
-        graph.createTag(qkm1);
-        graph.createTag(qkm2);
-        graph.createEdge(team);
+        graph.createTag(person);
+        graph.createTag(hobby);
+        graph.createEdge(subject);
         graph.createEdge(work);
         graph.create(vertexOne);
         graph.create(vertexTwo);
@@ -42,7 +42,7 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoGetDstID() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
@@ -51,7 +51,7 @@ public class TestGo extends TestDataBase {
         ResultSet all = go.all();
         assert go.exist();
         assert go.count() == 3;
-        List<ValueWrapper> dstId = all.colValues("team._dst");
+        List<ValueWrapper> dstId = all.colValues("subject._dst");
         assert dstId.get(0).asLong() == 2;
         assert dstId.get(1).asLong() == 3;
         assert dstId.get(2).asLong() == 4;
@@ -60,7 +60,7 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoReverselyDirectionGetDstID() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
@@ -69,14 +69,14 @@ public class TestGo extends TestDataBase {
         ResultSet all = go.direction(PathDirection.REVERSELY).all();
         assert go.exist();
         assert go.count() == 1;
-        List<ValueWrapper> dstId = all.colValues("team._dst");
+        List<ValueWrapper> dstId = all.colValues("subject._dst");
         assert dstId.get(0).asLong() == 1;
     }
 
     @Test
     public void testGoStepsGetDstID() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         Goer goer = new Goer(graph);
@@ -84,7 +84,7 @@ public class TestGo extends TestDataBase {
         ResultSet all = go.step(0, 2).all();
         assert go.exist();
         assert go.count() == 3;
-        List<ValueWrapper> dstId = all.colValues("team._dst");
+        List<ValueWrapper> dstId = all.colValues("subject._dst");
         assert dstId.get(0).asLong() == 2
             && dstId.get(1).asLong() == 3
             && dstId.get(2).asLong() == 4;
@@ -93,7 +93,7 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoIllegalStepsGetDstID() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         Goer goer = new Goer(graph);
@@ -104,59 +104,59 @@ public class TestGo extends TestDataBase {
         ResultSet all1 = go.step(-1, -1).all();
         assert go.exist();
         assert go.count() == 1;
-        List<ValueWrapper> dstId = all.colValues("team._dst");
-        List<ValueWrapper> dstId1 = all1.colValues("team._dst");
+        List<ValueWrapper> dstId = all.colValues("subject._dst");
+        List<ValueWrapper> dstId1 = all1.colValues("subject._dst");
         assert dstId.get(0).asLong() == dstId1.get(0).asLong();
     }
 
     @Test
     public void testGoGetDstIDAddWhere() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
         HashMap<String, Filter> filter = new HashMap<>();
-        filter.put("$^.QKM2.name", Relational.EQ.setValue("qkm"));
+        filter.put("$^.person.name", Relational.EQ.setValue("qkm"));
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
         ResultSet all = go.where(filter).all();
         assert go.exist();
         assert go.count() == 1;
-        List<ValueWrapper> dstId = all.colValues("team._dst");
+        List<ValueWrapper> dstId = all.colValues("subject._dst");
         assert dstId.get(0).asLong() == 2;
     }
 
     @Test
     public void testGoGetDstIDAddWhere2() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.where(null, "$$.QKM2.name == \"sc\"").all();
+        ResultSet all = go.where(null, "$$.person.name == \"sc\"").all();
         assert go.exist();
         assert go.count() == 1;
-        List<ValueWrapper> dstId = all.colValues("team._dst");
+        List<ValueWrapper> dstId = all.colValues("subject._dst");
         assert dstId.get(0).asLong() == 2;
     }
 
     @Test
     public void testGoGetDstIDAddWhere3() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
         ids.add(3);
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.where(null, "team.teacherName == \"qkm\"").all();
+        ResultSet all = go.where(null, "subject.teacherName == \"qkm\"").all();
         assert go.exist();
         assert go.count() == 2;
-        List<ValueWrapper> dstId = all.colValues("team._dst");
+        List<ValueWrapper> dstId = all.colValues("subject._dst");
         assert dstId.get(0).asLong() == 3;
         assert dstId.get(1).asLong() == 2;
     }
@@ -164,15 +164,15 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoGetDstIDAddWhereYield() throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
         ids.add(3);
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.where(null, "$$.QKM2.age > 19")
-            .yield("team.object as object").all();
+        ResultSet all = go.where(null, "$$.person.age > 19")
+            .yield("subject.object as object").all();
         assert go.exist();
         assert go.count() == 2;
         List<ValueWrapper> object = all.colValues("object");
@@ -183,14 +183,14 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoYield() throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
         ids.add(3);
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.yield("team.object as object").all();
+        ResultSet all = go.yield("subject.object as object").all();
         assert go.exist();
         assert go.count() == 3;
         List<ValueWrapper> object = all.colValues("object");
@@ -202,14 +202,14 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoYieldAddDistinct() throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
         ids.add(3);
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.yieldWithDistinct("team.object as object").all();
+        ResultSet all = go.yieldWithDistinct("subject.object as object").all();
         assert go.exist();
         assert go.count() == 2;
         List<ValueWrapper> object = all.colValues("object");
@@ -220,7 +220,7 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoGetDstIDAddWhereYieldAddOrderBy() throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
@@ -229,8 +229,8 @@ public class TestGo extends TestDataBase {
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("object", null);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.where(null, "$$.QKM2.age > 19")
-            .yield("team.object as object").orderBy(null, orderBy,null).all();
+        ResultSet all = go.where(null, "$$.person.age > 19")
+            .yield("subject.object as object").orderBy(null, orderBy,null).all();
         assert go.exist();
         assert go.count() == 2;
         List<ValueWrapper> object = all.colValues("object");
@@ -242,7 +242,7 @@ public class TestGo extends TestDataBase {
     public void testGoGetDstIDAddWhereYieldAddLimitAddOrderBy()
         throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
@@ -251,8 +251,8 @@ public class TestGo extends TestDataBase {
         HashMap<String, Sort> orderBy = new HashMap<>();
         orderBy.put("object", null);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.where(null, "$$.QKM2.age > 19")
-            .yield("team.object as object").limit(0, 1)
+        ResultSet all = go.where(null, "$$.person.age > 19")
+            .yield("subject.object as object").limit(0, 1)
             .orderBy(null, orderBy,null).all();
         assert go.exist();
         assert go.count() == 1;
@@ -263,7 +263,7 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoGetDstIDAddWhereYieldAddIllegalLimitAddOrderBy() {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
@@ -273,8 +273,8 @@ public class TestGo extends TestDataBase {
         orderBy.put("object", null);
         Go go = goer.go(ids, edges);
         try {
-            ResultSet all = go.where(null, "$$.QKM2.age > 19")
-                .yield("team.object as object").limit(-1, 1)
+            ResultSet all = go.where(null, "$$.person.age > 19")
+                .yield("subject.object as object").limit(-1, 1)
                 .orderBy(null, orderBy,null).all();
         } catch (Exception e) {
            assert e.getMessage().equals("SyntaxError: syntax error near `-1,1  | '");
@@ -284,7 +284,7 @@ public class TestGo extends TestDataBase {
     @Test
     public void testGoGetDstIDYieldAddOrderByAddGroupBy() throws UnsupportedEncodingException {
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(2);
@@ -299,7 +299,7 @@ public class TestGo extends TestDataBase {
         aggregateFunctions.add(aggregateColumn);
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.yield("team.object as object").orderBy(null, orderBy,null)
+        ResultSet all = go.yield("subject.object as object").orderBy(null, orderBy,null)
             .groupBy(groupBy, aggregateFunctions).all();
         assert go.exist();
         assert go.count() == 2;
@@ -327,11 +327,11 @@ public class TestGo extends TestDataBase {
         Column aggregateColumn = new Column(AggregateFunction.COUNT.setValue("*"), "count");
         aggregateFunctions.add(aggregateColumn);
         ArrayList<String> edges = new ArrayList<>();
-        edges.add("team");
+        edges.add("subject");
         edges.add("work");
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, edges);
-        ResultSet all = go.yield("team.object as object").orderBy(null, orderBy,null)
+        ResultSet all = go.yield("subject.object as object").orderBy(null, orderBy,null)
             .groupBy(groupBy, aggregateFunctions).orderBy(null, orderBy,null).all();
         assert go.exist();
         assert go.count() == 3;
@@ -351,7 +351,7 @@ public class TestGo extends TestDataBase {
         Goer goer = new Goer(graph);
         Go go = goer.go(ids, null);
         try {
-            ResultSet all = go.yield("team.object as object").all();
+            ResultSet all = go.yield("subject.object as object").all();
         } catch (Exception e) {
             assert e.getMessage().equals("srcIds can not be null");
         }
